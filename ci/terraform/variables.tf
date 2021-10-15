@@ -8,8 +8,8 @@ variable "environment" {
   type = string
 }
 
-variable "service_domain_name" {
-  default = "auth.ida.digital.cabinet-office.gov.uk"
+variable "base_url" {
+  type = string
 }
 
 variable "aws_region" {
@@ -20,4 +20,16 @@ variable "smoke_test_lambda_zip_file" {
   default     = "../../dist/canary.zip"
   description = "Location of the smoke tester Lambda ZIP file"
   type        = string
+}
+
+variable "username" {
+  type = string
+}
+
+variable "password" {
+  type = string
+}
+
+variable "phone" {
+  type = string
 }
