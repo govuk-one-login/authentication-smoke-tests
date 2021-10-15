@@ -6,6 +6,9 @@
   "author": "Chris Clayson <chris.clayson@digital.cabinet-office.gov.uk>",
   "license": "MIT",
   "scripts": {
-    "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs"
+    "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1008.0"
   }
 }

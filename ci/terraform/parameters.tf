@@ -41,7 +41,6 @@ resource "aws_ssm_parameter" "base_url" {
   name   = "${local.smoke_tester_name}-url"
   type   = "String"
   value  = var.base_url
-  key_id = aws_kms_alias.parameter_store_key_alias.id
 
   tags = local.default_tags
 }
