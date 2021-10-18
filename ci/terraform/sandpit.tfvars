@@ -1,1 +1,6 @@
-environment = "sandpit"
+environment         = "sandpit"
+shared_state_bucket = "digital-identity-dev-tfstate"
+base_url            = "https://api.sandpit.auth.ida.digital.cabinet-office.gov.uk/"
+password            = "af63a07a6a9d8dd081774c9203090cbe562bb55b3e243d9429d65dd05b325a55"
+username            = "digital-identity-tech-team+smoke-tests@digital.cabinet-office.gov.uk"
+phone               = "07700900111"
