@@ -10,4 +10,5 @@ data "terraform_remote_state" "shared" {
 
 locals {
   sms_bucket_name_arn = data.terraform_remote_state.shared.outputs.sms_bucket_name_arn
+  sms_bucket_name = data.terraform_remote_state.shared.outputs.sms_bucket_name
 }
