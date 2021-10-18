@@ -40,7 +40,7 @@ resource "aws_kms_alias" "parameter_store_key_alias" {
 resource "aws_ssm_parameter" "base_url" {
   name   = "${local.smoke_tester_name}-url"
   type   = "String"
-  value  = var.base_url
+  value  = local.account_management_url
 
   tags = local.default_tags
 }

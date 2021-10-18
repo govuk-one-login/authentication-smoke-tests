@@ -1,0 +1,22 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: node
+    tag: 16.8.0-alpine
+    username: ((docker-hub-username))
+    password: ((docker-hub-password))
+inputs:
+  - name: src
+outputs:
+  - name: release-artefacts
+run:
+  path: sh
+  args:
+    - -euc
+    - |
+      apk add zip
+      cd src
+      yarn install && yarn build
+
+      cp dist/canary.zip ../release-artefacts/
