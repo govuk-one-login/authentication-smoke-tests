@@ -75,7 +75,7 @@ resource "aws_ssm_parameter" "phone" {
 resource "aws_ssm_parameter" "sms_bucket" {
   name   = "${local.smoke_tester_name}-bucket"
   type   = "SecureString"
-  value  = var.phone
+  value  = local.sms_bucket_name
   key_id = aws_kms_alias.parameter_store_key_alias.id
 
   tags = local.default_tags
