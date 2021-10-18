@@ -9,11 +9,13 @@ image_resource:
 params:
   DEPLOYER_ROLE_ARN: ((deployer-role-arn-non-prod))
   DEPLOY_ENVIRONMENT: integration
-  STATE_BUCKET: digital-identity-dev-tfstate
-  BASE_URL: https://api.integration.auth.ida.digital.cabinet-office.gov.uk
+  DNS_DEPLOYER_ROLE_ARN: ((deployer-role-arn-production))
+  DNS_STATE_BUCKET: ((dns-state-bucket))
+  DNS_STATE_KEY: ((dns-state-key))
   SMOKETESTER_PASSWORD: ((smoke-tester-password-integration))
   SMOKETESTER_PHONE: ((smoke-tester-phone-integration))
   SMOKETESTER_USERNAME: ((smoke-tester-username-integration))
+  STATE_BUCKET: digital-identity-dev-tfstate
 
 inputs:
   - name: src
@@ -35,8 +37,10 @@ run:
 
       terraform apply -auto-approve \
         -var "deployer_role_arn=${DEPLOYER_ROLE_ARN}" \
+        -var "dns_state_bucket=${DNS_STATE_BUCKET}" \
+        -var "dns_state_key=${DNS_STATE_KEY}" \
+        -var "dns_state_role=${DNS_DEPLOYER_ROLE_ARN}" \
         -var "environment=${DEPLOY_ENVIRONMENT}" \
-        -var "base_url=${BASE_URL}" \
         -var "password=${SMOKETESTER_PASSWORD}" \
         -var "phone=${SMOKETESTER_PHONE}" \
         -var "shared_state_bucket=${STATE_BUCKET}" \

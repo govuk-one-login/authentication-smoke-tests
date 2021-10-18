@@ -1,15 +1,27 @@
-variable "aws_region" {
-  default = "eu-west-2"
+variable "account_management_url" {
+  default = null
 }
 
-variable "base_url" {
-  type = string
+variable "aws_region" {
+  default = "eu-west-2"
 }
 
 variable "deployer_role_arn" {
   default     = ""
   description = "The name of the AWS role to assume, leave blank when running locally"
   type        = string
+}
+
+variable "dns_state_bucket" {
+  type = string
+}
+
+variable "dns_state_key" {
+  type = string
+}
+
+variable "dns_state_role" {
+  type = string
 }
 
 variable "environment" {
