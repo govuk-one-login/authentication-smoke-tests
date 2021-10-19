@@ -60,15 +60,26 @@ variable "smoke_test_lambda_zip_file" {
 }
 
 variable "smoke_test_rate_minutes" {
-  default = 5
+  default     = 5
   description = "Minutes between smoke test executions"
-  type = number
+  type        = number
 }
 
 variable "username" {
   type = string
 }
 
+variable "pagerduty_p1_alerts_endpoint" {
+  type = string
+}
+
+variable "pagerduty_p2_alerts_endpoint" {
+  type = string
+}
+
+variable "pagerduty_cronitor_alerts_endpoint" {
+  type = string
+}
 variable "basic_auth_username" {
   type = string
   default = null
