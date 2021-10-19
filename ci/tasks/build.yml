@@ -21,5 +21,6 @@ run:
 
       cd heartbeat-src
       yarn install && yarn build
+      cd ..
 
       cp dist/*.zip ../release-artefacts/
