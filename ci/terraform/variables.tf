@@ -68,3 +68,13 @@ variable "smoke_test_rate_minutes" {
 variable "username" {
   type = string
 }
+
+variable "basic_auth_username" {
+  type = string
+  default = null
+}
+
+variable "basic_auth_password" {
+  type = string
+  default = null
+}

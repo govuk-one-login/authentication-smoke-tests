@@ -15,6 +15,8 @@ params:
   SMOKETESTER_PASSWORD: ((smoke-tester-password-integration))
   SMOKETESTER_PHONE: ((smoke-tester-phone-integration))
   SMOKETESTER_USERNAME: ((smoke-tester-username-integration))
+  BASIC_AUTH_USERNAME: ((basic-auth-username-integration))
+  BASIC_AUTH_PASSWORD: ((basic-auth-password-integration))
   STATE_BUCKET: digital-identity-dev-tfstate
   CRONITOR_API_KEY: ((cronitor-send-events-api-key))
   CRONITOR_MONITOR_KEY: ((cronitor-monitor-key-integration))
@@ -48,6 +50,8 @@ run:
         -var "heartbeat_lambda_zip_file=../../../smoke-test-release/heartbeat.zip" \
         -var "password=${SMOKETESTER_PASSWORD}" \
         -var "phone=${SMOKETESTER_PHONE}" \
+        -var "basic_auth_username=${BASIC_AUTH_USERNAME}" \
+        -var "basic_auth_password=${BASIC_AUTH_PASSWORD}" \
         -var "shared_state_bucket=${STATE_BUCKET}" \
         -var "smoke_test_lambda_zip_file=../../../smoke-test-release/canary.zip" \
         -var "username=${SMOKETESTER_USERNAME}" \
