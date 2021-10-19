@@ -40,7 +40,7 @@ resource "aws_synthetics_canary" "smoke_tester" {
   }
 
   schedule {
-    expression = "rate(2 minutes)"
+    expression = "rate(${var.smoke_test_rate_minutes} minutes)"
   }
 
   tags = local.default_tags

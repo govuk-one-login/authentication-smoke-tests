@@ -19,4 +19,7 @@ run:
       cd src
       yarn install && yarn build
 
-      cp dist/canary.zip ../release-artefacts/
+      cd heartbeat-src
+      yarn install && yarn build
+
+      cp dist/*.zip ../release-artefacts/
