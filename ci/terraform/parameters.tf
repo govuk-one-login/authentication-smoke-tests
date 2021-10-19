@@ -73,6 +73,7 @@ resource "aws_ssm_parameter" "phone" {
 }
 
 resource "aws_ssm_parameter" "basic_auth_username" {
+  count  = var.environment == "production" ? 0 : 1
   name   = "${local.smoke_tester_name}-basicauth-username"
   type   = "SecureString"
   value  = var.basic_auth_username
@@ -82,6 +83,7 @@ resource "aws_ssm_parameter" "basic_auth_username" {
 }
 
 resource "aws_ssm_parameter" "basic_auth_password" {
+  count  = var.environment == "production" ? 0 : 1
   name   = "${local.smoke_tester_name}-basicauth-password"
   type   = "SecureString"
   value  = var.basic_auth_password
