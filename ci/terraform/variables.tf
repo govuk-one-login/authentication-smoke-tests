@@ -6,6 +6,13 @@ variable "aws_region" {
   default = "eu-west-2"
 }
 
+variable "cronitor_api_key" {
+  type = string
+}
+variable "cronitor_monitor_key" {
+  type = string
+}
+
 variable "deployer_role_arn" {
   default     = ""
   description = "The name of the AWS role to assume, leave blank when running locally"
@@ -28,6 +35,12 @@ variable "environment" {
   type = string
 }
 
+variable "heartbeat_lambda_zip_file" {
+  default     = "../../dist/heartbeat.zip"
+  description = "Location of the heartbeat Lambda ZIP file"
+  type        = string
+}
+
 variable "password" {
   type = string
 }
@@ -44,6 +57,12 @@ variable "smoke_test_lambda_zip_file" {
   default     = "../../dist/canary.zip"
   description = "Location of the smoke tester Lambda ZIP file"
   type        = string
+}
+
+variable "smoke_test_rate_minutes" {
+  default = 5
+  description = "Minutes between smoke test executions"
+  type = number
 }
 
 variable "username" {

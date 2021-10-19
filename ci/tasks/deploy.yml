@@ -16,6 +16,8 @@ params:
   SMOKETESTER_PHONE: ((smoke-tester-phone-integration))
   SMOKETESTER_USERNAME: ((smoke-tester-username-integration))
   STATE_BUCKET: digital-identity-dev-tfstate
+  CRONITOR_API_KEY: ((cronitor-send-events-api-key))
+  CRONITOR_MONITOR_KEY: ((cronitor-monitor-key-integration))
 
 inputs:
   - name: src
@@ -36,6 +38,8 @@ run:
         -backend-config "region=eu-west-2"
 
       terraform apply -auto-approve \
+        -var "cronitor_api_key=${CRONITOR_API_KEY}" \
+        -var "cronitor_monitor_key=${CRONITOR_MONITOR_KEY}" \
         -var "deployer_role_arn=${DEPLOYER_ROLE_ARN}" \
         -var "dns_state_bucket=${DNS_STATE_BUCKET}" \
         -var "dns_state_key=${DNS_STATE_KEY}" \
