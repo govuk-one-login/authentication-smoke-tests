@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "canary_execution" {
     ]
 
     resources = [
-      "arn:aws:logs:eu-west-2:${data.aws_region.current.id}:log-group:/aws/lambda/cwsyn-${local.smoke_tester_name}-*"
+      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwsyn-${local.smoke_tester_name}-*"
     ]
   }
 
@@ -84,7 +84,6 @@ data "aws_iam_policy_document" "sms_bucket_policy" {
 
     actions = [
       "s3:DeleteObject",
-      "s3:ListObjects",
       "s3:ListBucket",
     ]
 
