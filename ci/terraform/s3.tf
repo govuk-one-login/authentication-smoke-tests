@@ -28,7 +28,7 @@ resource "aws_s3_bucket" "smoketest_source_bucket" {
   }
 
   versioning {
-    enabled    = true
+    enabled = true
   }
 
   tags = local.default_tags
@@ -38,6 +38,6 @@ resource "aws_s3_bucket_object" "canary_source" {
   bucket = aws_s3_bucket.smoketest_source_bucket.bucket
   key    = "${var.environment}-smoke-test-canary.zip"
 
-  source = var.smoke_test_lambda_zip_file
+  source      = var.smoke_test_lambda_zip_file
   source_hash = filemd5(var.smoke_test_lambda_zip_file)
 }

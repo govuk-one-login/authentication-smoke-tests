@@ -33,14 +33,14 @@ resource "aws_kms_key" "parameter_store_key" {
 }
 
 resource "aws_kms_alias" "parameter_store_key_alias" {
-  name = "alias/${var.environment}-parameter-store-encryption-key"
+  name          = "alias/${var.environment}-parameter-store-encryption-key"
   target_key_id = aws_kms_key.parameter_store_key.id
 }
 
 resource "aws_ssm_parameter" "base_url" {
-  name   = "${local.smoke_tester_name}-url"
-  type   = "String"
-  value  = local.account_management_url
+  name  = "${local.smoke_tester_name}-url"
+  type  = "String"
+  value = local.account_management_url
 
   tags = local.default_tags
 }
