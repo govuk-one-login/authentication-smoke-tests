@@ -130,5 +130,9 @@ const basicCustomEntryPoint = async () => {
 };
 
 module.exports.handler = async () => {
-  return await basicCustomEntryPoint();
+  try {
+    return await basicCustomEntryPoint();
+  } catch (err) {
+    log.error(err);
+  }
 };
