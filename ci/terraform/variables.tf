@@ -60,7 +60,7 @@ variable "smoke_test_lambda_zip_file" {
 }
 
 variable "smoke_test_rate_minutes" {
-  default     = 5
+  default     = 3
   description = "Minutes between smoke test executions"
   type        = number
 }
