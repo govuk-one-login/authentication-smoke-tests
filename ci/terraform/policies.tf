@@ -85,6 +85,7 @@ data "aws_iam_policy_document" "sms_bucket_policy" {
     actions = [
       "s3:DeleteObject",
       "s3:ListObjects",
+      "s3:ListBucket",
     ]
 
     resources = [
