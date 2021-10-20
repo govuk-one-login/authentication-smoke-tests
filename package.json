@@ -5,9 +5,23 @@
   "repository": "git@github.com:alphagov/di-authentication-smoke-tests.git",
   "license": "MIT",
   "scripts": {
-    "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs"
+    "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs",
+    "pretty": "prettier --write \"*/**/*.{js,json}\"",
+    "lint": "eslint . --ext .js"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true
   },
   "dependencies": {
-    "aws-sdk": "^2.1008.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.1008.0",
+    "prettier": "^2.4.1",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-node": "^11.1.0"
   }
 }
