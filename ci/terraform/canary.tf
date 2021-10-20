@@ -18,6 +18,12 @@ resource "aws_iam_role_policy_attachment" "parameter_policy" {
   role       = aws_iam_role.smoke_tester_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "basic_auth_parameter_policy" {
+  count      = var.environment == "production" ? 0 : 1
+  policy_arn = aws_iam_policy.basic_auth_parameter_policy.arn
+  role       = aws_iam_role.smoke_tester_role.name
+}
+
 resource "aws_synthetics_canary" "smoke_tester" {
   artifact_s3_location = "s3://${aws_s3_bucket.smoketest_artefact_bucket.bucket}"
   execution_role_arn   = aws_iam_role.smoke_tester_role.arn

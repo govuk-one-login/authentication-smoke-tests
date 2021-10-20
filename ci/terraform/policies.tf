@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "canary_execution" {
   }
 
   statement {
-    sid = "AllowS3Publishing"
+    sid    = "AllowS3Publishing"
     effect = "Allow"
 
     actions = [
@@ -114,6 +114,34 @@ data "aws_iam_policy_document" "parameter_policy" {
       aws_ssm_parameter.phone.arn,
       aws_ssm_parameter.sms_bucket.arn,
       aws_ssm_parameter.username.arn,
+    ]
+  }
+  statement {
+    sid    = "AllowDecryptOfParameters"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+    ]
+
+    resources = [
+      aws_kms_alias.parameter_store_key_alias.arn,
+      aws_kms_key.parameter_store_key.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "basic_auth_parameter_policy" {
+  count = var.environment == "production" ? 0 : 1
+  statement {
+    sid    = "AllowGetParameters"
+    effect = "Allow"
+
+    actions = [
+      "ssm:GetParameter",
+    ]
+
+    resources = [
       aws_ssm_parameter.basic_auth_password.arn,
       aws_ssm_parameter.basic_auth_username.arn,
     ]
@@ -131,6 +159,12 @@ data "aws_iam_policy_document" "parameter_policy" {
       aws_kms_key.parameter_store_key.arn
     ]
   }
+}
+
+resource "aws_iam_policy" "basic_auth_parameter_policy" {
+  count       = var.environment == "production" ? 0 : 1
+  policy      = data.aws_iam_policy_document.basic_auth_parameter_policy.json
+  name_prefix = "${var.environment}-basic-auth-parameter-store-policy"
 }
 
 resource "aws_iam_policy" "parameter_policy" {

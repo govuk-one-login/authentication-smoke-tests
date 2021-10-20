@@ -81,11 +81,11 @@ variable "pagerduty_cronitor_alerts_endpoint" {
   type = string
 }
 variable "basic_auth_username" {
-  type = string
+  type    = string
   default = null
 }
 
 variable "basic_auth_password" {
-  type = string
+  type    = string
   default = null
 }

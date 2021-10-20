@@ -75,7 +75,7 @@ resource "aws_cloudwatch_event_rule" "cronitor_event" {
       "Synthetics Canary TestRun Failure"
     ],
     "detail" = {
-      "canary-name": [
+      "canary-name" : [
         local.smoke_tester_name
       ]
     }
