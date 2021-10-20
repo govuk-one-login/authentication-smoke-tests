@@ -20,7 +20,7 @@ resource "aws_iam_role_policy_attachment" "parameter_policy" {
 
 resource "aws_iam_role_policy_attachment" "basic_auth_parameter_policy" {
   count      = var.environment == "production" ? 0 : 1
-  policy_arn = aws_iam_policy.basic_auth_parameter_policy.arn
+  policy_arn = aws_iam_policy.basic_auth_parameter_policy[0].arn
   role       = aws_iam_role.smoke_tester_role.name
 }
 

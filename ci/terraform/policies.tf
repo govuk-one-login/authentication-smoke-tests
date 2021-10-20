@@ -142,8 +142,8 @@ data "aws_iam_policy_document" "basic_auth_parameter_policy" {
     ]
 
     resources = [
-      aws_ssm_parameter.basic_auth_password.arn,
-      aws_ssm_parameter.basic_auth_username.arn,
+      aws_ssm_parameter.basic_auth_password[0].arn,
+      aws_ssm_parameter.basic_auth_username[0].arn,
     ]
   }
   statement {
@@ -163,7 +163,7 @@ data "aws_iam_policy_document" "basic_auth_parameter_policy" {
 
 resource "aws_iam_policy" "basic_auth_parameter_policy" {
   count       = var.environment == "production" ? 0 : 1
-  policy      = data.aws_iam_policy_document.basic_auth_parameter_policy.json
+  policy      = data.aws_iam_policy_document.basic_auth_parameter_policy[0].json
   name_prefix = "${var.environment}-basic-auth-parameter-store-policy"
 }
 
