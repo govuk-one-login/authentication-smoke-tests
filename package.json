@@ -5,7 +5,7 @@
   "repository": "git@github.com:alphagov/di-authentication-smoke-tests.git",
   "license": "MIT",
   "scripts": {
-    "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs",
+    "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs",
     "pretty": "prettier --write \"*/**/*.{js,json}\"",
     "lint": "eslint . --ext .js"
   },
