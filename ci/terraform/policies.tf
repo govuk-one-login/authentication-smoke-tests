@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "canary_execution" {
 
     resources = [
       aws_s3_bucket.smoketest_artefact_bucket.arn,
-      "${aws_s3_bucket.smoketest_artefact_bucket.arn}/*",
+      "${aws_s3_bucket.smoketest_artefact_bucket.arn}/canary/${data.aws_region.current.id}/${local.smoke_tester_name}/*",
     ]
   }
 
@@ -114,6 +114,8 @@ data "aws_iam_policy_document" "parameter_policy" {
       aws_ssm_parameter.phone.arn,
       aws_ssm_parameter.sms_bucket.arn,
       aws_ssm_parameter.username.arn,
+      aws_ssm_parameter.basic_auth_password.arn,
+      aws_ssm_parameter.basic_auth_username.arn,
     ]
   }
   statement {
