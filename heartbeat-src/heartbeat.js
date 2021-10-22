@@ -1,11 +1,10 @@
-const { Cronitor } = require("cronitor");
+const cronitor = require('cronitor')(process.env.CRONITOR_API_KEY);
 
 exports.handler = async function (event, context) {
-  let monitorKey = process.env.CRONITOR_MONITOR_KEY;
-  console.log("Ping Cronitor monitor " + monitorKey);
-  let cronitor = new Cronitor(process.env.CRONITOR_API_KEY);
-  let monitor = new cronitor.Monitor(monitorKey);
-  monitor.ping();
-  console.log("Complete");
-  return "ping complete";
-};
+    const monitorKey = process.env.CRONITOR_MONITOR_KEY;
+    console.log("cronitor ping monitor " + monitorKey);
+    const monitor = new cronitor.Monitor(monitorKey);
+    return monitor.ping().then((response) => {
+        return "cronitor ping monitor " + monitorKey + " returns: " + response;
+    });
+}
