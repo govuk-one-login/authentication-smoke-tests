@@ -61,6 +61,12 @@ resource "aws_lambda_function" "alerts_lambda" {
   timeout     = 30
   memory_size = 512
 
+  environment {
+    variables = {
+      DEPLOY_ENVIRONMENT = var.environment
+    }
+  }
+
   runtime = "nodejs14.x"
 
   tags = local.default_tags
