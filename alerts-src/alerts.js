@@ -5,7 +5,7 @@ const { getParameter } = require("./aws");
 
 exports.handler = async function(event, context) {
     console.log("Alert lambda triggered");
-    const slackHookUrl = await getParameter("slack-hook-url");
+    const slackHookUrl = await getParameter(process.env.DEPLOY_ENVIRONMENT+"-slack-hook-url");
 
     var data = JSON.stringify({
             "text":event.Records[0].Sns.Message});
