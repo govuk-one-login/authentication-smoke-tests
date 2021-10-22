@@ -23,6 +23,7 @@ params:
   PAGERDUTY_P1_ALERTS_ENDPOINT: ((pagerduty-p1-alerts-endpoint))
   PAGERDUTY_P2_ALERTS_ENDPOINT: ((pagerduty-p2-alerts-endpoint))
   PAGERDUTY_CRONITOR_ALERTS_ENDPOINT: ((pagerduty-cronitor-alerts-endpoint))
+  SLACK_ALERT_URI: ((monitoring-alert-slack-webhook))
 
 inputs:
   - name: src
@@ -59,6 +60,7 @@ run:
         -var "pagerduty_p2_alerts_endpoint=${PAGERDUTY_P2_ALERTS_ENDPOINT}" \
         -var "pagerduty_cronitor_alerts_endpoint=${PAGERDUTY_CRONITOR_ALERTS_ENDPOINT}" \
         -var "shared_state_bucket=${STATE_BUCKET}" \
+        -var "slack_hook_uri=${SLACK_ALERT_URI}" \
         -var "smoke_test_lambda_zip_file=../../../smoke-test-release/canary.zip" \
         -var "username=${SMOKETESTER_USERNAME}" \
 

@@ -23,4 +23,8 @@ run:
       yarn install --production && yarn build
       cd ..
 
+      cd alerts-src
+      yarn install --production && yarn build
+      cd ..
+
       cp dist/*.zip ../release-artefacts/
