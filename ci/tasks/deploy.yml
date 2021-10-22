@@ -62,6 +62,7 @@ run:
         -var "shared_state_bucket=${STATE_BUCKET}" \
         -var "slack_hook_uri=${SLACK_ALERT_URI}" \
         -var "smoke_test_lambda_zip_file=../../../smoke-test-release/canary.zip" \
+        -var "alerts_lambda_zip_file=../../../smoke-test-release/alerts.zip" \
         -var "username=${SMOKETESTER_USERNAME}" \
 
       terraform output --json > ../../../terraform-outputs/${DEPLOY_ENVIRONMENT}-smoke-test-terraform-outputs.json
