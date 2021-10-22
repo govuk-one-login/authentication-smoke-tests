@@ -100,3 +100,12 @@ resource "aws_ssm_parameter" "sms_bucket" {
 
   tags = local.default_tags
 }
+
+resource "aws_ssm_parameter" "slack_hook_url" {
+  name   = "slack-hook-url"
+  type   = "SecureString"
+  value  = var.slack_hook_uri
+  key_id = aws_kms_alias.parameter_store_key_alias.id
+
+  tags = local.default_tags
+}

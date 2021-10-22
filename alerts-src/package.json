@@ -1,0 +1,12 @@
+{
+  "name": "alerts-src",
+  "version": "1.0.0",
+  "main": "alerts.js",
+  "license": "MIT",
+  "dependencies": {
+    "cronitor": "^2.2.3"
+  },
+  "scripts": {
+    "build": "mkdir -p ../dist && zip -r ../dist/alerts.zip ."
+  }
+}

@@ -41,6 +41,16 @@ variable "heartbeat_lambda_zip_file" {
   type        = string
 }
 
+variable "alerts_lambda_zip_file" {
+  default     = "../../dist/alerts.zip"
+  description = "Location of the alerts Lambda ZIP file"
+  type        = string
+}
+
+variable "slack_hook_uri" {
+  type = string
+}
+
 variable "password" {
   type = string
 }
