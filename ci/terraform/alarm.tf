@@ -8,6 +8,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p1" {
   period              = "600"
   statistic           = "Sum"
   threshold           = "3"
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     CanaryName = aws_synthetics_canary.smoke_tester.name
@@ -15,6 +16,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p1" {
 
   alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} P1 failure"
   alarm_actions     = [aws_sns_topic.pagerduty_p1_alerts.arn]
+  ok_actions        = [aws_sns_topic.pagerduty_p1_alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p2" {
@@ -26,6 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p2" {
   period              = "600"
   statistic           = "Sum"
   threshold           = "5"
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     CanaryName = aws_synthetics_canary.smoke_tester.name
@@ -33,4 +36,5 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p2" {
 
   alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} P2 failure"
   alarm_actions     = [aws_sns_topic.pagerduty_p2_alerts.arn]
+  ok_actions        = [aws_sns_topic.pagerduty_p2_alerts.arn]
 }
