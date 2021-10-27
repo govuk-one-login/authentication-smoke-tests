@@ -54,56 +54,6 @@ resource "aws_sns_topic_subscription" "pagerduty_cronitor_alerts_topic_subscript
   endpoint  = var.pagerduty_cronitor_alerts_endpoint
 }
 
-resource "aws_cloudwatch_event_rule" "pagerduty_p1_alerts_event_rule" {
-  name       = "${var.environment}-pagerduty-p1-alerts-event-rule"
-  is_enabled = true
-  event_pattern = jsonencode({
-    "source" = [
-      "aws.synthetics"
-    ],
-    "detail-type" = [
-      "Synthetics Canary TestRun Failure"
-    ],
-    "detail" = {
-      "canary-name" : [
-        local.smoke_tester_name
-      ]
-    }
-  })
-
-  tags = local.default_tags
-}
-
-resource "aws_cloudwatch_event_target" "pagerduty_p1_alerts_event_target" {
-  arn  = aws_sns_topic.pagerduty_p1_alerts.arn
-  rule = aws_cloudwatch_event_rule.pagerduty_p1_alerts_event_rule.name
-}
-
-resource "aws_cloudwatch_event_rule" "pagerduty_p2_alerts_event_rule" {
-  name       = "${var.environment}-pagerduty-p2-alerts-event-rule"
-  is_enabled = true
-  event_pattern = jsonencode({
-    "source" = [
-      "aws.synthetics"
-    ],
-    "detail-type" = [
-      "Synthetics Canary TestRun Failure"
-    ],
-    "detail" = {
-      "canary-name" : [
-        local.smoke_tester_name
-      ]
-    }
-  })
-
-  tags = local.default_tags
-}
-
-resource "aws_cloudwatch_event_target" "pagerduty_p2_alerts_event_target" {
-  arn  = aws_sns_topic.pagerduty_p2_alerts.arn
-  rule = aws_cloudwatch_event_rule.pagerduty_p2_alerts_event_rule.name
-}
-
 resource "aws_cloudwatch_event_rule" "pagerduty_cronitor_alerts_event_rule" {
   name       = "${var.environment}-pagerduty-cronitor-alerts-event-rule"
   is_enabled = true
@@ -128,4 +78,3 @@ resource "aws_cloudwatch_event_target" "pagerduty_cronitor_alerts_event_target" 
   arn  = aws_sns_topic.pagerduty_cronitor_alerts.arn
   rule = aws_cloudwatch_event_rule.pagerduty_cronitor_alerts_event_rule.name
 }
-
