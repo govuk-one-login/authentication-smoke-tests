@@ -15,8 +15,8 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p1" {
   }
 
   alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} P1 failure"
-  alarm_actions     = [aws_sns_topic.pagerduty_p1_alerts.arn]
-  ok_actions        = [aws_sns_topic.pagerduty_p1_alerts.arn]
+  alarm_actions     = [var.environment == "production" ? aws_sns_topic.pagerduty_p1_alerts.arn : data.aws_sns_topic.slack_events.arn]
+  ok_actions        = [var.environment == "production" ? aws_sns_topic.pagerduty_p1_alerts.arn : data.aws_sns_topic.slack_events.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p2" {
@@ -35,6 +35,6 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p2" {
   }
 
   alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} P2 failure"
-  alarm_actions     = [aws_sns_topic.pagerduty_p2_alerts.arn]
-  ok_actions        = [aws_sns_topic.pagerduty_p2_alerts.arn]
+  alarm_actions     = [var.environment == "production" ? aws_sns_topic.pagerduty_p2_alerts.arn : data.aws_sns_topic.slack_events.arn]
+  ok_actions        = [var.environment == "production" ? aws_sns_topic.pagerduty_p2_alerts.arn : data.aws_sns_topic.slack_events.arn]
 }
