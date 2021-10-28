@@ -55,6 +55,11 @@ variable "password" {
   type = string
 }
 
+variable "hashed_password" {
+  type        = string
+  description = "The hashed version of the password"
+}
+
 variable "phone" {
   type = string
 }
@@ -98,4 +103,8 @@ variable "basic_auth_username" {
 variable "basic_auth_password" {
   type    = string
   default = null
+}
+
+variable "terms_and_conditions_version" {
+  default = "1.1"
 }

@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 3.54.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "0.7.2"
+    }
   }
 
   backend "s3" {
@@ -19,6 +23,8 @@ provider "aws" {
     role_arn = var.deployer_role_arn
   }
 }
+
+provider "time" {}
 
 locals {
   // Using a local rather than the default_tags option on the AWS provider, as the latter has known issues which produce errors on apply.
