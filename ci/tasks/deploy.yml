@@ -28,6 +28,7 @@ params:
 inputs:
   - name: src
   - name: smoke-test-release
+  - name: hashed-password
 outputs:
   - name: terraform-outputs
 run:
@@ -53,6 +54,7 @@ run:
         -var "environment=${DEPLOY_ENVIRONMENT}" \
         -var "heartbeat_lambda_zip_file=../../../smoke-test-release/heartbeat.zip" \
         -var "password=${SMOKETESTER_PASSWORD}" \
+        -var "hashed_password=$(hashed-password/hashed-password.txt)" \
         -var "phone=${SMOKETESTER_PHONE}" \
         -var "basic_auth_username=${BASIC_AUTH_USERNAME}" \
         -var "basic_auth_password=${BASIC_AUTH_PASSWORD}" \
