@@ -12,7 +12,7 @@ exports.handler = async function(event, context) {
         colorCode = "#36a64f"
     }
      var data = JSON.stringify({
-      "attachments": [{"fallback": snsMessage.AlarmDescription,"color": colorCode,"title": snsMessage.AlarmName,"text": "Alarm Description: " + snsMessage.AlarmDescription,"fields": [{"title": "Status","value": snsMessage.NewStateValue,"short": false}],"footer": "GOV.UK Sign In alert"}]});
+      "attachments": [{"fallback": snsMessage.AlarmDescription,"color": colorCode,"title": snsMessage.AlarmName,"text": snsMessage.AlarmDescription,"fields": [{"title": "Status","value": snsMessage.NewStateValue,"short": false}],"footer": "GOV.UK Sign In alert"}]});
     var config = {
       method: 'post',
       url: slackHookUrl,
