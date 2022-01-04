@@ -42,21 +42,9 @@ const basicCustomEntryPoint = async () => {
 
   await navigationPromise;
 
-  await synthetics.executeStep("Select sign in", async () => {
-    await page.waitForSelector("form #create-account-false");
-    await page.click("form #create-account-false");
-    await page.type("form #create-account-false", "false");
-  });
-
-  await navigationPromise;
-
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+  await synthetics.executeStep("Click sign in", async () => {
+    await page.waitForSelector('#main-content #sign-in-link')
+    await page.click('#main-content #sign-in-link')
   });
 
   await navigationPromise;
