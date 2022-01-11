@@ -41,11 +41,6 @@ resource "aws_iam_role_policy_attachment" "alerts_execution" {
   role       = aws_iam_role.alerts_execution.name
 }
 
-resource "aws_iam_role_policy_attachment" "sns_execution" {
-  policy_arn = aws_iam_policy.slack_sns_policy.arn
-  role       = aws_iam_role.alerts_execution.name
-}
-
 resource "aws_iam_role_policy_attachment" "parameter_execution" {
   policy_arn = aws_iam_policy.parameter_policy.arn
   role       = aws_iam_role.alerts_execution.name
@@ -70,36 +65,6 @@ resource "aws_lambda_function" "alerts_lambda" {
   runtime = "nodejs14.x"
 
   tags = local.default_tags
-}
-
-data "aws_iam_policy_document" "slack_sns_policy_document" {
-  version   = "2012-10-17"
-  policy_id = "${var.environment}-slack-sns-topic-policy"
-
-  statement {
-    effect = "Allow"
-    sid    = "GiveSlackSnsTopicPolicyPublish"
-    actions = [
-      "SNS:Publish",
-      "SNS:RemovePermission",
-      "SNS:SetTopicAttributes",
-      "SNS:DeleteTopic",
-      "SNS:ListSubscriptionsByTopic",
-      "SNS:GetTopicAttributes",
-      "SNS:Receive",
-      "SNS:AddPermission",
-      "SNS:Subscribe"
-    ]
-    resources = [data.aws_sns_topic.slack_events.arn]
-  }
-}
-
-resource "aws_iam_policy" "slack_sns_policy" {
-  name        = "${var.environment}-slack-lambda-sns-policy"
-  path        = "/"
-  description = "IAM policy for managing Slack SNS connection for a lambda"
-
-  policy = data.aws_iam_policy_document.slack_sns_policy_document.json
 }
 
 resource "aws_sns_topic_subscription" "event_stream_subscription" {
