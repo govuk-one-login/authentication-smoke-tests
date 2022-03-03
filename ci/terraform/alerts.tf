@@ -84,3 +84,21 @@ resource "aws_lambda_permission" "with_sns" {
 data "aws_sns_topic" "slack_events" {
   name = "${var.environment}-slack-events"
 }
+
+resource "aws_sns_topic_subscription" "slack_alerts_stream_subscription" {
+  topic_arn = data.aws_sns_topic.slack_alerts.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.alerts_lambda.arn
+}
+
+resource "aws_lambda_permission" "slack_alerts_with_sns" {
+  statement_id  = "AllowExecutionFromSlackAlertsSNSTopic"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.alerts_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = data.aws_sns_topic.slack_alerts.arn
+}
+
+data "aws_sns_topic" "slack_alerts" {
+  name = "${var.environment}-slack-alerts"
+}
