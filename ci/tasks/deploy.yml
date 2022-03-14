@@ -39,8 +39,8 @@ run:
   args:
     - -euc
     - |
-      ALERT_CODE_S3_KEY="di-monitoring-utils/alerts.zip/$(ls -1 di-monitoring-utils-alerts-lambda/signed-*.zip)"
-      HEARTBEAT_CODE_S3_KEY="di-monitoring-utils/heartbeat.zip/$(ls -1 di-monitoring-utils-heartbeat-lambda/signed-*.zip)"
+      ALERT_CODE_S3_KEY="di-monitoring-utils/alerts.zip/$(basename $(ls -1 di-monitoring-utils-alerts-lambda/signed-*.zip))"
+      HEARTBEAT_CODE_S3_KEY="di-monitoring-utils/heartbeat.zip/$(basename $(ls -1 di-monitoring-utils-heartbeat-lambda/signed-*.zip))"
       
       cd "src/ci/terraform"
       terraform init -input=false \
