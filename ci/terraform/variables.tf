@@ -108,3 +108,14 @@ variable "basic_auth_password" {
 variable "terms_and_conditions_version" {
   default = "1.1"
 }
+
+variable "code_s3_bucket" {
+  type = string
+}
+variable "alerts_code_s3_key" {
+  type = string
+}
+
+variable "heartbeat_code_s3_key" {
+  type = string
+}

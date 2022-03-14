@@ -24,11 +24,14 @@ params:
   PAGERDUTY_P2_ALERTS_ENDPOINT: ((pagerduty-p2-alerts-endpoint))
   PAGERDUTY_CRONITOR_ALERTS_ENDPOINT: ((pagerduty-cronitor-alerts-endpoint))
   SLACK_ALERT_URI: ((monitoring-alert-slack-webhook))
+  SIGNED_CODE_S3_BUCKET: ((di-auth-lambda-signed-bucket))
 
 inputs:
   - name: src
   - name: smoke-test-release
   - name: hashed-password
+  - name: di-monitoring-utils-alerts-lambda
+  - name: di-monitoring-utils-heartbeat-lambda
 outputs:
   - name: terraform-outputs
 run:
@@ -36,6 +39,9 @@ run:
   args:
     - -euc
     - |
+      ALERT_CODE_S3_KEY="di-monitoring-utils/alerts.zip/$(ls -1 di-monitoring-utils-alerts-lambda/signed-*.zip)"
+      HEARTBEAT_CODE_S3_KEY="di-monitoring-utils/heartbeat.zip/$(ls -1 di-monitoring-utils-heartbeat-lambda/signed-*.zip)"
+      
       cd "src/ci/terraform"
       terraform init -input=false \
         -backend-config "role_arn=${DEPLOYER_ROLE_ARN}" \
@@ -66,5 +72,8 @@ run:
         -var "smoke_test_lambda_zip_file=../../../smoke-test-release/canary.zip" \
         -var "alerts_lambda_zip_file=../../../smoke-test-release/alerts.zip" \
         -var "username=${SMOKETESTER_USERNAME}" \
+        -var "code_s3_bucket=${SIGNED_CODE_S3_BUCKET}" \
+        -var "alerts_code_s3_key=${ALERT_CODE_S3_KEY}" \
+        -var "heartbeat_code_s3_key=${HEARTBEAT_CODE_S3_KEY}" \
 
       terraform output --json > ../../../terraform-outputs/${DEPLOY_ENVIRONMENT}-smoke-test-terraform-outputs.json
