@@ -35,18 +35,6 @@ variable "environment" {
   type = string
 }
 
-variable "heartbeat_lambda_zip_file" {
-  default     = "../../dist/heartbeat.zip"
-  description = "Location of the heartbeat Lambda ZIP file"
-  type        = string
-}
-
-variable "alerts_lambda_zip_file" {
-  default     = "../../dist/alerts.zip"
-  description = "Location of the alerts Lambda ZIP file"
-  type        = string
-}
-
 variable "slack_hook_uri" {
   type = string
 }
@@ -112,6 +100,7 @@ variable "terms_and_conditions_version" {
 variable "code_s3_bucket" {
   type = string
 }
+
 variable "alerts_code_s3_key" {
   type = string
 }

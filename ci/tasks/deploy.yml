@@ -58,7 +58,6 @@ run:
         -var "dns_state_key=${DNS_STATE_KEY}" \
         -var "dns_state_role=${DNS_DEPLOYER_ROLE_ARN}" \
         -var "environment=${DEPLOY_ENVIRONMENT}" \
-        -var "heartbeat_lambda_zip_file=../../../smoke-test-release/heartbeat.zip" \
         -var "password=${SMOKETESTER_PASSWORD}" \
         -var "hashed_password=$(cat ../../../hashed-password/hashed-password.txt)" \
         -var "phone=${SMOKETESTER_PHONE}" \
@@ -70,7 +69,6 @@ run:
         -var "shared_state_bucket=${STATE_BUCKET}" \
         -var "slack_hook_uri=${SLACK_ALERT_URI}" \
         -var "smoke_test_lambda_zip_file=../../../smoke-test-release/canary.zip" \
-        -var "alerts_lambda_zip_file=../../../smoke-test-release/alerts.zip" \
         -var "username=${SMOKETESTER_USERNAME}" \
         -var "code_s3_bucket=${SIGNED_CODE_S3_BUCKET}" \
         -var "alerts_code_s3_key=${ALERT_CODE_S3_KEY}" \
