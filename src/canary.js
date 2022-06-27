@@ -15,9 +15,10 @@ const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests");
 
   const bucketName = await getParameter("bucket");
+  const phoneNumber = await getParameter("phone");
 
   log.info("Empty OTP code bucket");
-  await emptyOtpBucket(bucketName);
+  await emptyOtpBucket(bucketName, phoneNumber);
 
   let page = await synthetics.getPage();
   const navigationPromise = page.waitForNavigation({
@@ -86,7 +87,6 @@ const basicCustomEntryPoint = async () => {
   await synthetics.executeStep("Enter OTP code", async () => {
     await page.waitForSelector(".govuk-grid-row #code");
 
-    const phoneNumber = await getParameter("phone");
     const otpCode = await getOTPCode(phoneNumber, bucketName);
 
     await page.type(".govuk-grid-row #code", otpCode);

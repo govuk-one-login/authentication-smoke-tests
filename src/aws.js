@@ -15,16 +15,15 @@ const getParameter = async (parameterName) => {
   return result.Parameter.Value;
 };
 
-const emptyOtpBucket = async (bucketName) => {
-  const { Contents } = await S3.listObjectsV2({ Bucket: bucketName }).promise();
-  if (Contents.length > 0) {
+const emptyOtpBucket = async (bucketName, phoneNumber) => {
     await S3.deleteObjects({
       Bucket: bucketName,
       Delete: {
-        Objects: Contents.map(({ Key }) => ({ Key })),
+        Objects: [
+            phoneNumber
+        ],
       },
     }).promise();
-  }
 };
 
 const getOTPCode = async (phoneNumber, bucketName) => {
