@@ -16,13 +16,9 @@ const getParameter = async (parameterName) => {
 };
 
 const emptyOtpBucket = async (bucketName, phoneNumber) => {
-    await S3.deleteObjects({
+    await S3.deleteObject({
       Bucket: bucketName,
-      Delete: {
-        Objects: [
-            phoneNumber
-        ],
-      },
+      Key: phoneNumber
     }).promise();
 };
 
