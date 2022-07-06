@@ -107,7 +107,7 @@ const basicCustomEntryPoint = async () => {
     await page.waitForSelector("#warning-link");
 
     const hasReachedAM =
-      (await page.title()) === "Manage your account - GOV.UK account";
+      (await page.title()) === "Your GOV.UK account - GOV.UK account";
 
     if (!hasReachedAM) {
       throw "Failed smoke test";
