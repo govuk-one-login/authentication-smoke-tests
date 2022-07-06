@@ -104,7 +104,7 @@ const basicCustomEntryPoint = async () => {
   await navigationPromise;
 
   await synthetics.executeStep("Manage your account", async () => {
-    await page.waitForSelector("#warning-link");
+    await page.waitForSelector("#your-account");
 
     const hasReachedAM =
       (await page.title()) === "Your GOV.UK account - GOV.UK account";
