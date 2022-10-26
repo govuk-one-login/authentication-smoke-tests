@@ -104,12 +104,10 @@ const basicCustomEntryPoint = async () => {
   await navigationPromise;
 
   await synthetics.executeStep("Manage your account", async () => {
-    //await page.waitForSelector("#your-account");
-    await page.waitForSelector("#main-content > div > div.govuk-grid-column-two-thirds > h1");
+    await page.waitForSelector("#your-account");
 
     const hasReachedAM =
-      //(await page.title()) === "Your GOV.UK account - GOV.UK account";
-        (await page.title()) === "Manage your account - GOV.UK account";
+      (await page.title()) === "Your GOV.UK account - GOV.UK account";
 
     if (!hasReachedAM) {
       throw "Failed smoke test";
