@@ -108,7 +108,8 @@ const basicCustomEntryPoint = async () => {
     await page.waitForSelector("#main-content > div > div.govuk-grid-column-two-thirds > h1");
 
     const hasReachedAM =
-      (await page.title()) === "Your GOV.UK account - GOV.UK account";
+      //(await page.title()) === "Your GOV.UK account - GOV.UK account";
+        (await page.title()) === "Manage your account - GOV.UK account";
 
     if (!hasReachedAM) {
       throw "Failed smoke test";
