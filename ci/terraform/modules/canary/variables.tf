@@ -66,3 +66,15 @@ variable "basic_auth_username" {
 variable "basic_auth_password" {
   type = string
 }
+
+variable "sns_topic_pagerduty_p1_alerts_arn" {
+  type = string
+}
+
+variable "sns_topic_pagerduty_p2_alerts_arn" {
+  type = string
+}
+
+variable "sns_topic_slack_alerts_arn" {
+  type = string
+}
