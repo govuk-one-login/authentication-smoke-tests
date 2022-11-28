@@ -40,8 +40,8 @@ data "aws_iam_policy_document" "canary_execution" {
     ]
 
     resources = [
-      aws_s3_bucket.smoketest_artefact_bucket.arn,
-      "${aws_s3_bucket.smoketest_artefact_bucket.arn}/canary/${data.aws_region.current.id}/${local.smoke_tester_name}/*",
+      var.artefact_bucket_arn,
+      "${var.artefact_bucket_arn}/canary/${data.aws_region.current.id}/${var.environment}-${var.canary_name}/*",
     ]
   }
 
@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "canary_execution" {
     ]
 
     resources = [
-      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwsyn-${local.smoke_tester_name}-*"
+      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwsyn-${var.canary_name}-*",
     ]
   }
 
@@ -74,7 +74,7 @@ data "aws_iam_policy_document" "canary_execution" {
 
 resource "aws_iam_policy" "canary_execution" {
   policy      = data.aws_iam_policy_document.canary_execution.json
-  name_prefix = "${var.environment}-canary-execution-policy"
+  name_prefix = "${var.environment}-${var.canary_name}-canary-execution-policy"
 }
 
 data "aws_iam_policy_document" "sms_bucket_policy" {
@@ -89,15 +89,17 @@ data "aws_iam_policy_document" "sms_bucket_policy" {
     ]
 
     resources = [
-      local.sms_bucket_name_arn,
-      "${local.sms_bucket_name_arn}/*"
+      var.sms_bucket_name_arn,
+      "${var.sms_bucket_name_arn}/*",
+      "arn:aws:s3:::build-smoke-test-sms-codes/*",
+      "arn:aws:s3:::build-smoke-test-sms-codes"
     ]
   }
 }
 
 resource "aws_iam_policy" "sms_bucket_policy" {
   policy      = data.aws_iam_policy_document.sms_bucket_policy.json
-  name_prefix = "${var.environment}-canary-sms-bucket-policy"
+  name_prefix = "${var.environment}-${var.canary_name}-canary-sms-bucket-policy"
 }
 
 data "aws_iam_policy_document" "parameter_policy" {
@@ -111,7 +113,6 @@ data "aws_iam_policy_document" "parameter_policy" {
 
     resources = [
       aws_ssm_parameter.base_url.arn,
-      aws_ssm_parameter.password.arn,
       aws_ssm_parameter.phone.arn,
       aws_ssm_parameter.sms_bucket.arn,
       aws_ssm_parameter.username.arn,
@@ -166,10 +167,10 @@ data "aws_iam_policy_document" "basic_auth_parameter_policy" {
 resource "aws_iam_policy" "basic_auth_parameter_policy" {
   count       = var.environment == "production" ? 0 : 1
   policy      = data.aws_iam_policy_document.basic_auth_parameter_policy[0].json
-  name_prefix = "${var.environment}-basic-auth-parameter-store-policy"
+  name_prefix = "${var.environment}-${var.canary_name}-basic-auth-parameter-store-policy"
 }
 
 resource "aws_iam_policy" "parameter_policy" {
   policy      = data.aws_iam_policy_document.parameter_policy.json
-  name_prefix = "${var.environment}-parameter-store-policy"
+  name_prefix = "${var.environment}-${var.canary_name}-parameter-store-policy"
 }

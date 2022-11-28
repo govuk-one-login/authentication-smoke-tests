@@ -108,3 +108,7 @@ variable "alerts_code_s3_key" {
 variable "heartbeat_code_s3_key" {
   type = string
 }
+
+variable "username_create_account" {
+  type = string
+}
