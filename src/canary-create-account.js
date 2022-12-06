@@ -16,9 +16,15 @@ const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests");
 
   const bucketName = await getParameter("bucket");
+  const fireDrill = await getParameter("fire-drill");
   const email = await getParameter("username");
   const phoneNumber = await getParameter("phone");
   const password = crypto.randomBytes(20).toString("base64url");
+
+  if (fireDrill === "1") {
+    log.info("Fire Drill! Smoke test will fail.");
+    throw "Smoke Test failed due to Fire Drill";
+  }
 
   log.info("Empty OTP code bucket");
   await emptyOtpBucket(bucketName, email);
@@ -234,9 +240,5 @@ const basicCustomEntryPoint = async () => {
 };
 
 module.exports.handler = async () => {
-  try {
     return await basicCustomEntryPoint();
-  } catch (err) {
-    log.error(err);
-  }
 };
