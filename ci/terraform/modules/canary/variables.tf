@@ -47,6 +47,11 @@ variable "sms_bucket_name" {
   type = string
 }
 
+variable "fire_drill" {
+  type    = string
+  default = "0"
+}
+
 variable "account_management_url" {
   type = string
 }

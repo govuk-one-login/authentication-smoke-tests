@@ -38,6 +38,14 @@ resource "aws_kms_alias" "parameter_store_key_alias" {
   target_key_id = aws_kms_key.parameter_store_key.id
 }
 
+resource "aws_ssm_parameter" "fire_drill" {
+  name  = "${var.environment}-${var.canary_name}-fire-drill"
+  type  = "String"
+  value = var.fire_drill
+
+  tags = local.default_tags
+}
+
 resource "aws_ssm_parameter" "base_url" {
   name  = "${var.environment}-${var.canary_name}-url"
   type  = "String"
