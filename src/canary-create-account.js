@@ -2,6 +2,7 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const crypto = require("crypto");
+const { ADDRGETNETWORKPARAMS } = require("dns");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -12,11 +13,28 @@ SYNTHETICS_CONFIG.setConfig({
   screenshotOnStepFailure: true,
 });
 
+const deleteSyntheticsUser = async function(res) {
+  return new Promise((resolve, reject) => {
+      if (res.statusCode < 200 || (res.statusCode > 299 && !res.statusCode == 404)) {
+          throw res.statusCode + ' ' + res.statusMessage;
+      }
+      if (res.statusCode == 404) {
+        log.warn("synthetics-user not found for deletion, OK to continue the test")
+      }
+      res.on('end', () => {
+          resolve();
+      });
+  });
+};
+
 const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests");
 
   const bucketName = await getParameter("bucket");
   const fireDrill = await getParameter("fire-drill");
+  const testServicesApiHostname = await getParameter("test-services-api-hostname");
+  const testServicesApiKey = await getParameter("test-services-api-key");
+  const syntheticsUserDeletePath = await getParameter("synthetics-user-delete-path");
   const email = await getParameter("username");
   const phoneNumber = await getParameter("phone");
   const password = crypto.randomBytes(20).toString("base64url");
@@ -45,6 +63,29 @@ const basicCustomEntryPoint = async () => {
       password: basicAuthPassword,
     });
   }
+
+  log.info("Preparing call to synthetics-user DELETE")
+  let syntheticsUserDeleteStepOptions = {
+    'hostname': testServicesApiHostname,
+    'method': 'DELETE',
+    'path': syntheticsUserDeletePath,
+    'port': 443,
+    'protocol': 'https:'
+  };
+
+  headers = {};
+  headers['User-Agent'] = [synthetics.getCanaryUserAgentString(), headers['User-Agent']].join(' ');
+  headers['x-api-key'] =  testServicesApiKey;
+
+  syntheticsUserDeleteStepOptions['headers'] = headers;
+
+  stepConfig = {
+      includeResponseHeaders: true,
+      restrictedHeaders: ['x-api-key'],
+      includeResponseBody: true
+  };
+
+  await synthetics.executeHttpStep('Calling synthetics-user DELETE', syntheticsUserDeleteStepOptions, deleteSyntheticsUser, stepConfig);
 
   await synthetics.executeStep("Launch AM", async () => {
     const url = await getParameter("url");
@@ -183,55 +224,6 @@ const basicCustomEntryPoint = async () => {
       (await page.title()) === "Your GOV.UK account - GOV.UK account";
 
     if (!hasReachedAM) {
-      throw "Failed smoke test";
-    }
-  });
-
-  await synthetics.executeStep("Click delete your GOV.UK account", async () => {
-    await page.waitForSelector("#your-account");
-    await page.click('a[href="/enter-password?type=deleteAccount"]');
-  });
-
-  await navigationPromise;
-
-  await synthetics.executeStep("Enter password", async () => {
-    await page.waitForSelector(".govuk-grid-row #password");
-    await page.type(".govuk-grid-row #password", password);
-  });
-
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-  });
-
-  await navigationPromise;
-
-  await synthetics.executeStep("Confirm account deletion", async () => {
-    (await page.url()).endsWith("/delete-account");
-
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-  });
-
-  await navigationPromise;
-
-  await synthetics.executeStep("Account deleted confirmation", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > .govuk-button"
-    );
-    const accountDeleted = (await page.url()).endsWith(
-      "/account-deleted-confirmation"
-    );
-
-    if (!accountDeleted) {
       throw "Failed smoke test";
     }
   });

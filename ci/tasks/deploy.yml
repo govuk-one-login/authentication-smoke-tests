@@ -18,6 +18,9 @@ params:
   BASIC_AUTH_USERNAME: ((basic-auth-username-integration))
   BASIC_AUTH_PASSWORD: ((basic-auth-password-integration))
   SMOKETESTER_CREATE_ACCOUNT_USERNAME: ((smoke-tester-create-account-username-integration))
+  TEST_SERVICES_API_HOSTNAME: ((test-services-api-hostname-integration))
+  TEST_SERVICES_API_KEY: ((test-services-api-key-integration))
+  SYNTHETICS_USER_DELETE_PATH: ((synthetics-user-delete-path-integration))
   STATE_BUCKET: digital-identity-dev-tfstate
   CRONITOR_API_KEY: ((cronitor-send-events-api-key))
   CRONITOR_MONITOR_KEY: ((cronitor-monitor-key-integration))
@@ -75,5 +78,8 @@ run:
         -var "alerts_code_s3_key=${ALERT_CODE_S3_KEY}" \
         -var "heartbeat_code_s3_key=${HEARTBEAT_CODE_S3_KEY}" \
         -var "username_create_account=${SMOKETESTER_CREATE_ACCOUNT_USERNAME}" \
+        -var "test-services-api-hostname=${TEST_SERVICES_API_HOSTNAME}" \
+        -var "test-services-api-key=${TEST_SERVICES_API_KEY}" \
+        -var "synthetics-user-delete-path=${SYNTHETICS_USER_DELETE_PATH}" \
 
       terraform output --json > ../../../terraform-outputs/${DEPLOY_ENVIRONMENT}-smoke-test-terraform-outputs.json

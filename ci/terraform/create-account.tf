@@ -23,11 +23,14 @@ module "canary_create_account" {
   sns_topic_pagerduty_p2_alerts_arn = aws_sns_topic.pagerduty_p2_alerts.arn
   sns_topic_slack_alerts_arn        = data.aws_sns_topic.slack_events.arn
 
-  username            = var.username_create_account
-  phone               = var.phone
-  basic_auth_username = var.basic_auth_username
-  basic_auth_password = var.basic_auth_password
+  test-services-api-key       = var.test-services-api-key
+  test-services-api-hostname  = var.test-services-api-hostname
+  synthetics-user-delete-path = var.synthetics-user-delete-path
+  username                    = var.username_create_account
+  phone                       = var.phone
+  basic_auth_username         = var.basic_auth_username
+  basic_auth_password         = var.basic_auth_password
 
-  smoke_test_cron_expression = "0/10 10-17 ? * MON-FRI *"
+  smoke_test_cron_expression = "0/05 10-17 ? * MON-FRI *"
 
 }
