@@ -52,6 +52,18 @@ variable "fire_drill" {
   default = "0"
 }
 
+variable "synthetics-user-delete-path" {
+  type = string
+}
+
+variable "test-services-api-key" {
+  type = string
+}
+
+variable "test-services-api-hostname" {
+  type = string
+}
+
 variable "account_management_url" {
   type = string
 }

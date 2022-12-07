@@ -112,3 +112,15 @@ variable "heartbeat_code_s3_key" {
 variable "username_create_account" {
   type = string
 }
+
+variable "synthetics-user-delete-path" {
+  type = string
+}
+
+variable "test-services-api-key" {
+  type = string
+}
+
+variable "test-services-api-hostname" {
+  type = string
+}

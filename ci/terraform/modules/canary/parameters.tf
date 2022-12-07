@@ -46,6 +46,31 @@ resource "aws_ssm_parameter" "fire_drill" {
   tags = local.default_tags
 }
 
+resource "aws_ssm_parameter" "test-services-api-key" {
+  name  = "${var.environment}-${var.canary_name}-test-services-api-key"
+  type  = "String"
+  value = var.test-services-api-key
+
+  tags = local.default_tags
+}
+
+resource "aws_ssm_parameter" "test-services-api-hostname" {
+  name  = "${var.environment}-${var.canary_name}-test-services-api-hostname"
+  type  = "String"
+  value = var.test-services-api-hostname
+
+  tags = local.default_tags
+}
+
+resource "aws_ssm_parameter" "synthetics-user-delete-path" {
+  name  = "${var.environment}-${var.canary_name}-synthetics-user-delete-path"
+  type  = "String"
+  value = var.synthetics-user-delete-path
+
+  tags = local.default_tags
+}
+
+
 resource "aws_ssm_parameter" "base_url" {
   name  = "${var.environment}-${var.canary_name}-url"
   type  = "String"
