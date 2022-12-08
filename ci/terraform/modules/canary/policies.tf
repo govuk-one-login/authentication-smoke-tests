@@ -90,9 +90,7 @@ data "aws_iam_policy_document" "sms_bucket_policy" {
 
     resources = [
       var.sms_bucket_name_arn,
-      "${var.sms_bucket_name_arn}/*",
-      "arn:aws:s3:::build-smoke-test-sms-codes/*",
-      "arn:aws:s3:::build-smoke-test-sms-codes"
+      "${var.sms_bucket_name_arn}/*"
     ]
   }
 }
