@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p1" {
     CanaryName = aws_synthetics_canary.smoke_tester_canary[0].name
   }
 
-  alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} P1 failure"
+  alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} (create account smoke test) P1 alarm"
   alarm_actions     = [var.environment == "production" ? var.sns_topic_pagerduty_p1_alerts_arn : var.sns_topic_slack_alerts_arn]
   ok_actions        = [var.environment == "production" ? var.sns_topic_pagerduty_p1_alerts_arn : var.sns_topic_slack_alerts_arn]
 }
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p2" {
     CanaryName = aws_synthetics_canary.smoke_tester_canary[0].name
   }
 
-  alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} P2 failure"
+  alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} (create account smoke test) P2 alarm"
   alarm_actions     = [var.environment == "production" ? var.sns_topic_pagerduty_p2_alerts_arn : var.sns_topic_slack_alerts_arn]
   ok_actions        = [var.environment == "production" ? var.sns_topic_pagerduty_p2_alerts_arn : var.sns_topic_slack_alerts_arn]
 }
