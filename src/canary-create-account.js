@@ -217,11 +217,11 @@ const basicCustomEntryPoint = async () => {
 
   await navigationPromise;
 
-  await synthetics.executeStep("Manage your account", async () => {
-    await page.waitForSelector("#your-account");
+  await synthetics.executeStep("Your services", async () => {
+    await page.waitForSelector(".govuk-header__logotype-text");
 
     const hasReachedAM =
-      (await page.title()) === "Your GOV.UK account - GOV.UK account";
+      (await page.title()) === "Your services - GOV.UK account";
 
     if (!hasReachedAM) {
       throw "Failed smoke test";
