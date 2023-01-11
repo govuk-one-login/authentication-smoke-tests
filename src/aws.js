@@ -16,10 +16,10 @@ const getParameter = async (parameterName) => {
 };
 
 const emptyOtpBucket = async (bucketName, phoneNumber) => {
-    await S3.deleteObject({
-      Bucket: bucketName,
-      Key: phoneNumber
-    }).promise();
+  await S3.deleteObject({
+    Bucket: bucketName,
+    Key: phoneNumber,
+  }).promise();
 };
 
 const getOTPCode = async (phoneNumber, bucketName) => {

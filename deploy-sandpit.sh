@@ -8,7 +8,7 @@ function runTerraform() {
   pushd "${DIR}/ci/terraform/${1}" > /dev/null
   rm -rf .terraform/
   terraform init -backend-config=sandpit.hcl
-  terraform apply -var-file sandpit.tfvars ${2}
+  terraform apply -var-file sandpit.tfvars -var-file sandpit-stub-clients.tfvars ${2}
   popd > /dev/null
 }
 

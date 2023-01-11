@@ -95,3 +95,19 @@ variable "sns_topic_pagerduty_p2_alerts_arn" {
 variable "sns_topic_slack_alerts_arn" {
   type = string
 }
+
+variable "client_id" {
+  type = string
+}
+
+variable "client_base_url" {
+  type = string
+}
+
+variable "issuer_base_url" {
+  type = string
+}
+
+variable "client_private_key" {
+  type = string
+}
