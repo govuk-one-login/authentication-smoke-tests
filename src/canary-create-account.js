@@ -9,7 +9,7 @@ const SYNTHETICS_CONFIG = synthetics.getConfiguration();
 
 const express = require("express");
 const app = express();
-const { auth, requiresAuth } = require("express-openid-connect");
+const { auth } = require("express-openid-connect");
 
 SYNTHETICS_CONFIG.setConfig({
   screenshotOnStepStart: false,
@@ -81,7 +81,7 @@ const basicCustomEntryPoint = async () => {
       },
     })
   );
-  app.get("/", requiresAuth(), async (req, res) => {
+  app.get("/", async (req, res) => {
     userinfo = await req.oidc.fetchUserInfo();
     res.json(userinfo);
   });
