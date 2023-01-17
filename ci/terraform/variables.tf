@@ -126,7 +126,8 @@ variable "test-services-api-hostname" {
 }
 
 variable "client_base_url" {
-  type = string
+  type    = string
+  default = "http://localhost:3031"
 }
 
 variable "issuer_base_url" {
