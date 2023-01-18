@@ -124,3 +124,18 @@ variable "test-services-api-key" {
 variable "test-services-api-hostname" {
   type = string
 }
+
+variable "client_base_url" {
+  type    = string
+  default = "http://localhost:3031"
+}
+
+variable "issuer_base_url" {
+  type = string
+}
+
+variable "stub_rp_clients" {
+  default     = []
+  type        = list(object({ client_name : string, callback_urls : list(string), logout_urls : list(string), test_client : string, scopes : list(string), client_type : string, identity_verification_supported : string, consent_required : string }))
+  description = "The details of RP clients to provision in the Client table"
+}

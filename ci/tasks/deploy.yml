@@ -81,5 +81,7 @@ run:
         -var "test-services-api-hostname=${TEST_SERVICES_API_HOSTNAME}" \
         -var "test-services-api-key=${TEST_SERVICES_API_KEY}" \
         -var "synthetics-user-delete-path=${SYNTHETICS_USER_DELETE_PATH}" \
+        -var-file "${DEPLOY_ENVIRONMENT}-overrides.tfvars" \
+        -var-file "${DEPLOY_ENVIRONMENT}-stub-clients.tfvars" \
 
       terraform output --json > ../../../terraform-outputs/${DEPLOY_ENVIRONMENT}-smoke-test-terraform-outputs.json

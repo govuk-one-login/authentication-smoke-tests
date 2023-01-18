@@ -134,3 +134,36 @@ resource "aws_ssm_parameter" "slack_hook_url" {
 
   tags = local.default_tags
 }
+
+resource "aws_ssm_parameter" "client_id" {
+  name  = "${var.environment}-${var.canary_name}-client-id"
+  type  = "String"
+  value = var.client_id
+
+  tags = local.default_tags
+}
+
+resource "aws_ssm_parameter" "client_private_key" {
+  name   = "${var.environment}-${var.canary_name}-client-private-key"
+  type   = "SecureString"
+  value  = var.client_private_key
+  key_id = aws_kms_alias.parameter_store_key_alias.id
+
+  tags = local.default_tags
+}
+
+resource "aws_ssm_parameter" "client_base_url" {
+  name  = "${var.environment}-${var.canary_name}-client-base-url"
+  type  = "String"
+  value = var.client_base_url
+
+  tags = local.default_tags
+}
+
+resource "aws_ssm_parameter" "issuer_base_url" {
+  name  = "${var.environment}-${var.canary_name}-issuer-base-url"
+  type  = "String"
+  value = var.issuer_base_url
+
+  tags = local.default_tags
+}

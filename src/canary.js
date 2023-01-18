@@ -44,8 +44,8 @@ const basicCustomEntryPoint = async () => {
   await navigationPromise;
 
   await synthetics.executeStep("Click sign in", async () => {
-    await page.waitForSelector('#main-content #sign-in-link')
-    await page.click('#main-content #sign-in-link')
+    await page.waitForSelector('#main-content #sign-in-link');
+    await page.click('#main-content #sign-in-link');
   });
 
   await navigationPromise;
