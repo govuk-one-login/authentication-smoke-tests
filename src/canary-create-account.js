@@ -263,12 +263,12 @@ const basicCustomEntryPoint = async () => {
     await page.waitForSelector(
       "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
     );
-      await Promise.all([
-        page.click(
-              "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button",
-        page.waitForNavigation(),
-      ]);
-    );
+    await Promise.all([
+      page.click(
+        "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
+      ),
+      page.waitForNavigation(),
+    ]);
   });
 
   await synthetics.executeStep("Microclient user-info", async () => {
