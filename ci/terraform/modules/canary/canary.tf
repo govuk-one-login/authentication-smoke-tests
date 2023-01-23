@@ -20,7 +20,7 @@ resource "aws_synthetics_canary" "smoke_tester_canary" {
   run_config {
     active_tracing     = false
     memory_in_mb       = 1024
-    timeout_in_seconds = 90
+    timeout_in_seconds = 60
   }
 
   schedule {

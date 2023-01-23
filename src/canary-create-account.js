@@ -1,15 +1,11 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
+const { startClient } = require("./client");
 const crypto = require("crypto");
-const { ADDRGETNETWORKPARAMS } = require("dns");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
-
-const express = require("express");
-const app = express();
-const { auth } = require("express-openid-connect");
 
 SYNTHETICS_CONFIG.setConfig({
   screenshotOnStepStart: false,
@@ -18,7 +14,7 @@ SYNTHETICS_CONFIG.setConfig({
 });
 
 const deleteSyntheticsUser = async function (res) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (
       res.statusCode < 200 ||
       (res.statusCode > 299 && !res.statusCode == 404)
@@ -52,40 +48,17 @@ const basicCustomEntryPoint = async () => {
   const email = await getParameter("username");
   const phoneNumber = await getParameter("phone");
   const password = crypto.randomBytes(20).toString("base64url");
-  const clientBaseUrl = await getParameter("client-base-url");
-  const clientPrivateKey = await getParameter("client-private-key");
   const clientId = await getParameter("client-id");
+  const clientBaseUrl = await getParameter("client-base-url");
   const issuerBaseURL = await getParameter("issuer-base-url");
-
+  const clientPrivateKey = await getParameter("client-private-key");
+ 
   if (fireDrill === "1") {
     log.info("Fire Drill! Smoke test will fail.");
     throw "Smoke Test failed due to Fire Drill";
   }
 
-  log.info("Starting Client");
-
-  const port = 3031;
-  app.use(
-    auth({
-      issuerBaseURL: issuerBaseURL,
-      baseURL: clientBaseUrl,
-      clientID: clientId,
-      secret: crypto.randomBytes(20).toString("base64url"),
-      clientAuthMethod: "private_key_jwt",
-      clientAssertionSigningKey: clientPrivateKey,
-      idTokenSigningAlg: "ES256",
-      authRequired: true,
-      authorizationParams: {
-        response_type: "code",
-        scope: "openid email phone",
-      },
-    })
-  );
-  app.get("/", async (req, res) => {
-    userinfo = await req.oidc.fetchUserInfo();
-    res.json(userinfo);
-  });
-  const server = app.listen(port);
+  const server = await startClient(3031, "openid email phone", clientId, clientBaseUrl, issuerBaseURL, clientPrivateKey);
 
   log.info("Empty OTP code bucket");
   await emptyOtpBucket(bucketName, email);
@@ -116,7 +89,7 @@ const basicCustomEntryPoint = async () => {
     protocol: "https:",
   };
 
-  headers = {};
+  var headers = {};
   headers["User-Agent"] = [
     synthetics.getCanaryUserAgentString(),
     headers["User-Agent"],
@@ -125,7 +98,7 @@ const basicCustomEntryPoint = async () => {
 
   syntheticsUserDeleteStepOptions["headers"] = headers;
 
-  stepConfig = {
+  const stepConfig = {
     includeResponseHeaders: true,
     restrictedHeaders: ["x-api-key"],
     includeResponseBody: true,
@@ -274,7 +247,7 @@ const basicCustomEntryPoint = async () => {
   await synthetics.executeStep("Microclient user-info", async () => {
     await page.content();
 
-    userInfo = await page.evaluate(() => {
+    const userInfo = await page.evaluate(() => {
       return JSON.parse(document.querySelector("body").innerText);
     });
 
