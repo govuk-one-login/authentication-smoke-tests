@@ -16,6 +16,7 @@ const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests");
 
   const bucketName = await getParameter("bucket");
+  const email = await getParameter("username");
   const phoneNumber = await getParameter("phone");
   const clientBaseUrl = await getParameter("client-base-url");
   const clientId = await getParameter("client-id");
@@ -42,10 +43,10 @@ const basicCustomEntryPoint = async () => {
   if (CANARY_NAME.includes("integration")) {
     log.info("Running against INTEGRATION environment");
 
-    const email = await getParameter("basicauth-username");
+    const basicAuthUsername = await getParameter("basicauth-username");
     const basicAuthPassword = await getParameter("basicauth-password");
 
-    await page.authenticate({ username: email, password: basicAuthPassword });
+    await page.authenticate({ username: basicAuthUsername, password: basicAuthPassword });
   }
 
   await synthetics.executeStep("Launch Client", async () => {
@@ -68,7 +69,6 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Enter email", async () => {
     await page.waitForSelector(".govuk-grid-row #email");
-    const email = await getParameter("username");
     await page.type(".govuk-grid-row #email", email);
   });
 
