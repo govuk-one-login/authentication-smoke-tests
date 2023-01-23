@@ -1,6 +1,7 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
+const { startClient } = require("./client");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -16,6 +17,19 @@ const basicCustomEntryPoint = async () => {
 
   const bucketName = await getParameter("bucket");
   const phoneNumber = await getParameter("phone");
+  const clientBaseUrl = await getParameter("client-base-url");
+  const clientId = await getParameter("client-id");
+  const issuerBaseURL = await getParameter("issuer-base-url");
+  const clientPrivateKey = await getParameter("client-private-key");
+
+  const server = await startClient(
+    3031,
+    "openid email phone",
+    clientId,
+    clientBaseUrl,
+    issuerBaseURL,
+    clientPrivateKey
+  );
 
   log.info("Empty OTP code bucket");
   await emptyOtpBucket(bucketName, phoneNumber);
@@ -34,9 +48,11 @@ const basicCustomEntryPoint = async () => {
     await page.authenticate({ username: email, password: basicAuthPassword });
   }
 
-  await synthetics.executeStep("Launch AM", async () => {
-    const url = await getParameter("url");
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await synthetics.executeStep("Launch Client", async () => {
+    await page.goto(clientBaseUrl, {
+      waitUntil: "domcontentloaded",
+      timeout: 60000,
+    });
   });
 
   await page.setViewport({ width: 1864, height: 1096 });
@@ -44,8 +60,8 @@ const basicCustomEntryPoint = async () => {
   await navigationPromise;
 
   await synthetics.executeStep("Click sign in", async () => {
-    await page.waitForSelector('#main-content #sign-in-link');
-    await page.click('#main-content #sign-in-link');
+    await page.waitForSelector("#main-content #sign-in-link");
+    await page.click("#main-content #sign-in-link");
   });
 
   await navigationPromise;
@@ -96,31 +112,33 @@ const basicCustomEntryPoint = async () => {
     await page.waitForSelector(
       "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
     );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+    await Promise.all([
+      page.click(
+        "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
+      ),
+      page.waitForNavigation(),
+    ]);
   });
 
-  await navigationPromise;
+  await synthetics.executeStep("Microclient user-info", async () => {
+    await page.content();
 
-  await synthetics.executeStep("Your services", async () => {
-    await page.waitForSelector(".govuk-header__logotype-text");
+    const userInfo = await page.evaluate(() => {
+      return JSON.parse(document.querySelector("body").innerText);
+    });
 
-    const hasReachedAM =
-      (await page.title()) === "Your services - GOV.UK account";
+    const hasReachedUserInfo = userInfo.email === email;
 
-    if (!hasReachedAM) {
+    if (!hasReachedUserInfo) {
+      server.close();
       throw "Failed smoke test";
     }
   });
 
+  server.close();
   return "success";
 };
 
 module.exports.handler = async () => {
-  try {
-    return await basicCustomEntryPoint();
-  } catch (err) {
-    log.error(err);
-  }
+  return await basicCustomEntryPoint();
 };
