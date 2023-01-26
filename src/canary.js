@@ -32,7 +32,10 @@ const basicCustomEntryPoint = async () => {
     const basicAuthUsername = await getParameter("basicauth-username");
     const basicAuthPassword = await getParameter("basicauth-password");
 
-    await page.authenticate({ username: basicAuthUsername, password: basicAuthPassword });
+    await page.authenticate({
+      username: basicAuthUsername,
+      password: basicAuthPassword,
+    });
   }
 
   await synthetics.executeStep("Launch AM", async () => {
@@ -45,8 +48,8 @@ const basicCustomEntryPoint = async () => {
   await navigationPromise;
 
   await synthetics.executeStep("Click sign in", async () => {
-    await page.waitForSelector('#main-content #sign-in-link');
-    await page.click('#main-content #sign-in-link');
+    await page.waitForSelector("#main-content #sign-in-link");
+    await page.click("#main-content #sign-in-link");
   });
 
   await navigationPromise;

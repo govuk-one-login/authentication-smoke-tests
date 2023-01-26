@@ -52,13 +52,20 @@ const basicCustomEntryPoint = async () => {
   const clientBaseUrl = await getParameter("client-base-url");
   const issuerBaseURL = await getParameter("issuer-base-url");
   const clientPrivateKey = await getParameter("client-private-key");
- 
+
   if (fireDrill === "1") {
     log.info("Fire Drill! Smoke test will fail.");
     throw "Smoke Test failed due to Fire Drill";
   }
 
-  const server = await startClient(3031, "openid email phone", clientId, clientBaseUrl, issuerBaseURL, clientPrivateKey);
+  const server = await startClient(
+    3031,
+    "openid email phone",
+    clientId,
+    clientBaseUrl,
+    issuerBaseURL,
+    clientPrivateKey
+  );
 
   log.info("Empty OTP code bucket");
   await emptyOtpBucket(bucketName, email);
@@ -248,6 +255,7 @@ const basicCustomEntryPoint = async () => {
     await page.content();
 
     const userInfo = await page.evaluate(() => {
+      // eslint-disable-next-line no-undef
       return JSON.parse(document.querySelector("body").innerText);
     });
 
