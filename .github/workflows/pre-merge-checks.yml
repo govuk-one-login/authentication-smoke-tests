@@ -1,0 +1,27 @@
+name: Pre-merge checks
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - synchronize
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: yarn install
+      - name: Check formatting
+        run: yarn check-pretty
+      - name: Build app
+        run: yarn build
+      - name: Run lint
+        run: yarn lint
