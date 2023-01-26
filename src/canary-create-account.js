@@ -47,7 +47,7 @@ const basicCustomEntryPoint = async () => {
 
   const email = await getParameter("username");
   const phoneNumber = await getParameter("phone");
-  const password = crypto.randomBytes(20).toString("base64url");
+  const password = crypto.randomBytes(20).toString("base64url") + "a1";
   const clientId = await getParameter("client-id");
   const clientBaseUrl = await getParameter("client-base-url");
   const issuerBaseURL = await getParameter("issuer-base-url");
