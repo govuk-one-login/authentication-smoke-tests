@@ -8,6 +8,7 @@
     "clean": "rm -rf dist && rm -rf node_modules  && rm -rf release-artefacts",
     "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs",
     "pretty": "prettier --write \"*/**/*.{js,json}\"",
+    "check-pretty": "prettier --check \"*/**/*.{js,ts,json}\"",
     "lint": "eslint . --ext .js"
   },
   "prettier": {

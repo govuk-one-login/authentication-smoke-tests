@@ -4,8 +4,14 @@ const app = express();
 const { auth } = require("express-openid-connect");
 const crypto = require("crypto");
 
-const startClient = async (port, scope, clientId, clientBaseUrl, issuerBaseURL, clientPrivateKey) => {
-  
+const startClient = async (
+  port,
+  scope,
+  clientId,
+  clientBaseUrl,
+  issuerBaseURL,
+  clientPrivateKey
+) => {
   log.info("Starting Client");
   app.use(
     auth({
