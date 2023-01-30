@@ -129,3 +129,19 @@ variable "integration_issuer_base_url" {
 variable "client_private_key" {
   type = string
 }
+
+variable "cloudwatch_key_arn" {
+  type        = string
+  description = "The ARN of the KMS key to use log encryption"
+}
+
+variable "cloudwatch_log_retention" {
+  type        = number
+  description = "The number of days to retain Cloudwatch logs for"
+}
+
+variable "logging_endpoint_arns" {
+  type        = list(string)
+  default     = []
+  description = "Amazon Resource Name (ARN) for the CSLS endpoints to ship logs to"
+}

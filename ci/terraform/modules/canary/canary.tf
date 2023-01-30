@@ -35,3 +35,28 @@ resource "aws_synthetics_canary" "smoke_tester_canary" {
     aws_iam_role_policy_attachment.sms_bucket_policy,
   ]
 }
+
+resource "aws_cloudwatch_log_group" "canary_log_group" {
+  count = var.environment == "production" ? 0 : 1
+
+  name              = "/aws/lambda/cwsyn-${aws_synthetics_canary.smoke_tester_canary[0].name}"
+  tags              = local.default_tags
+  kms_key_id        = var.cloudwatch_key_arn
+  retention_in_days = var.cloudwatch_log_retention
+
+  depends_on = [
+    aws_synthetics_canary.smoke_tester_canary
+  ]
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "log_subscription" {
+  count           = var.environment == "production" ? 0 : length(var.logging_endpoint_arns)
+  name            = "${aws_synthetics_canary.smoke_tester_canary[0].name}-log-subscription-${count.index}"
+  log_group_name  = aws_cloudwatch_log_group.canary_log_group[0].name
+  filter_pattern  = ""
+  destination_arn = var.logging_endpoint_arns[count.index]
+
+  lifecycle {
+    create_before_destroy = false
+  }
+}
