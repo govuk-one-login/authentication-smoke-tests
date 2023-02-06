@@ -116,10 +116,6 @@ data "aws_iam_policy_document" "parameter_policy" {
       aws_ssm_parameter.sms_bucket.arn,
       aws_ssm_parameter.username.arn,
       aws_ssm_parameter.slack_hook_url.arn,
-      aws_ssm_parameter.client_id.arn,
-      aws_ssm_parameter.client_base_url.arn,
-      aws_ssm_parameter.issuer_base_url.arn,
-      aws_ssm_parameter.client_private_key.arn,
     ]
   }
   statement {

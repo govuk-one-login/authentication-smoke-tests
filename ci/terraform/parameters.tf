@@ -117,35 +117,3 @@ resource "aws_ssm_parameter" "smoke_test_client_id" {
 
   tags = local.default_tags
 }
-resource "aws_ssm_parameter" "client_id" {
-  name  = "${local.smoke_tester_name}-client-id"
-  type  = "String"
-  value = random_string.stub_rp_client_id[0].result
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "client_private_key" {
-  name   = "${local.smoke_tester_name}-client-private-key"
-  type   = "SecureString"
-  value  = tls_private_key.stub_rp_client_private_key[0].private_key_pem
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "client_base_url" {
-  name  = "${local.smoke_tester_name}-client-base-url"
-  type  = "String"
-  value = var.client_base_url
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "issuer_base_url" {
-  name  = "${local.smoke_tester_name}-issuer-base-url"
-  type  = "String"
-  value = var.issuer_base_url
-
-  tags = local.default_tags
-}
