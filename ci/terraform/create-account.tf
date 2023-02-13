@@ -1,7 +1,7 @@
 
 module "canary_create_account" {
   source               = "./modules/canary"
-  count                = var.environment == "production" ? 0 : 1
+  count                = contains(["production", "integration"], var.environment) ? 0 : 1
   environment          = var.environment
   artifact_s3_location = "s3://${aws_s3_bucket.smoketest_artefact_bucket.bucket}"
   artefact_bucket_arn  = aws_s3_bucket.smoketest_artefact_bucket.arn
