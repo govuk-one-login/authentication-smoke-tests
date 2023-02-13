@@ -29,3 +29,5 @@ heartbeat_code_s3_key                   = "di-monitoring-utils/heartbeat.zip/san
 hashed_password                         = "123456"
 code_s3_bucket                          = "sandpit-smoke-test-sms-codes"
 use_integration_env_for_sign_in_journey = true
+
+logging_endpoint_arns = []

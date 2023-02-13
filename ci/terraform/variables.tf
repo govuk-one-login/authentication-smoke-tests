@@ -183,3 +183,9 @@ variable "integration_password" {
   default     = null
   description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
 }
+
+variable "logging_endpoint_arns" {
+  type        = list(string)
+  default     = []
+  description = "Amazon Resource Name (ARN) for the CSLS endpoints to ship logs to"
+}

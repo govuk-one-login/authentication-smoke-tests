@@ -40,4 +40,7 @@ module "canary_create_account" {
 
   smoke_test_cron_expression = "0/03 10-17 ? * MON-FRI *"
 
+  cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
+  cloudwatch_log_retention = 1
+  logging_endpoint_arns    = var.logging_endpoint_arns
 }
