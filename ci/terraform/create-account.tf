@@ -1,7 +1,7 @@
 
 module "canary_create_account" {
   source               = "./modules/canary"
-  count                = contains(["production", "integration"], var.environment) ? 0 : 1
+  count                = contains(["production"], var.environment) ? 0 : 1
   environment          = var.environment
   artifact_s3_location = "s3://${aws_s3_bucket.smoketest_artefact_bucket.bucket}"
   artefact_bucket_arn  = aws_s3_bucket.smoketest_artefact_bucket.arn
@@ -28,7 +28,7 @@ module "canary_create_account" {
   synthetics-user-delete-path = var.synthetics-user-delete-path
   username                    = var.username_create_account
   password                    = var.password
-  phone                       = var.phone
+  phone                       = var.phone_create_account
   ipv_smoke_test_phone        = var.ipv_smoke_test_phone
   basic_auth_username         = var.basic_auth_username
   basic_auth_password         = var.basic_auth_password

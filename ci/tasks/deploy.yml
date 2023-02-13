@@ -18,6 +18,7 @@ params:
   BASIC_AUTH_USERNAME: ((basic-auth-username-integration))
   BASIC_AUTH_PASSWORD: ((basic-auth-password-integration))
   SMOKETESTER_CREATE_ACCOUNT_USERNAME: ((smoke-tester-create-account-username-integration))
+  SMOKETESTER_CREATE_ACCOUNT_PHONE: ((smoke-tester-create-account-phone-integration))
   TEST_SERVICES_API_HOSTNAME: ((test-services-api-hostname-integration))
   TEST_SERVICES_API_KEY: ((test-services-api-key-integration))
   SYNTHETICS_USER_DELETE_PATH: ((synthetics-user-delete-path-integration))
@@ -80,6 +81,7 @@ run:
         -var "alerts_code_s3_key=${ALERT_CODE_S3_KEY}" \
         -var "heartbeat_code_s3_key=${HEARTBEAT_CODE_S3_KEY}" \
         -var "username_create_account=${SMOKETESTER_CREATE_ACCOUNT_USERNAME}" \
+        -var "phone_create_account=${SMOKETESTER_CREATE_ACCOUNT_PHONE}" \
         -var "test-services-api-hostname=${TEST_SERVICES_API_HOSTNAME}" \
         -var "test-services-api-key=${TEST_SERVICES_API_KEY}" \
         -var "synthetics-user-delete-path=${SYNTHETICS_USER_DELETE_PATH}" \
