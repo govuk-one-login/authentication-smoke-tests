@@ -1,7 +1,6 @@
 
 resource "aws_synthetics_canary" "smoke_tester_canary" {
-
-  count                = var.environment == "production" ? 0 : 1
+  count                = 1
   artifact_s3_location = var.artifact_s3_location
 
   execution_role_arn = aws_iam_role.smoke_tester_role[0].arn
