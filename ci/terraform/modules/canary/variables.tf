@@ -72,7 +72,15 @@ variable "username" {
   type = string
 }
 
+variable "password" {
+  type = string
+}
+
 variable "phone" {
+  type = string
+}
+
+variable "ipv_smoke_test_phone" {
   type = string
 }
 
@@ -104,10 +112,20 @@ variable "client_base_url" {
   type = string
 }
 
+variable "id_enabled_client_base_url" {
+  type    = string
+  default = "http://localhost:3032"
+}
+
 variable "issuer_base_url" {
   type = string
 }
+variable "integration_issuer_base_url" {
+  type        = string
+  default     = ""
+  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
 
+}
 variable "client_private_key" {
   type = string
 }

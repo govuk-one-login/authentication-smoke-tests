@@ -52,6 +52,10 @@ variable "phone" {
   type = string
 }
 
+variable "ipv_smoke_test_phone" {
+  type = string
+}
+
 variable "shared_state_bucket" {
   default = ""
 }
@@ -69,6 +73,10 @@ variable "smoke_test_rate_minutes" {
 }
 
 variable "username" {
+  type = string
+}
+
+variable "ipv_smoke_test_username" {
   type = string
 }
 
@@ -91,6 +99,18 @@ variable "basic_auth_username" {
 variable "basic_auth_password" {
   type    = string
   default = null
+}
+
+variable "integration_basic_auth_username" {
+  type        = string
+  default     = null
+  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
+}
+
+variable "integration_basic_auth_password" {
+  type        = string
+  default     = null
+  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
 }
 
 variable "terms_and_conditions_version" {
@@ -130,6 +150,11 @@ variable "client_base_url" {
   default = "http://localhost:3031"
 }
 
+variable "id_enabled_client_base_url" {
+  type    = string
+  default = "http://localhost:3032"
+}
+
 variable "issuer_base_url" {
   type = string
 }
@@ -138,4 +163,21 @@ variable "stub_rp_clients" {
   default     = []
   type        = list(object({ client_name : string, callback_urls : list(string), logout_urls : list(string), test_client : string, scopes : list(string), client_type : string, identity_verification_supported : string, consent_required : string }))
   description = "The details of RP clients to provision in the Client table"
+}
+
+variable "use_integration_env_for_sign_in_journey" {
+  type        = bool
+  default     = false
+  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. To make testing easier, this variable allows us to deploy tests in one environment whilst still using the integration environment for the sign in journey"
+}
+
+variable "integration_issuer_base_url" {
+  type        = string
+  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
+
+}
+
+variable "integration_password" {
+  type        = string
+  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
 }

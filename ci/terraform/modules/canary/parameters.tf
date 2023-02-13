@@ -88,10 +88,28 @@ resource "aws_ssm_parameter" "username" {
   tags = local.default_tags
 }
 
+resource "aws_ssm_parameter" "password" {
+  name   = "${var.environment}-${var.canary_name}-password"
+  type   = "SecureString"
+  value  = var.password
+  key_id = aws_kms_alias.parameter_store_key_alias.id
+
+  tags = local.default_tags
+}
+
 resource "aws_ssm_parameter" "phone" {
   name   = "${var.environment}-${var.canary_name}-phone"
   type   = "SecureString"
   value  = var.phone
+  key_id = aws_kms_alias.parameter_store_key_alias.id
+
+  tags = local.default_tags
+}
+
+resource "aws_ssm_parameter" "ipv_smoke_test_phone" {
+  name   = "${var.environment}-${var.canary_name}-ipv-smoke-test-phone"
+  type   = "SecureString"
+  value  = var.ipv_smoke_test_phone
   key_id = aws_kms_alias.parameter_store_key_alias.id
 
   tags = local.default_tags
@@ -156,6 +174,13 @@ resource "aws_ssm_parameter" "client_base_url" {
   name  = "${var.environment}-${var.canary_name}-client-base-url"
   type  = "String"
   value = var.client_base_url
+
+  tags = local.default_tags
+}
+resource "aws_ssm_parameter" "id_enabled_client_base_url" {
+  name  = "${var.environment}-${var.canary_name}-id-enabled-client-base-url"
+  type  = "String"
+  value = var.id_enabled_client_base_url
 
   tags = local.default_tags
 }

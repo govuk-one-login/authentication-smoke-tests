@@ -10,7 +10,8 @@ const startClient = async (
   clientId,
   clientBaseUrl,
   issuerBaseURL,
-  clientPrivateKey
+  clientPrivateKey,
+  isP2LevelOfConfidenceJourney
 ) => {
   log.info("Starting Client");
   app.use(
@@ -26,6 +27,7 @@ const startClient = async (
       authorizationParams: {
         response_type: "code",
         scope: scope,
+        vtr: isP2LevelOfConfidenceJourney ? '["P2.Cl.Cm"]' : '["Cl.Cm"]',
       },
     })
   );
