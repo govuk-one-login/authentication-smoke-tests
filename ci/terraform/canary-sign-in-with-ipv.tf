@@ -1,6 +1,5 @@
 module "canary_sign_in_with_ipv" {
   source               = "./modules/canary"
-  count                = var.environment == "production" ? 0 : 1
   environment          = var.environment
   artifact_s3_location = "s3://${aws_s3_bucket.smoketest_artefact_bucket.bucket}"
   artefact_bucket_arn  = aws_s3_bucket.smoketest_artefact_bucket.arn
