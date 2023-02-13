@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "parameter_policy" {
 }
 
 data "aws_iam_policy_document" "basic_auth_parameter_policy" {
-  count = var.environment == "production" ? 0 : 1
+  count = 1
   statement {
     sid    = "AllowGetParameters"
     effect = "Allow"
@@ -174,7 +174,7 @@ data "aws_iam_policy_document" "basic_auth_parameter_policy" {
 }
 
 resource "aws_iam_policy" "basic_auth_parameter_policy" {
-  count       = var.environment == "production" ? 0 : 1
+  count       = 1
   policy      = data.aws_iam_policy_document.basic_auth_parameter_policy[0].json
   name_prefix = "${var.environment}-${var.canary_name}-basic-auth-parameter-store-policy"
 }

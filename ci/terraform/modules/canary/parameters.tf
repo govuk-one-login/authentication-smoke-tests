@@ -116,7 +116,7 @@ resource "aws_ssm_parameter" "ipv_smoke_test_phone" {
 }
 
 resource "aws_ssm_parameter" "basic_auth_username" {
-  count  = var.environment == "production" ? 0 : 1
+  count  = 1
   name   = "${var.environment}-${var.canary_name}-basicauth-username"
   type   = "SecureString"
   value  = var.basic_auth_username
@@ -126,7 +126,7 @@ resource "aws_ssm_parameter" "basic_auth_username" {
 }
 
 resource "aws_ssm_parameter" "basic_auth_password" {
-  count  = var.environment == "production" ? 0 : 1
+  count  = 1
   name   = "${var.environment}-${var.canary_name}-basicauth-password"
   type   = "SecureString"
   value  = var.basic_auth_password
