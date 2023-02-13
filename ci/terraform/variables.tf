@@ -173,11 +173,13 @@ variable "use_integration_env_for_sign_in_journey" {
 
 variable "integration_issuer_base_url" {
   type        = string
+  default     = null
   description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
 
 }
 
 variable "integration_password" {
   type        = string
+  default     = null
   description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
 }
