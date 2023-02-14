@@ -133,6 +133,10 @@ variable "username_create_account" {
   type = string
 }
 
+variable "phone_create_account" {
+  type = string
+}
+
 variable "synthetics-user-delete-path" {
   type = string
 }
