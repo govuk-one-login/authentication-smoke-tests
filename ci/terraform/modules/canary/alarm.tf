@@ -12,7 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p1" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    CanaryName = aws_synthetics_canary.smoke_tester_canary[0].name
+    CanaryName = aws_synthetics_canary.smoke_tester_canary.name
   }
 
   alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} (create account smoke test) P1 alarm"
@@ -33,7 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p2" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    CanaryName = aws_synthetics_canary.smoke_tester_canary[0].name
+    CanaryName = aws_synthetics_canary.smoke_tester_canary.name
   }
 
   alarm_description = "GOV.UK Sign in - ${local.smoke_tester_name} (create account smoke test) P2 alarm"

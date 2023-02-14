@@ -1,9 +1,8 @@
 
 resource "aws_synthetics_canary" "smoke_tester_canary" {
-  count                = 1
   artifact_s3_location = var.artifact_s3_location
 
-  execution_role_arn = aws_iam_role.smoke_tester_role[0].arn
+  execution_role_arn = aws_iam_role.smoke_tester_role.arn
   handler            = var.canary_handler
   name               = local.smoke_tester_name
   runtime_version    = "syn-nodejs-puppeteer-3.9"
@@ -36,9 +35,7 @@ resource "aws_synthetics_canary" "smoke_tester_canary" {
 }
 
 resource "aws_cloudwatch_log_group" "canary_log_group" {
-  count = var.environment == "production" ? 0 : 1
-
-  name_prefix       = "/aws/lambda/cwsyn-${aws_synthetics_canary.smoke_tester_canary[0].name}-"
+  name              = "/aws/lambda/${split(":", aws_synthetics_canary.smoke_tester_canary.engine_arn)[6]}"
   tags              = local.default_tags
   kms_key_id        = var.cloudwatch_key_arn
   retention_in_days = var.cloudwatch_log_retention
@@ -49,9 +46,9 @@ resource "aws_cloudwatch_log_group" "canary_log_group" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "log_subscription" {
-  count           = var.environment == "production" ? 0 : length(var.logging_endpoint_arns)
-  name            = "${aws_synthetics_canary.smoke_tester_canary[0].name}-log-subscription-${count.index}"
-  log_group_name  = aws_cloudwatch_log_group.canary_log_group[0].name
+  count           = length(var.logging_endpoint_arns)
+  name            = "${local.smoke_tester_name}-log-subscription-${count.index}"
+  log_group_name  = aws_cloudwatch_log_group.canary_log_group.name
   filter_pattern  = ""
   destination_arn = var.logging_endpoint_arns[count.index]
 
