@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "canary_execution" {
     ]
 
     resources = [
-      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/cwsyn-${local.smoke_tester_name}-*",
+      "arn:aws:logs:*:*:*",
     ]
   }
 
@@ -75,6 +75,10 @@ data "aws_iam_policy_document" "canary_execution" {
 resource "aws_iam_policy" "canary_execution" {
   policy      = data.aws_iam_policy_document.canary_execution.json
   name_prefix = "${var.environment}-${var.canary_name}-canary-execution-policy"
+
+  depends_on = [
+    data.aws_iam_policy_document.canary_execution
+  ]
 }
 
 data "aws_iam_policy_document" "sms_bucket_policy" {
@@ -98,6 +102,10 @@ data "aws_iam_policy_document" "sms_bucket_policy" {
 resource "aws_iam_policy" "sms_bucket_policy" {
   policy      = data.aws_iam_policy_document.sms_bucket_policy.json
   name_prefix = "${var.environment}-${var.canary_name}-canary-sms-bucket-policy"
+
+  depends_on = [
+    data.aws_iam_policy_document.sms_bucket_policy
+  ]
 }
 
 data "aws_iam_policy_document" "parameter_policy" {
@@ -144,7 +152,6 @@ data "aws_iam_policy_document" "parameter_policy" {
 }
 
 data "aws_iam_policy_document" "basic_auth_parameter_policy" {
-  count = 1
   statement {
     sid    = "AllowGetParameters"
     effect = "Allow"
@@ -154,8 +161,8 @@ data "aws_iam_policy_document" "basic_auth_parameter_policy" {
     ]
 
     resources = [
-      aws_ssm_parameter.basic_auth_password[0].arn,
-      aws_ssm_parameter.basic_auth_username[0].arn,
+      aws_ssm_parameter.basic_auth_password.arn,
+      aws_ssm_parameter.basic_auth_username.arn,
     ]
   }
   statement {
@@ -174,12 +181,19 @@ data "aws_iam_policy_document" "basic_auth_parameter_policy" {
 }
 
 resource "aws_iam_policy" "basic_auth_parameter_policy" {
-  count       = 1
-  policy      = data.aws_iam_policy_document.basic_auth_parameter_policy[0].json
+  policy      = data.aws_iam_policy_document.basic_auth_parameter_policy.json
   name_prefix = "${var.environment}-${var.canary_name}-basic-auth-parameter-store-policy"
+
+  depends_on = [
+    data.aws_iam_policy_document.basic_auth_parameter_policy
+  ]
 }
 
 resource "aws_iam_policy" "parameter_policy" {
   policy      = data.aws_iam_policy_document.parameter_policy.json
   name_prefix = "${var.environment}-${var.canary_name}-parameter-store-policy"
+
+  depends_on = [
+    data.aws_iam_policy_document.parameter_policy
+  ]
 }
