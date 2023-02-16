@@ -53,19 +53,18 @@ variable "fire_drill" {
 }
 
 variable "synthetics-user-delete-path" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "test-services-api-key" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "test-services-api-hostname" {
-  type = string
-}
-
-variable "account_management_url" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "username" {
@@ -73,14 +72,11 @@ variable "username" {
 }
 
 variable "password" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "phone" {
-  type = string
-}
-
-variable "ipv_smoke_test_phone" {
   type = string
 }
 
@@ -112,20 +108,10 @@ variable "client_base_url" {
   type = string
 }
 
-variable "id_enabled_client_base_url" {
-  type    = string
-  default = "http://localhost:3032"
-}
-
 variable "issuer_base_url" {
   type = string
 }
-variable "integration_issuer_base_url" {
-  type        = string
-  default     = ""
-  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
 
-}
 variable "client_private_key" {
   type = string
 }

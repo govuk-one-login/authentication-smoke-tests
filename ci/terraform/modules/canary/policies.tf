@@ -122,9 +122,7 @@ data "aws_iam_policy_document" "parameter_policy" {
       aws_ssm_parameter.test-services-api-key.arn,
       aws_ssm_parameter.test-services-api-hostname.arn,
       aws_ssm_parameter.synthetics-user-delete-path.arn,
-      aws_ssm_parameter.base_url.arn,
       aws_ssm_parameter.phone.arn,
-      aws_ssm_parameter.ipv_smoke_test_phone.arn,
       aws_ssm_parameter.sms_bucket.arn,
       aws_ssm_parameter.username.arn,
       aws_ssm_parameter.password.arn,
@@ -132,8 +130,7 @@ data "aws_iam_policy_document" "parameter_policy" {
       aws_ssm_parameter.client_id.arn,
       aws_ssm_parameter.client_base_url.arn,
       aws_ssm_parameter.issuer_base_url.arn,
-      aws_ssm_parameter.client_private_key.arn,
-      aws_ssm_parameter.id_enabled_client_base_url.arn
+      aws_ssm_parameter.client_private_key.arn
     ]
   }
   statement {

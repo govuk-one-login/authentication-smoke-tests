@@ -30,9 +30,9 @@ const basicCustomEntryPoint = async () => {
     : await getParameter("bucket");
   const email = await getParameter("username");
   const password = await getParameter("password");
-  const phoneNumber = await getParameter("ipv-smoke-test-phone");
+  const phoneNumber = await getParameter("phone");
   const clientId = await getParameter("client-id");
-  const clientBaseUrl = await getParameter("id-enabled-client-base-url");
+  const clientBaseUrl = await getParameter("client-base-url");
   const issuerBaseURL = await getParameter("issuer-base-url");
   const clientPrivateKey = await getParameter("client-private-key");
 
