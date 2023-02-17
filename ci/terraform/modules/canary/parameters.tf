@@ -47,6 +47,7 @@ resource "aws_ssm_parameter" "fire_drill" {
 }
 
 resource "aws_ssm_parameter" "test-services-api-key" {
+  count = var.create_account_smoke_test ? 1 : 0
   name  = "${var.environment}-${var.canary_name}-test-services-api-key"
   type  = "String"
   value = var.test-services-api-key
@@ -55,6 +56,7 @@ resource "aws_ssm_parameter" "test-services-api-key" {
 }
 
 resource "aws_ssm_parameter" "test-services-api-hostname" {
+  count = var.create_account_smoke_test ? 1 : 0
   name  = "${var.environment}-${var.canary_name}-test-services-api-hostname"
   type  = "String"
   value = var.test-services-api-hostname
@@ -63,6 +65,7 @@ resource "aws_ssm_parameter" "test-services-api-hostname" {
 }
 
 resource "aws_ssm_parameter" "synthetics-user-delete-path" {
+  count = var.create_account_smoke_test ? 1 : 0
   name  = "${var.environment}-${var.canary_name}-synthetics-user-delete-path"
   type  = "String"
   value = var.synthetics-user-delete-path
@@ -80,6 +83,7 @@ resource "aws_ssm_parameter" "username" {
 }
 
 resource "aws_ssm_parameter" "password" {
+  count  = var.create_account_smoke_test ? 0 : 1
   name   = "${var.environment}-${var.canary_name}-password"
   type   = "SecureString"
   value  = var.password

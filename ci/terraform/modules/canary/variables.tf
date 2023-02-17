@@ -31,6 +31,10 @@ variable "canary_source_version_id" {
   type = string
 }
 
+variable "create_account_smoke_test" {
+  type = bool
+}
+
 variable "artifact_s3_location" {
   type = string
 }
@@ -54,17 +58,17 @@ variable "fire_drill" {
 
 variable "synthetics-user-delete-path" {
   type    = string
-  default = ""
+  default = null
 }
 
 variable "test-services-api-key" {
   type    = string
-  default = ""
+  default = null
 }
 
 variable "test-services-api-hostname" {
   type    = string
-  default = ""
+  default = null
 }
 
 variable "username" {
@@ -73,7 +77,7 @@ variable "username" {
 
 variable "password" {
   type    = string
-  default = ""
+  default = null
 }
 
 variable "phone" {

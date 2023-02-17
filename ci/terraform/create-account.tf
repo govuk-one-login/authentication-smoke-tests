@@ -20,6 +20,7 @@ module "canary_create_account" {
   sns_topic_pagerduty_p1_alerts_arn = aws_sns_topic.pagerduty_p1_alerts.arn
   sns_topic_pagerduty_p2_alerts_arn = aws_sns_topic.pagerduty_p2_alerts.arn
   sns_topic_slack_alerts_arn        = data.aws_sns_topic.slack_events.arn
+  create_account_smoke_test         = true
 
   test-services-api-key       = var.test-services-api-key
   test-services-api-hostname  = var.test-services-api-hostname

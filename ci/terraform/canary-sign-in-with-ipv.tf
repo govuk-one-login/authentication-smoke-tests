@@ -18,6 +18,7 @@ module "canary_sign_in_with_ipv" {
   sns_topic_pagerduty_p1_alerts_arn = aws_sns_topic.pagerduty_p1_alerts.arn
   sns_topic_pagerduty_p2_alerts_arn = aws_sns_topic.pagerduty_p2_alerts.arn
   sns_topic_slack_alerts_arn        = data.aws_sns_topic.slack_events.arn
+  create_account_smoke_test         = false
 
   username            = var.ipv_smoke_test_username
   password            = var.use_integration_env_for_sign_in_journey ? var.integration_password : var.password
