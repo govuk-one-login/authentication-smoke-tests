@@ -110,7 +110,6 @@ data "aws_iam_policy_document" "parameter_policy" {
     ]
 
     resources = [
-      aws_ssm_parameter.base_url.arn,
       aws_ssm_parameter.password.arn,
       aws_ssm_parameter.phone.arn,
       aws_ssm_parameter.sms_bucket.arn,

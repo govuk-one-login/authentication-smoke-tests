@@ -1,7 +1,3 @@
-variable "account_management_url" {
-  default = null
-}
-
 variable "aws_region" {
   default = "eu-west-2"
 }

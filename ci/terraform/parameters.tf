@@ -37,14 +37,6 @@ resource "aws_kms_alias" "parameter_store_key_alias" {
   target_key_id = aws_kms_key.parameter_store_key.id
 }
 
-resource "aws_ssm_parameter" "base_url" {
-  name  = "${local.smoke_tester_name}-url"
-  type  = "String"
-  value = local.account_management_url
-
-  tags = local.default_tags
-}
-
 resource "aws_ssm_parameter" "username" {
   name   = "${local.smoke_tester_name}-username"
   type   = "SecureString"
@@ -110,13 +102,6 @@ resource "aws_ssm_parameter" "slack_hook_url" {
   tags = local.default_tags
 }
 
-resource "aws_ssm_parameter" "smoke_test_client_id" {
-  name  = "${var.environment}-smoke-test-client-id"
-  type  = "String"
-  value = random_string.stub_rp_client_id[0].result
-
-  tags = local.default_tags
-}
 resource "aws_ssm_parameter" "client_id" {
   name  = "${local.smoke_tester_name}-client-id"
   type  = "String"
