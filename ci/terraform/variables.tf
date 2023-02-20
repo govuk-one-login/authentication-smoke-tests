@@ -193,3 +193,11 @@ variable "logging_endpoint_arns" {
   default     = []
   description = "Amazon Resource Name (ARN) for the CSLS endpoints to ship logs to"
 }
+
+variable "ipv_sign_in_metric_alarm_enabled" {
+  type = bool
+}
+
+variable "create_account_metric_alarm_enabled" {
+  type = bool
+}

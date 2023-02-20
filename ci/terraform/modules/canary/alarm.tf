@@ -1,6 +1,6 @@
 
 resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p1" {
-  count               = var.environment == "production" ? 0 : 1
+  count               = var.metric_alarms_enabled ? 1 : 0
   alarm_name          = "${local.smoke_tester_name}-metric-alarm_p1"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
@@ -21,7 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p1" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p2" {
-  count               = var.environment == "production" ? 0 : 1
+  count               = var.metric_alarms_enabled ? 1 : 0
   alarm_name          = "${local.smoke_tester_name}-metric-alarm_p2"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
