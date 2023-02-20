@@ -35,6 +35,10 @@ variable "create_account_smoke_test" {
   type = bool
 }
 
+variable "metric_alarms_enabled" {
+  type = bool
+}
+
 variable "artifact_s3_location" {
   type = string
 }
