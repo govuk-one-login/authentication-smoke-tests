@@ -28,12 +28,24 @@ resource "aws_iam_role_policy_attachment" "sms_bucket_policy" {
   ]
 }
 
-resource "aws_iam_role_policy_attachment" "parameter_policy" {
-  policy_arn = aws_iam_policy.parameter_policy.arn
+resource "aws_iam_role_policy_attachment" "signin_parameter_policy_attachment" {
+  count      = var.create_account_smoke_test ? 0 : 1
+  policy_arn = aws_iam_policy.signin_parameter_policy[0].arn
   role       = aws_iam_role.smoke_tester_role.name
 
   depends_on = [
-    aws_iam_policy.parameter_policy,
+    aws_iam_policy.signin_parameter_policy[0],
+    aws_iam_role.smoke_tester_role
+  ]
+}
+
+resource "aws_iam_role_policy_attachment" "create_parameter_policy_attachment" {
+  count      = var.create_account_smoke_test ? 1 : 0
+  policy_arn = aws_iam_policy.create_parameter_policy[0].arn
+  role       = aws_iam_role.smoke_tester_role.name
+
+  depends_on = [
+    aws_iam_policy.create_parameter_policy[0],
     aws_iam_role.smoke_tester_role
   ]
 }

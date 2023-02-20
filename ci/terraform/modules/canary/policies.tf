@@ -108,7 +108,8 @@ resource "aws_iam_policy" "sms_bucket_policy" {
   ]
 }
 
-data "aws_iam_policy_document" "parameter_policy" {
+data "aws_iam_policy_document" "create_parameter_policy" {
+  count = var.create_account_smoke_test ? 1 : 0
   statement {
     sid    = "AllowGetParameters"
     effect = "Allow"
@@ -119,21 +120,55 @@ data "aws_iam_policy_document" "parameter_policy" {
 
     resources = [
       aws_ssm_parameter.fire_drill.arn,
-      aws_ssm_parameter.test-services-api-key.arn,
-      aws_ssm_parameter.test-services-api-hostname.arn,
-      aws_ssm_parameter.synthetics-user-delete-path.arn,
-      aws_ssm_parameter.base_url.arn,
+      aws_ssm_parameter.test-services-api-key[0].arn,
+      aws_ssm_parameter.test-services-api-hostname[0].arn,
+      aws_ssm_parameter.synthetics-user-delete-path[0].arn,
       aws_ssm_parameter.phone.arn,
-      aws_ssm_parameter.ipv_smoke_test_phone.arn,
       aws_ssm_parameter.sms_bucket.arn,
       aws_ssm_parameter.username.arn,
-      aws_ssm_parameter.password.arn,
       aws_ssm_parameter.slack_hook_url.arn,
       aws_ssm_parameter.client_id.arn,
       aws_ssm_parameter.client_base_url.arn,
       aws_ssm_parameter.issuer_base_url.arn,
-      aws_ssm_parameter.client_private_key.arn,
-      aws_ssm_parameter.id_enabled_client_base_url.arn
+      aws_ssm_parameter.client_private_key.arn
+    ]
+  }
+  statement {
+    sid    = "AllowDecryptOfParameters"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt",
+    ]
+
+    resources = [
+      aws_kms_alias.parameter_store_key_alias.arn,
+      aws_kms_key.parameter_store_key.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "signin_parameter_policy" {
+  count = var.create_account_smoke_test ? 0 : 1
+  statement {
+    sid    = "AllowGetParameters"
+    effect = "Allow"
+
+    actions = [
+      "ssm:GetParameter",
+    ]
+
+    resources = [
+      aws_ssm_parameter.fire_drill.arn,
+      aws_ssm_parameter.phone.arn,
+      aws_ssm_parameter.sms_bucket.arn,
+      aws_ssm_parameter.username.arn,
+      aws_ssm_parameter.password[0].arn,
+      aws_ssm_parameter.slack_hook_url.arn,
+      aws_ssm_parameter.client_id.arn,
+      aws_ssm_parameter.client_base_url.arn,
+      aws_ssm_parameter.issuer_base_url.arn,
+      aws_ssm_parameter.client_private_key.arn
     ]
   }
   statement {
@@ -189,11 +224,22 @@ resource "aws_iam_policy" "basic_auth_parameter_policy" {
   ]
 }
 
-resource "aws_iam_policy" "parameter_policy" {
-  policy      = data.aws_iam_policy_document.parameter_policy.json
+resource "aws_iam_policy" "signin_parameter_policy" {
+  count       = var.create_account_smoke_test ? 0 : 1
+  policy      = data.aws_iam_policy_document.signin_parameter_policy[0].json
   name_prefix = "${var.environment}-${var.canary_name}-parameter-store-policy"
 
   depends_on = [
-    data.aws_iam_policy_document.parameter_policy
+    data.aws_iam_policy_document.signin_parameter_policy[0]
+  ]
+}
+
+resource "aws_iam_policy" "create_parameter_policy" {
+  count       = var.create_account_smoke_test ? 1 : 0
+  policy      = data.aws_iam_policy_document.create_parameter_policy[0].json
+  name_prefix = "${var.environment}-${var.canary_name}-parameter-store-policy"
+
+  depends_on = [
+    data.aws_iam_policy_document.create_parameter_policy[0]
   ]
 }

@@ -47,6 +47,7 @@ resource "aws_ssm_parameter" "fire_drill" {
 }
 
 resource "aws_ssm_parameter" "test-services-api-key" {
+  count = var.create_account_smoke_test ? 1 : 0
   name  = "${var.environment}-${var.canary_name}-test-services-api-key"
   type  = "String"
   value = var.test-services-api-key
@@ -55,6 +56,7 @@ resource "aws_ssm_parameter" "test-services-api-key" {
 }
 
 resource "aws_ssm_parameter" "test-services-api-hostname" {
+  count = var.create_account_smoke_test ? 1 : 0
   name  = "${var.environment}-${var.canary_name}-test-services-api-hostname"
   type  = "String"
   value = var.test-services-api-hostname
@@ -63,18 +65,10 @@ resource "aws_ssm_parameter" "test-services-api-hostname" {
 }
 
 resource "aws_ssm_parameter" "synthetics-user-delete-path" {
+  count = var.create_account_smoke_test ? 1 : 0
   name  = "${var.environment}-${var.canary_name}-synthetics-user-delete-path"
   type  = "String"
   value = var.synthetics-user-delete-path
-
-  tags = local.default_tags
-}
-
-
-resource "aws_ssm_parameter" "base_url" {
-  name  = "${var.environment}-${var.canary_name}-url"
-  type  = "String"
-  value = var.account_management_url
 
   tags = local.default_tags
 }
@@ -89,6 +83,7 @@ resource "aws_ssm_parameter" "username" {
 }
 
 resource "aws_ssm_parameter" "password" {
+  count  = var.create_account_smoke_test ? 0 : 1
   name   = "${var.environment}-${var.canary_name}-password"
   type   = "SecureString"
   value  = var.password
@@ -101,15 +96,6 @@ resource "aws_ssm_parameter" "phone" {
   name   = "${var.environment}-${var.canary_name}-phone"
   type   = "SecureString"
   value  = var.phone
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "ipv_smoke_test_phone" {
-  name   = "${var.environment}-${var.canary_name}-ipv-smoke-test-phone"
-  type   = "SecureString"
-  value  = var.ipv_smoke_test_phone
   key_id = aws_kms_alias.parameter_store_key_alias.id
 
   tags = local.default_tags
@@ -172,13 +158,6 @@ resource "aws_ssm_parameter" "client_base_url" {
   name  = "${var.environment}-${var.canary_name}-client-base-url"
   type  = "String"
   value = var.client_base_url
-
-  tags = local.default_tags
-}
-resource "aws_ssm_parameter" "id_enabled_client_base_url" {
-  name  = "${var.environment}-${var.canary_name}-id-enabled-client-base-url"
-  type  = "String"
-  value = var.id_enabled_client_base_url
 
   tags = local.default_tags
 }

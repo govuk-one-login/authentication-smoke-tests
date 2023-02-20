@@ -29,7 +29,8 @@ resource "aws_synthetics_canary" "smoke_tester_canary" {
 
   depends_on = [
     aws_iam_role_policy_attachment.canary_execution,
-    aws_iam_role_policy_attachment.parameter_policy,
+    aws_iam_role_policy_attachment.signin_parameter_policy_attachment[0],
+    aws_iam_role_policy_attachment.create_parameter_policy_attachment[0],
     aws_iam_role_policy_attachment.sms_bucket_policy,
   ]
 }
