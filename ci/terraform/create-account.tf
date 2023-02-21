@@ -22,6 +22,7 @@ module "canary_create_account" {
   sns_topic_slack_alerts_arn        = data.aws_sns_topic.slack_events.arn
   create_account_smoke_test         = true
   metric_alarms_enabled             = var.create_account_metric_alarm_enabled
+  heartbeat_ping_enabled            = var.create_account_heartbeat_ping_enabled
 
   test-services-api-key       = var.test-services-api-key
   test-services-api-hostname  = var.test-services-api-hostname
@@ -41,4 +42,8 @@ module "canary_create_account" {
   cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
   cloudwatch_log_retention = 1
   logging_endpoint_arns    = var.logging_endpoint_arns
+
+  depends_on = [
+    aws_lambda_function.cronitor_ping_lambda
+  ]
 }
