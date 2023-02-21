@@ -169,7 +169,7 @@ variable "issuer_base_url" {
 
 variable "stub_rp_clients" {
   default     = []
-  type        = list(object({ client_name : string, callback_urls : list(string), logout_urls : list(string), test_client : string, scopes : list(string), client_type : string, identity_verification_supported : string, consent_required : string }))
+  type        = list(object({ client_name : string, callback_urls : list(string), logout_urls : list(string), test_client : string, smoke_test : string, scopes : list(string), client_type : string, identity_verification_supported : string, consent_required : string }))
   description = "The details of RP clients to provision in the Client table"
 }
 
