@@ -197,3 +197,11 @@ variable "ipv_sign_in_metric_alarm_enabled" {
 variable "create_account_metric_alarm_enabled" {
   type = bool
 }
+
+variable "ipv_sign_in_heartbeat_ping_enabled" {
+  type = bool
+}
+
+variable "create_account_heartbeat_ping_enabled" {
+  type = bool
+}

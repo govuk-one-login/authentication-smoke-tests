@@ -39,6 +39,10 @@ variable "metric_alarms_enabled" {
   type = bool
 }
 
+variable "heartbeat_ping_enabled" {
+  type = bool
+}
+
 variable "artifact_s3_location" {
   type = string
 }

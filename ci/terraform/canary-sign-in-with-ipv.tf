@@ -20,6 +20,7 @@ module "canary_sign_in_with_ipv" {
   sns_topic_slack_alerts_arn        = data.aws_sns_topic.slack_events.arn
   create_account_smoke_test         = false
   metric_alarms_enabled             = var.ipv_sign_in_metric_alarm_enabled
+  heartbeat_ping_enabled            = var.ipv_sign_in_heartbeat_ping_enabled
 
   username            = var.ipv_smoke_test_username
   password            = var.use_integration_env_for_sign_in_journey ? var.integration_password : var.password
@@ -37,4 +38,8 @@ module "canary_sign_in_with_ipv" {
   cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
   cloudwatch_log_retention = 1
   logging_endpoint_arns    = var.logging_endpoint_arns
+
+  depends_on = [
+    aws_lambda_function.cronitor_ping_lambda
+  ]
 }
