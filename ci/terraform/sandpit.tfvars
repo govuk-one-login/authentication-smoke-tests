@@ -29,7 +29,7 @@ create_account_heartbeat_ping_enabled = false
 ipv_sign_in_heartbeat_ping_enabled    = false
 sign_in_metric_alarm_enabled          = false
 sign_in_heartbeat_ping_enabled        = false
-
+smoke_test_cron_expression            = "0/03 09-17 ? * MON-FRI *"
 
 alerts_code_s3_key                      = "di-monitoring-utils/alerts.zip/sandpit-smoketest"
 heartbeat_code_s3_key                   = "di-monitoring-utils/heartbeat.zip/sandpit-smoketest"
