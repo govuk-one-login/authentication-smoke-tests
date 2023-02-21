@@ -98,6 +98,69 @@ resource "aws_dynamodb_table_item" "user_profile" {
   })
 }
 
+resource "aws_dynamodb_table_item" "user_credential_sign_in_smoke_test" {
+  table_name = data.aws_dynamodb_table.user_credential_table.name
+  hash_key   = data.aws_dynamodb_table.user_credential_table.hash_key
+  item = jsonencode({
+    "Email" = {
+      "S" = var.sign_in_smoke_test_username
+    },
+    "Updated" = {
+      "S" = local.create_date
+    },
+    "SubjectID" = {
+      "S" = random_string.subject_id.result
+    },
+    "Password" = {
+      "S" = var.hashed_password
+    },
+    "Created" = {
+      "S" = formatdate("YYYY-MM-DD'T'hh:mm:ss.000000", time_static.create_date.rfc3339)
+    }
+  })
+}
+
+resource "aws_dynamodb_table_item" "user_profile_sign_in_smoke_test" {
+  table_name = data.aws_dynamodb_table.user_profile_table.name
+  hash_key   = data.aws_dynamodb_table.user_profile_table.hash_key
+  item = jsonencode({
+    "Email" = {
+      "S" = var.sign_in_smoke_test_username
+    },
+    "EmailVerified" = {
+      "N" = "1"
+    },
+    "PhoneNumberVerified" = {
+      "N" = "1"
+    },
+    "SubjectID" = {
+      "S" = random_string.subject_id.result
+    },
+    "PhoneNumber" = {
+      "S" = var.sign_in_smoke_test_phone
+    },
+    "PublicSubjectID" = {
+      "S" = random_string.public_subject_id.result
+    },
+    "termsAndConditions" = {
+      "M" = {
+        "version" = {
+          "S" = var.terms_and_conditions_version
+        },
+        "timestamp" = {
+          "S" = local.create_date
+        }
+      }
+    },
+    "Updated" = {
+      "S" = local.create_date
+    },
+    "Created" = {
+      "S" = local.create_date
+    }
+  })
+}
+
 resource "aws_dynamodb_table_item" "user_profile_ipv_smoke_test" {
   table_name = data.aws_dynamodb_table.user_profile_table.name
   hash_key   = data.aws_dynamodb_table.user_profile_table.hash_key

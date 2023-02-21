@@ -32,6 +32,8 @@ params:
   SIGNED_CODE_S3_BUCKET: ((di-auth-lambda-signed-bucket))
   IPV_SMOKE_TEST_PHONE_NUMBER: ((ipv-smoke-test-phone-number-integration))
   IPV_SMOKE_TEST_USERNAME: ((ipv-smoke-test-username-integration))
+  SIGN_IN_SMOKE_TEST_PHONE_NUMBER: ((sign-in-smoke-test-phone-number-integration))
+  SIGN_IN_SMOKE_TEST_USERNAME: ((sign-in-smoke-test-username-integration))
 
 inputs:
   - name: src
@@ -87,6 +89,8 @@ run:
         -var "synthetics-user-delete-path=${SYNTHETICS_USER_DELETE_PATH}" \
         -var "ipv_smoke_test_phone=${IPV_SMOKE_TEST_PHONE_NUMBER}" \
         -var "ipv_smoke_test_username=${IPV_SMOKE_TEST_USERNAME}" \
+        -var "sign_in_smoke_test_phone=${SIGN_IN_SMOKE_TEST_PHONE_NUMBER}" \
+        -var "sign_in_smoke_test_username=${SIGN_IN_SMOKE_TEST_USERNAME}" \
         -var-file "${DEPLOY_ENVIRONMENT}-overrides.tfvars" \
         -var-file "${DEPLOY_ENVIRONMENT}-stub-clients.tfvars" \
 
