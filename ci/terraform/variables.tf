@@ -48,6 +48,10 @@ variable "phone" {
   type = string
 }
 
+variable "sign_in_smoke_test_phone" {
+  type = string
+}
+
 variable "ipv_smoke_test_phone" {
   type = string
 }
@@ -69,6 +73,10 @@ variable "smoke_test_rate_minutes" {
 }
 
 variable "username" {
+  type = string
+}
+
+variable "sign_in_smoke_test_username" {
   type = string
 }
 
@@ -198,10 +206,18 @@ variable "create_account_metric_alarm_enabled" {
   type = bool
 }
 
+variable "sign_in_metric_alarm_enabled" {
+  type = bool
+}
+
 variable "ipv_sign_in_heartbeat_ping_enabled" {
   type = bool
 }
 
 variable "create_account_heartbeat_ping_enabled" {
+  type = bool
+}
+
+variable "sign_in_heartbeat_ping_enabled" {
   type = bool
 }

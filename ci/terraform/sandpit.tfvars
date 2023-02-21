@@ -21,10 +21,14 @@ basic_auth_password                   = "p"
 integration_basic_auth_username       = ""
 integration_basic_auth_password       = ""
 slack_hook_uri                        = "some-slack-uri"
+sign_in_smoke_test_username           = ""
+sign_in_smoke_test_phone              = ""
 create_account_metric_alarm_enabled   = false
 ipv_sign_in_metric_alarm_enabled      = false
 create_account_heartbeat_ping_enabled = false
 ipv_sign_in_heartbeat_ping_enabled    = false
+sign_in_metric_alarm_enabled          = false
+sign_in_heartbeat_ping_enabled        = false
 
 
 alerts_code_s3_key                      = "di-monitoring-utils/alerts.zip/sandpit-smoketest"
