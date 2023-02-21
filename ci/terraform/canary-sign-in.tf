@@ -9,7 +9,7 @@ module "canary_sign_in" {
   sms_bucket_name_arn = local.sms_bucket_name_arn
 
   canary_handler = "canary-sign-in.handler"
-  canary_name    = "smoke-sign-in"
+  canary_name    = "smoke-in"
 
   canary_source_bucket     = aws_s3_bucket_object.canary_source.bucket
   canary_source_key        = aws_s3_bucket_object.canary_source.key
