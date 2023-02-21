@@ -10,6 +10,7 @@ stub_rp_clients = [
       "http://localhost:3031/signed-out",
     ]
     test_client                     = "1"
+    smoke_test                      = "1"
     consent_required                = "0"
     identity_verification_supported = "1"
     client_type                     = "web"
