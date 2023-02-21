@@ -119,6 +119,14 @@ resource "aws_ssm_parameter" "client_private_key" {
   tags = local.default_tags
 }
 
+resource "aws_ssm_parameter" "smoke_test_client_id" {
+  name  = "${var.environment}-smoke-test-client-id"
+  type  = "String"
+  value = random_string.stub_rp_client_id[0].result
+
+  tags = local.default_tags
+}
+
 resource "aws_ssm_parameter" "client_base_url" {
   name  = "${local.smoke_tester_name}-client-base-url"
   type  = "String"
