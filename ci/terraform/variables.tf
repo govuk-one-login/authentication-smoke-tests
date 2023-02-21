@@ -221,3 +221,7 @@ variable "create_account_heartbeat_ping_enabled" {
 variable "sign_in_heartbeat_ping_enabled" {
   type = bool
 }
+
+variable "smoke_test_cron_expression" {
+  type = string
+}

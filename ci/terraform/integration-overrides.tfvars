@@ -10,5 +10,8 @@ create_account_heartbeat_ping_enabled = false
 ipv_sign_in_metric_alarm_enabled   = true
 ipv_sign_in_heartbeat_ping_enabled = false
 
-sign_in_metric_alarm_enabled   = false
+sign_in_metric_alarm_enabled   = true
 sign_in_heartbeat_ping_enabled = false
+
+#This will run the smoke tests every 3 minutes between 09:00 - 17:00 Mon - Fri
+smoke_test_cron_expression = "0/03 09-17 ? * MON-FRI *"

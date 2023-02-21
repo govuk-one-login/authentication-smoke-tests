@@ -32,8 +32,7 @@ module "canary_sign_in" {
   client_private_key  = tls_private_key.stub_rp_client_private_key[0].private_key_pem
   issuer_base_url     = var.issuer_base_url
 
-  # the test will run Mon-Fri, between 1000-1700 every 3 minutes
-  smoke_test_cron_expression = "0/03 10-17 ? * MON-FRI *"
+  smoke_test_cron_expression = var.smoke_test_cron_expression
 
   cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
   cloudwatch_log_retention = 1
