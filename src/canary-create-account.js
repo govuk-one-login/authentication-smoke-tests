@@ -69,6 +69,7 @@ const basicCustomEntryPoint = async () => {
 
   log.info("Empty OTP code bucket");
   await emptyOtpBucket(bucketName, email);
+  await emptyOtpBucket(bucketName, phoneNumber);
 
   let page = await synthetics.getPage();
   const navigationPromise = page.waitForNavigation({
