@@ -10,8 +10,8 @@ create_account_heartbeat_ping_enabled = false
 ipv_sign_in_metric_alarm_enabled   = false
 ipv_sign_in_heartbeat_ping_enabled = false
 
-sign_in_metric_alarm_enabled   = false
-sign_in_heartbeat_ping_enabled = false
+sign_in_metric_alarm_enabled   = true
+sign_in_heartbeat_ping_enabled = true
 
 #This will run the smoke tests every 3 minutes 24/7
 smoke_test_cron_expression = "0/03 * * * ? *"
