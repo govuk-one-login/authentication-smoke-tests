@@ -1,7 +1,4 @@
 resource "random_string" "subject_id_ipv_sign_in" {
-  keepers = {
-    username = var.username
-  }
   lower   = true
   upper   = true
   special = false

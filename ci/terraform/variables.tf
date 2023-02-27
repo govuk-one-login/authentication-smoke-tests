@@ -56,10 +56,6 @@ variable "smoke_test_rate_minutes" {
   type        = number
 }
 
-variable "username" {
-  type = string
-}
-
 variable "sign_in_smoke_test_username" {
   type = string
 }

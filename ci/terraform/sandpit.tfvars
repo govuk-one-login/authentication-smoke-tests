@@ -1,7 +1,6 @@
 environment                           = "sandpit"
 shared_state_bucket                   = "digital-identity-dev-tfstate"
 password                              = "not-a-real-password"
-username                              = "hello@gov.uk"
 ipv_smoke_test_username               = ""
 ipv_smoke_test_phone                  = "07700900333"
 integration_password                  = ""

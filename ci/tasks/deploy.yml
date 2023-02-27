@@ -74,7 +74,6 @@ run:
         -var "shared_state_bucket=${STATE_BUCKET}" \
         -var "slack_hook_uri=${SLACK_ALERT_URI}" \
         -var "smoke_test_lambda_zip_file=../../../smoke-test-release/canary.zip" \
-        -var "username=${SMOKETESTER_USERNAME}" \
         -var "code_s3_bucket=${SIGNED_CODE_S3_BUCKET}" \
         -var "alerts_code_s3_key=${ALERT_CODE_S3_KEY}" \
         -var "heartbeat_code_s3_key=${HEARTBEAT_CODE_S3_KEY}" \
