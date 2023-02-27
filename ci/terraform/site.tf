@@ -32,8 +32,6 @@ locals {
     environment = var.environment
     application = "smoke-tests"
   }
-
-  smoke_tester_name = "${var.environment}-smoketest"
 }
 
 data "aws_caller_identity" "current" {}

@@ -37,62 +37,6 @@ resource "aws_kms_alias" "parameter_store_key_alias" {
   target_key_id = aws_kms_key.parameter_store_key.id
 }
 
-resource "aws_ssm_parameter" "username" {
-  name   = "${local.smoke_tester_name}-username"
-  type   = "SecureString"
-  value  = var.username
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "password" {
-  name   = "${local.smoke_tester_name}-password"
-  type   = "SecureString"
-  value  = var.password
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "phone" {
-  name   = "${local.smoke_tester_name}-phone"
-  type   = "SecureString"
-  value  = var.phone
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "basic_auth_username" {
-  count  = var.environment == "production" ? 0 : 1
-  name   = "${local.smoke_tester_name}-basicauth-username"
-  type   = "SecureString"
-  value  = var.basic_auth_username
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "basic_auth_password" {
-  count  = var.environment == "production" ? 0 : 1
-  name   = "${local.smoke_tester_name}-basicauth-password"
-  type   = "SecureString"
-  value  = var.basic_auth_password
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "sms_bucket" {
-  name   = "${local.smoke_tester_name}-bucket"
-  type   = "SecureString"
-  value  = local.sms_bucket_name
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
 resource "aws_ssm_parameter" "slack_hook_url" {
   name   = "${var.environment}-slack-hook-url"
   type   = "SecureString"
@@ -102,43 +46,10 @@ resource "aws_ssm_parameter" "slack_hook_url" {
   tags = local.default_tags
 }
 
-resource "aws_ssm_parameter" "client_id" {
-  name  = "${local.smoke_tester_name}-client-id"
-  type  = "String"
-  value = random_string.stub_rp_client_id[0].result
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "client_private_key" {
-  name   = "${local.smoke_tester_name}-client-private-key"
-  type   = "SecureString"
-  value  = tls_private_key.stub_rp_client_private_key[0].private_key_pem
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
 resource "aws_ssm_parameter" "smoke_test_client_id" {
   name  = "${var.environment}-smoke-test-client-id"
   type  = "String"
   value = random_string.stub_rp_client_id[0].result
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "client_base_url" {
-  name  = "${local.smoke_tester_name}-client-base-url"
-  type  = "String"
-  value = var.client_base_url
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "issuer_base_url" {
-  name  = "${local.smoke_tester_name}-issuer-base-url"
-  type  = "String"
-  value = var.issuer_base_url
 
   tags = local.default_tags
 }
