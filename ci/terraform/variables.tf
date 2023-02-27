@@ -15,18 +15,6 @@ variable "deployer_role_arn" {
   type        = string
 }
 
-variable "dns_state_bucket" {
-  type = string
-}
-
-variable "dns_state_key" {
-  type = string
-}
-
-variable "dns_state_role" {
-  type = string
-}
-
 variable "environment" {
   type = string
 }
@@ -42,10 +30,6 @@ variable "password" {
 variable "hashed_password" {
   type        = string
   description = "The hashed version of the password"
-}
-
-variable "phone" {
-  type = string
 }
 
 variable "sign_in_smoke_test_phone" {
