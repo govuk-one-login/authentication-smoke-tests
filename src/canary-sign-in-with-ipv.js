@@ -85,20 +85,6 @@ const basicCustomEntryPoint = async () => {
 
   await navigationPromise;
 
-  await synthetics.executeStep("Select yes to having photo ID", async () => {
-    await page.waitForSelector("#havePhotoId");
-    await page.click("#havePhotoId");
-  });
-
-  await navigationPromise;
-
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector("#form-tracking > button");
-    await page.click("#form-tracking > button");
-  });
-
-  await navigationPromise;
-
   await synthetics.executeStep("Click sign in", async () => {
     await page.waitForSelector("#main-content #sign-in-button");
     await page.click("#main-content #sign-in-button");
