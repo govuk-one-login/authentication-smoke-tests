@@ -32,8 +32,8 @@ module "canary_sign_in_with_ipv" {
   client_private_key  = tls_private_key.stub_rp_client_private_key[0].private_key_pem
   issuer_base_url     = var.use_integration_env_for_sign_in_journey ? var.integration_issuer_base_url : var.issuer_base_url
 
-  # the test will run Mon-Fri, between 1000-1700 every 5 minutes
-  smoke_test_cron_expression = "0/05 10-17 ? * MON-FRI *"
+  # the test will run Mon-Fri, between 0800-1700 (UTC) every 5 minutes
+  smoke_test_cron_expression = "0/05 08-17 ? * MON-FRI *"
 
   cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
   cloudwatch_log_retention = 1
