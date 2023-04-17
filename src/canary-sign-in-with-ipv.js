@@ -166,6 +166,7 @@ module.exports.handler = async () => {
     return await basicCustomEntryPoint();
   } catch (err) {
     log.error(err);
+    throw err;
   } finally {
     if (server) server.close();
   }

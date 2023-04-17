@@ -6,6 +6,8 @@ const { startClient } = require("./client");
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
 
+let server;
+
 SYNTHETICS_CONFIG.setConfig({
   screenshotOnStepStart: true,
   screenshotOnStepSuccess: true,
@@ -23,7 +25,7 @@ const basicCustomEntryPoint = async () => {
   const issuerBaseURL = await getParameter("issuer-base-url");
   const clientPrivateKey = await getParameter("client-private-key");
 
-  const server = await startClient(
+  server = await startClient(
     3031,
     "openid email phone",
     clientId,
@@ -133,15 +135,20 @@ const basicCustomEntryPoint = async () => {
     const hasReachedUserInfo = userInfo.email === email;
 
     if (!hasReachedUserInfo) {
-      server.close();
       throw "Failed smoke test";
     }
   });
 
-  server.close();
   return "success";
 };
 
 module.exports.handler = async () => {
-  return await basicCustomEntryPoint();
+  try {
+    return await basicCustomEntryPoint();
+  } catch (err) {
+    log.error(err);
+    throw err;
+  } finally {
+    if (server) server.close();
+  }
 };
