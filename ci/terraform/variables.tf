@@ -98,7 +98,7 @@ variable "integration_basic_auth_password" {
 }
 
 variable "terms_and_conditions_version" {
-  default = "1.1"
+  default = "1.2"
 }
 
 variable "code_s3_bucket" {
