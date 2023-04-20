@@ -151,7 +151,8 @@ const basicCustomEntryPoint = async () => {
     log.info(pageTitleForConsole);
 
     const hasReachedIPV =
-      (await page.title()) === "You’ve signed in to GOV.UK One Login – GOV.UK";
+      (await page.title()) ===
+      "Start proving your identity with GOV.UK One Login – GOV.UK";
 
     if (!hasReachedIPV) {
       throw "Failed smoke test";
