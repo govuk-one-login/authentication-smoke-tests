@@ -6,7 +6,7 @@ resource "aws_synthetics_canary" "smoke_tester_canary" {
   handler            = var.canary_handler
   name               = local.smoke_tester_name
   runtime_version    = "syn-nodejs-puppeteer-4.0"
-  start_canary       = true
+  start_canary       = var.start_canary
 
   s3_bucket  = var.canary_source_bucket
   s3_key     = var.canary_source_key
