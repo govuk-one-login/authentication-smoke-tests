@@ -143,3 +143,8 @@ variable "logging_endpoint_arns" {
   default     = []
   description = "Amazon Resource Name (ARN) for the CSLS endpoints to ship logs to"
 }
+
+variable "start_canary" {
+  type    = bool
+  default = true
+}
