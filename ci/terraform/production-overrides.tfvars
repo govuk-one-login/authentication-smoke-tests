@@ -7,7 +7,7 @@ logging_endpoint_arns = [
 create_account_metric_alarm_enabled   = false
 create_account_heartbeat_ping_enabled = false
 
-ipv_sign_in_metric_alarm_enabled   = false
+ipv_sign_in_metric_alarm_enabled   = true
 ipv_sign_in_heartbeat_ping_enabled = false
 
 sign_in_metric_alarm_enabled   = true
