@@ -152,7 +152,7 @@ const basicCustomEntryPoint = async () => {
 
     const hasReachedIPV =
       (await page.title()) ===
-      "Start proving your identity with GOV.UK One Login – GOV.UK";
+      "Tell us if you have one of the following types of photo ID";
 
     if (!hasReachedIPV) {
       throw "Failed smoke test";
