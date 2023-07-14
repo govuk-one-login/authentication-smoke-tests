@@ -1,0 +1,15 @@
+{
+  "name": "heartbeat-src",
+  "version": "1.0.0",
+  "main": "heartbeat.js",
+  "license": "MIT",
+  "dependencies": {
+    "cronitor": "^2.3.1"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.1090.0"
+  },
+  "scripts": {
+    "build": "mkdir -p ../dist && zip -r ../dist/heartbeat.zip ."
+  }
+}
