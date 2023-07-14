@@ -64,8 +64,8 @@ const formatMessage = (snsMessage, colorCode, snsMessageFooter) => {
   }
 };
 
+// eslint-disable-next-line no-unused-vars
 const handler = async function (event, context) {
-  // eslint-disable-line no-unused-vars
   console.log("Alert lambda triggered");
   const slackHookUrl =
     process.env.SLACK_WEBHOOK_URL ||

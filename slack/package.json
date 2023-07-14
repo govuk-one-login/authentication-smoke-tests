@@ -7,16 +7,7 @@
     "@aws-sdk/client-ssm": "3.354.0",
     "@aws-sdk/client-sts": "3.354.0"
   },
-  "devDependencies": {
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.5.1"
-  },
   "scripts": {
-    "build": "mkdir -p ../dist && zip -r ../dist/slack.zip .",
-    "lint": "eslint . --ext .ts,.js",
-    "pretty": "prettier --write \"**/*.{ts,json}\""
+    "build": "mkdir -p ../dist && zip -r ../dist/slack.zip ."
   }
 }

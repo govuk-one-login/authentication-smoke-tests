@@ -1,7 +1,7 @@
 const cronitor = require("cronitor")(process.env.CRONITOR_API_KEY);
 
+// eslint-disable-next-line no-unused-vars
 const handler = async function (event, context) {
-  // eslint-disable-line no-unused-vars
   const monitorKey = process.env.CRONITOR_MONITOR_KEY;
   console.log("cronitor ping monitor " + monitorKey);
   const monitor = new cronitor.Monitor(monitorKey);
