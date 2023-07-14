@@ -40,7 +40,7 @@ jobs:
         cache: 'npm'
     
     - name: Build smoke tests
-      run: npm build:${{ matrix.module }}
+      run: npm run build:${{ matrix.module }}
     
     - name: Upload ${{ matrix.module }} to source bucket
       working-directory: dist
