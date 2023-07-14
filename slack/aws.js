@@ -1,11 +1,8 @@
-const {
-  SSM
-} = require("@aws-sdk/client-ssm");
+const { SSM } = require("@aws-sdk/client-ssm");
 
 const client = new SSM();
 
 const getParameter = async (parameterName) => {
-
   const result = await client.getParameter({
     Name: `${parameterName}`,
     WithDecryption: true,
