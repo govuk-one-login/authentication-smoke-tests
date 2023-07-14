@@ -12,6 +12,13 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        module:
+        - canary
+        - alerts
+        - heartbeat
+        - slack
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -30,27 +37,26 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: 18
-        cache: 'yarn'
-    
-    - name: Install dependencies
-      run: yarn install --production
+        cache: 'npm'
     
     - name: Build smoke tests
-      run: yarn build
+      run: npm build:${{ matrix.module }}
     
-    - name: Upload smoke tests to source bucket
+    - name: Upload ${{ matrix.module }} to source bucket
       working-directory: dist
       run: |
         S3_RESPONSE=`aws s3api put-object \
           --bucket $SOURCE_BUCKET \
-          --key canary/${{ github.sha }}.zip \
-          --body canary.zip`
+          --key ${{ matrix.module }}/${{ github.sha }}.zip \
+          --body ${{ matrix.module }}.zip`
         VERSION=`echo $S3_RESPONSE | jq .VersionId -r`
         echo "VERSION=$VERSION" >> $GITHUB_ENV
     
-    - name: Start signing job for smoke tests
+    - name: Start signing job for ${{ matrix.module }}
       run: |
-        aws signer start-signing-job \
+        SIGNER_RESPONSE=`aws signer start-signing-job \
           --profile-name "${SIGNING_PROFILE}" \
-          --source "s3={bucketName=${SOURCE_BUCKET},key=canary/${{ github.sha }}.zip,version=$VERSION}" \
-          --destination "s3={bucketName=${DESTINATION_BUCKET},prefix=signed-canary-${{ github.sha }}-}"
+          --source "s3={bucketName=${SOURCE_BUCKET},key=${{ matrix.module }}/${{ github.sha }}.zip,version=$VERSION}" \
+          --destination "s3={bucketName=${DESTINATION_BUCKET},prefix=signed-${{ matrix.module }}-${{ github.sha }}-}"`
+        JOB_ID=`echo $SIGNER_RESPONSE | jq .jobId -r`
+        aws signer wait successful-signing-job --job-id $JOB_ID

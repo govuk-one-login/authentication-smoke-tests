@@ -1,0 +1,22 @@
+{
+  "name": "heartbeat-src",
+  "version": "1.0.0",
+  "main": "heartbeat.js",
+  "license": "MIT",
+  "dependencies": {
+    "cronitor": "^2.3.1"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.1090.0",
+    "eslint": "^7.30.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.6.0"
+  },
+  "scripts": {
+    "build": "mkdir -p ../dist && zip -r ../dist/heartbeat.zip .",
+    "lint": "eslint . --ext .ts,.js",
+    "pretty": "prettier --write \"**/*.{ts,json}\""
+  }
+}

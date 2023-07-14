@@ -1,0 +1,22 @@
+{
+  "name": "alerts-src",
+  "version": "1.0.0",
+  "main": "alerts.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.26.1"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.1099.0",
+    "eslint": "^7.30.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.1"
+  },
+  "scripts": {
+    "build": "mkdir -p ../dist && zip -r ../dist/alerts.zip .",
+    "lint": "eslint . --ext .ts,.js",
+    "pretty": "prettier --write \"**/*.{ts,json}\""
+  }
+}
