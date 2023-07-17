@@ -42,8 +42,16 @@ jobs:
         run: |
           aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
             --recursive --exclude "*" \
-            --include "signed-alerts-api-${{ github.sha }}-*"
+            --include "signed-alerts-${{ github.sha }}-*"
           mv artifacts/signed-alerts-*.zip artifacts/alerts.zip
+      
+      - name: Download and copy Heartbeat signed lambda zip
+        working-directory: ci/terraform
+        run: |
+          aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
+            --recursive --exclude "*" \
+            --include "signed-heartbeat-${{ github.sha }}-*"
+          mv artifacts/signed-heartbeat-*.zip artifacts/heartbeat.zip
 
       - name: Upload Smoke Tests Terraform files
         working-directory: ci/terraform

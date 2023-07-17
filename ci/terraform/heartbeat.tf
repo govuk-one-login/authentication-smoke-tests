@@ -44,8 +44,9 @@ resource "aws_iam_role_policy_attachment" "cronitor_execution" {
 resource "aws_lambda_function" "cronitor_ping_lambda" {
   function_name = local.cronitor_lambda_name
 
-  s3_bucket = var.code_s3_bucket
-  s3_key    = var.heartbeat_code_s3_key
+  s3_bucket         = var.heartbeat_lambda_zip_file == "" ? var.code_s3_bucket : aws_s3_bucket_object.heartbeat_source[0].bucket
+  s3_key            = var.heartbeat_lambda_zip_file == "" ? var.heartbeat_code_s3_key : aws_s3_bucket_object.heartbeat_source[0].key
+  s3_object_version = var.heartbeat_lambda_zip_file == "" ? null : aws_s3_bucket_object.heartbeat_source[0].version_id
 
   role        = aws_iam_role.cronitor_execution.arn
   handler     = "heartbeat.handler"
