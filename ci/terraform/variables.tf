@@ -50,6 +50,16 @@ variable "smoke_test_lambda_zip_file" {
   type        = string
 }
 
+variable "alerts_lambda_zip_file" {
+  default = ""
+  type    = string
+}
+
+variable "heartbeat_lambda_zip_file" {
+  default = ""
+  type    = string
+}
+
 variable "smoke_test_rate_minutes" {
   default     = 3
   description = "Minutes between smoke test executions"

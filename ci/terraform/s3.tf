@@ -41,3 +41,21 @@ resource "aws_s3_bucket_object" "canary_source" {
   source      = var.smoke_test_lambda_zip_file
   source_hash = filemd5(var.smoke_test_lambda_zip_file)
 }
+
+resource "aws_s3_bucket_object" "alerts_source" {
+  count  = var.alerts_lambda_zip_file == "" ? 0 : 1
+  bucket = aws_s3_bucket.smoketest_source_bucket.bucket
+  key    = "${var.environment}-alerts-canary.zip"
+
+  source      = var.alerts_lambda_zip_file
+  source_hash = filemd5(var.alerts_lambda_zip_file)
+}
+
+resource "aws_s3_bucket_object" "heartbeat_source" {
+  count  = var.alerts_lambda_zip_file == "" ? 0 : 1
+  bucket = aws_s3_bucket.smoketest_source_bucket.bucket
+  key    = "${var.environment}-heartbeat-canary.zip"
+
+  source      = var.heartbeat_lambda_zip_file
+  source_hash = filemd5(var.heartbeat_lambda_zip_file)
+}

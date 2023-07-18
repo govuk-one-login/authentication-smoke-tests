@@ -1,0 +1,66 @@
+name: Deploy Smoke Tests
+
+env:
+  GHA_ROLE: arn:aws:iam::761723964695:role/build-auth-deploy-pipeline-GitHubActionsRole-160U5ADTRKQ2O
+  DESTINATION_BUCKET: di-auth-lambda-signed-20220215170204376200000002
+  ARTIFACT_BUCKET: build-auth-deploy-pipeli-githubartifactsourcebuck-1o4hcrnik6ayv
+
+on:
+  workflow_run:
+    workflows: ["Build modules"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ env.GHA_ROLE }}
+          aws-region: eu-west-2
+      
+      - name: Download and copy Smoke Tests signed lambda zip
+        working-directory: ci/terraform
+        run: |
+          aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
+            --recursive --exclude "*" \
+            --include "signed-smoke-tests-${{ github.sha }}-*"
+          mv artifacts/signed-smoke-tests-*.zip artifacts/smoke-tests.zip
+      
+      - name: Download and copy Alerts signed lambda zip
+        working-directory: ci/terraform
+        run: |
+          aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
+            --recursive --exclude "*" \
+            --include "signed-alerts-${{ github.sha }}-*"
+          mv artifacts/signed-alerts-*.zip artifacts/alerts.zip
+      
+      - name: Download and copy Heartbeat signed lambda zip
+        working-directory: ci/terraform
+        run: |
+          aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
+            --recursive --exclude "*" \
+            --include "signed-heartbeat-${{ github.sha }}-*"
+          mv artifacts/signed-heartbeat-*.zip artifacts/heartbeat.zip
+
+      - name: Upload Smoke Tests Terraform files
+        working-directory: ci/terraform
+        run: |
+          zip -r smoke-test.zip .
+          S3_RESPONSE=`aws s3api put-object \
+            --bucket $ARTIFACT_BUCKET \
+            --key smoke-test.zip \
+            --body smoke-test.zip \
+            --metadata "repository=$GITHUB_REPOSITORY,commitsha=$GITHUB_SHA,committag=$GIT_TAG,commitmessage=$COMMIT_MSG"`
+          VERSION=`echo $S3_RESPONSE | jq .VersionId -r`
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
