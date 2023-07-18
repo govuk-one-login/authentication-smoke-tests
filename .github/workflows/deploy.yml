@@ -34,8 +34,8 @@ jobs:
         run: |
           aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
             --recursive --exclude "*" \
-            --include "signed-smoke-tests-${{ github.sha }}-*"
-          mv artifacts/signed-smoke-tests-*.zip artifacts/smoke-tests.zip
+            --include "signed-canary-${{ github.sha }}-*"
+          mv artifacts/signed-canary-*.zip artifacts/smoke-tests.zip
       
       - name: Download and copy Alerts signed lambda zip
         working-directory: ci/terraform
