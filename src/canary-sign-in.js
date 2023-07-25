@@ -55,6 +55,7 @@ const basicCustomEntryPoint = async () => {
   }
 
   await synthetics.executeStep("Launch Client", async () => {
+    
     await page.goto(clientBaseUrl, {
       waitUntil: "domcontentloaded",
     });
