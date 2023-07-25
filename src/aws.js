@@ -1,5 +1,6 @@
 const AWS = require("aws-sdk");
 const synthetics = require("Synthetics");
+const log = require("SyntheticsLogger");
 
 const SSM = new AWS.SSM();
 const S3 = new AWS.S3();

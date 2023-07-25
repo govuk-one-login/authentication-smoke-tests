@@ -5,6 +5,7 @@ const { startClient } = require("./client");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
+const isSandpitJourney = () => CANARY_NAME.includes("sandpit");
 
 let server;
 
@@ -31,7 +32,8 @@ const basicCustomEntryPoint = async () => {
     clientId,
     clientBaseUrl,
     issuerBaseURL,
-    clientPrivateKey
+    clientPrivateKey,
+    true
   );
 
   log.info("Empty OTP code bucket");
@@ -42,7 +44,7 @@ const basicCustomEntryPoint = async () => {
     waitUntil: "networkidle0",
   });
 
-  if (CANARY_NAME.includes("integration")) {
+  if (CANARY_NAME.includes("integration") || isSandpitJourney()) {
     log.info("Running against INTEGRATION environment");
 
     const basicAuthUsername = await getParameter("basicauth-username");
@@ -55,7 +57,7 @@ const basicCustomEntryPoint = async () => {
   }
 
   await synthetics.executeStep("Launch Client", async () => {
-    
+
     await page.goto(clientBaseUrl, {
       waitUntil: "domcontentloaded",
     });
