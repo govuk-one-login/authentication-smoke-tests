@@ -64,7 +64,7 @@ if [[ $BUILD == "1" ]]; then
 fi
 
 echo -n "Getting AWS credentials ... "
-eval $(gds aws digital-identity-dev -e)
+# eval $(gds aws digital-identity-dev -e)
 echo "done!"
 
 runTerraform "." "${TERRAFORM_OPTS}"
