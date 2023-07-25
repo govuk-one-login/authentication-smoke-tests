@@ -54,7 +54,7 @@ const basicCustomEntryPoint = async () => {
   });
 
   // TODO: remove ref to sandpit - this is only temp so we can point at integration for now
-  if (CANARY_NAME.includes("integration")) {
+  if (CANARY_NAME.includes("integration")|| isSandpitJourney()) {
     log.info("Running against INTEGRATION environment");
 
     const basicAuthUsername = await getParameter("basicauth-username");
