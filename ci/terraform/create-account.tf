@@ -24,9 +24,9 @@ module "canary_create_account" {
   metric_alarms_enabled             = var.create_account_metric_alarm_enabled
   heartbeat_ping_enabled            = var.create_account_heartbeat_ping_enabled
 
-  test-services-api-key       = var.test-services-api-key
-  test-services-api-hostname  = var.test-services-api-hostname
-  synthetics-user-delete-path = var.synthetics-user-delete-path
+  test_services_api_key       = var.test_services_api_key
+  test_services_api_hostname  = var.test_services_api_hostname
+  synthetics_user_delete_path = var.synthetics_user_delete_path
   username                    = var.username_create_account
   phone                       = var.phone_create_account
   basic_auth_username         = var.basic_auth_username

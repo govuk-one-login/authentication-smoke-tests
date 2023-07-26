@@ -120,9 +120,9 @@ data "aws_iam_policy_document" "create_parameter_policy" {
 
     resources = [
       aws_ssm_parameter.fire_drill.arn,
-      aws_ssm_parameter.test-services-api-key[0].arn,
-      aws_ssm_parameter.test-services-api-hostname[0].arn,
-      aws_ssm_parameter.synthetics-user-delete-path[0].arn,
+      aws_ssm_parameter.test_services_api_key[0].arn,
+      aws_ssm_parameter.test_services_api_hostname[0].arn,
+      aws_ssm_parameter.synthetics_user_delete_path[0].arn,
       aws_ssm_parameter.phone.arn,
       aws_ssm_parameter.sms_bucket.arn,
       aws_ssm_parameter.username.arn,
