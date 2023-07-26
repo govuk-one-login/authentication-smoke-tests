@@ -5,8 +5,8 @@ module "canary_sign_in_with_ipv" {
   artefact_bucket_arn  = aws_s3_bucket.smoketest_artefact_bucket.arn
 
   slack_hook_uri      = var.slack_hook_uri
-  sms_bucket_name     = var.use_integration_env_for_sign_in_journey ? "integration-smoke-test-sms-codes" : local.sms_bucket_name
-  sms_bucket_name_arn = var.use_integration_env_for_sign_in_journey ? "arn:aws:s3:::integration-smoke-test-sms-codes" : local.sms_bucket_name_arn
+  sms_bucket_name     = var.use_integration_env_for_sign_in_journey ? "build-smoke-test-sms-codes" : local.sms_bucket_name
+  sms_bucket_name_arn = var.use_integration_env_for_sign_in_journey ? "arn:aws:s3:::build-smoke-test-sms-codes" : local.sms_bucket_name_arn
 
   canary_handler = "canary-sign-in-with-ipv.handler"
   canary_name    = "smoke-ipv"
