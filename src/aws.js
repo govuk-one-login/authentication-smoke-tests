@@ -9,7 +9,7 @@ const getParameter = async (parameterName) => {
   const canaryName = synthetics.getCanaryName();
 
   const result = await SSM.getParameter({
-    Name: `${canaryName}-${parameterName}`,
+  Name: `${canaryName}-${parameterName}`,
     WithDecryption: true,
   }).promise();
 

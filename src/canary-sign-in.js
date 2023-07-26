@@ -2,6 +2,7 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
+const { validateLaunchClient } = require("./canary-sign-in-validations");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -21,6 +22,7 @@ const basicCustomEntryPoint = async () => {
   const email = await getParameter("username");
   const phoneNumber = await getParameter("phone");
   const clientBaseUrl = await getParameter("client-base-url");
+  // const clientId = "incorrectId";
   const clientId = await getParameter("client-id");
   const issuerBaseURL = await getParameter("issuer-base-url");
   const clientPrivateKey = await getParameter("client-private-key");
@@ -31,8 +33,7 @@ const basicCustomEntryPoint = async () => {
     clientId,
     clientBaseUrl,
     issuerBaseURL,
-    clientPrivateKey,
-    true
+    clientPrivateKey
   );
 
   log.info("Empty OTP code bucket");
@@ -55,12 +56,7 @@ const basicCustomEntryPoint = async () => {
     });
   }
 
-  await synthetics.executeStep("Launch Client", async () => {
-
-    await page.goto(clientBaseUrl, {
-      waitUntil: "domcontentloaded",
-    });
-  });
+  await synthetics.executeStep("Launch Client", () => validateLaunchClient(clientBaseUrl, page));
 
   await page.setViewport({ width: 1864, height: 1096 });
 
