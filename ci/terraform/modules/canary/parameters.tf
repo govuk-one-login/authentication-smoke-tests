@@ -46,29 +46,29 @@ resource "aws_ssm_parameter" "fire_drill" {
   tags = local.default_tags
 }
 
-resource "aws_ssm_parameter" "test-services-api-key" {
+resource "aws_ssm_parameter" "test_services_api_key" {
   count = var.create_account_smoke_test ? 1 : 0
-  name  = "${var.environment}-${var.canary_name}-test-services-api-key"
+  name  = "${var.environment}-${var.canary_name}-test_services_api_key"
   type  = "String"
-  value = var.test-services-api-key
+  value = var.test_services_api_key
 
   tags = local.default_tags
 }
 
-resource "aws_ssm_parameter" "test-services-api-hostname" {
+resource "aws_ssm_parameter" "test_services_api_hostname" {
   count = var.create_account_smoke_test ? 1 : 0
-  name  = "${var.environment}-${var.canary_name}-test-services-api-hostname"
+  name  = "${var.environment}-${var.canary_name}-test_services_api_hostname"
   type  = "String"
-  value = var.test-services-api-hostname
+  value = var.test_services_api_hostname
 
   tags = local.default_tags
 }
 
-resource "aws_ssm_parameter" "synthetics-user-delete-path" {
+resource "aws_ssm_parameter" "synthetics_user_delete_path" {
   count = var.create_account_smoke_test ? 1 : 0
-  name  = "${var.environment}-${var.canary_name}-synthetics-user-delete-path"
+  name  = "${var.environment}-${var.canary_name}-synthetics_user_delete_path"
   type  = "String"
-  value = var.synthetics-user-delete-path
+  value = var.synthetics_user_delete_path
 
   tags = local.default_tags
 }

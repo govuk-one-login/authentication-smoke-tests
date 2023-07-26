@@ -131,15 +131,15 @@ variable "phone_create_account" {
   type = string
 }
 
-variable "synthetics-user-delete-path" {
+variable "synthetics_user_delete_path" {
   type = string
 }
 
-variable "test-services-api-key" {
+variable "test_services_api_key" {
   type = string
 }
 
-variable "test-services-api-hostname" {
+variable "test_services_api_hostname" {
   type = string
 }
 

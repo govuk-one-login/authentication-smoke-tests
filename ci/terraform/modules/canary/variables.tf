@@ -64,17 +64,17 @@ variable "fire_drill" {
   default = "0"
 }
 
-variable "synthetics-user-delete-path" {
+variable "synthetics_user_delete_path" {
   type    = string
   default = null
 }
 
-variable "test-services-api-key" {
+variable "test_services_api_key" {
   type    = string
   default = null
 }
 
-variable "test-services-api-hostname" {
+variable "test_services_api_hostname" {
   type    = string
   default = null
 }
