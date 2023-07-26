@@ -2,7 +2,7 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
-const { validateLaunchClient } = require("./canary-sign-in-validations");
+const { validateLaunchClient, validateClickSignIn } = require("./canary-sign-in-validations");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -62,12 +62,9 @@ const basicCustomEntryPoint = async () => {
 
   await navigationPromise;
 
-  await synthetics.executeStep("Click sign in", async () => {
-    await page.waitForSelector("#main-content #sign-in-button");
-    await page.click("#main-content #sign-in-button");
-  });
+  await synthetics.executeStep("Click sign in", () => validateClickSignIn(page));
 
-  await navigationPromise;
+  await navigationPromise; //TODO can this be removed if it's in the step above
 
   await synthetics.executeStep("Enter email", async () => {
     await page.waitForSelector(".govuk-grid-row #email");
