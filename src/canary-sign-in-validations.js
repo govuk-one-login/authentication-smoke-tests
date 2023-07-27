@@ -1,30 +1,34 @@
+const { validateText, getNetworkIdlePromise } = require("./helpers");
+const { text, selectors } = require("./vars");
+
 const validateLaunchClient = async (clientBaseUrl, page) => {
     await page.goto(clientBaseUrl, {
       waitUntil: "domcontentloaded",
     });
-    const expectedText = 'Create a GOV.UK One Login or sign in';
-    // Evaluate the page content to check if the text exists
-    await page.evaluate((expectedText) => {
-      const bodyText = document.body.innerText;
-      if (!bodyText.includes(expectedText)) {
-        throw new Error(`Page does not contain text ${expectedText}`);
-      }
-    }, expectedText);
+    await validateText(text.login, page);
+
   };
 
 const validateClickSignIn = async (page) => {
-  await page.waitForSelector("#main-content #sign-in-button");
-  await page.click("#main-content #sign-in-button");
-  await page.waitForNavigation({ waitUntil: "networkidle0" });
+  await page.waitForSelector(selectors.signInButton);
+  await page.click(selectors.signInButton);
 
-  const expectedText = 'Enter your email address to sign in to your GOV.UK One Login';
-  // Evaluate the page content to check if the text exists
-  await page.evaluate((expectedText) => {
-    const bodyText = document.body.innerText;
-    if (!bodyText.includes(expectedText)) {
-      throw new Error(`Page does not contain text ${expectedText}`);
-    }
-  }, expectedText);
+  await getNetworkIdlePromise();
+
+  await validateText(text.enterEmail, page);
+
+
 };
 
-  module.exports = { validateLaunchClient, validateClickSignIn };
+const validateClickContinueAfterEnteringEmail = async (page) => {
+  await page.waitForSelector(selectors.emailContinueButton);
+  await page.click(selectors.emailContinueButton);
+  await getNetworkIdlePromise();
+
+  await validateText(text.password, page);
+
+
+};
+
+
+  module.exports = { validateLaunchClient, validateClickSignIn, validateClickContinueAfterEnteringEmail };

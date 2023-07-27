@@ -13,8 +13,6 @@ const getParameter = async (parameterName) => {
     WithDecryption: true,
   }).promise();
 
-  log.info(`${parameterName} :>> `, result.Parameter.Value)
-
   return result.Parameter.Value;
 };
 

@@ -2,7 +2,7 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
-const { validateLaunchClient, validateClickSignIn } = require("./canary-sign-in-validations");
+const { validateLaunchClient, validateClickSignIn, validateClickContinueAfterEnteringEmail } = require("./canary-sign-in-validations");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -64,23 +64,16 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click sign in", () => validateClickSignIn(page));
 
-  await navigationPromise; //TODO can this be removed if it's in the step above
+  // await navigationPromise; //TODO can this be removed if it's in the step above
 
   await synthetics.executeStep("Enter email", async () => {
     await page.waitForSelector(".govuk-grid-row #email");
     await page.type(".govuk-grid-row #email", email);
   });
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-  });
+  await synthetics.executeStep("Click continue", () => validateClickContinueAfterEnteringEmail(page));
 
-  await navigationPromise;
+  // await navigationPromise;
 
   await synthetics.executeStep("Enter password", async () => {
     await page.waitForSelector(".govuk-grid-row #password");
