@@ -1,4 +1,6 @@
 const synthetics = require("Synthetics");
+const log = require("SyntheticsLogger");
+
 
 const validateText = async (expectedText, page) => {
     await page.evaluate((expectedText) => {
@@ -18,4 +20,14 @@ const getNetworkIdlePromise = async () => {
       return idlePromise;
 }
 
-module.exports = { validateText, getNetworkIdlePromise }
+const checkTimeBefore = (text) => {
+  const time = new Date();
+    log.info(`time before ${text} = ${time.getUTCSeconds()}:${time.getMilliseconds()}`)
+}
+
+const checkTimeAfter = (text) => {
+  const time = new Date();
+    log.info(`time after ${text} = ${time.getUTCSeconds()}:${time.getMilliseconds()}`)
+}
+
+module.exports = { validateText, getNetworkIdlePromise, checkTimeBefore, checkTimeAfter }

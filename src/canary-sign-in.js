@@ -2,7 +2,8 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
-const { validateLaunchClient, validateClickSignIn, validateClickContinueAfterEnteringEmail } = require("./canary-sign-in-validations");
+const { validateText, checkTimeBefore, checkTimeAfter } = require("./helpers");
+const { text } = require("./vars");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -16,13 +17,12 @@ SYNTHETICS_CONFIG.setConfig({
 });
 
 const basicCustomEntryPoint = async () => {
-  log.info("Running smoke tests");
+  log.info(`Running smoke tests 02`);
 
   const bucketName = await getParameter("bucket");
   const email = await getParameter("username");
   const phoneNumber = await getParameter("phone");
   const clientBaseUrl = await getParameter("client-base-url");
-  // const clientId = "incorrectId";
   const clientId = await getParameter("client-id");
   const issuerBaseURL = await getParameter("issuer-base-url");
   const clientPrivateKey = await getParameter("client-private-key");
@@ -56,24 +56,50 @@ const basicCustomEntryPoint = async () => {
     });
   }
 
-  await synthetics.executeStep("Launch Client", () => validateLaunchClient(clientBaseUrl, page));
+  await synthetics.executeStep("Launch Client", async () => {
+    await page.goto(clientBaseUrl, {
+      waitUntil: "domcontentloaded",
+    });
+    await validateText(text.login, page);
+  });
 
   await page.setViewport({ width: 1864, height: 1096 });
 
+  await navigationPromise; // TODO remove these?
+
+  await synthetics.executeStep("Click sign in", async () => {
+    await page.waitForSelector("#main-content #sign-in-button");
+
+    checkTimeBefore("click sign in");
+    await Promise.all([
+      await page.click("#main-content #sign-in-button"),
+      await page.waitForNavigation({
+        waitUntil: "networkidle0",
+      })
+    ]);
+    checkTimeAfter("click sign in");
+
+
+    await validateText(text.enterEmail, page);
+  });
+
   await navigationPromise;
-
-  await synthetics.executeStep("Click sign in", () => validateClickSignIn(page));
-
-  // await navigationPromise; //TODO can this be removed if it's in the step above
 
   await synthetics.executeStep("Enter email", async () => {
     await page.waitForSelector(".govuk-grid-row #email");
     await page.type(".govuk-grid-row #email", email);
   });
 
-  await synthetics.executeStep("Click continue", () => validateClickContinueAfterEnteringEmail(page));
+  await synthetics.executeStep("Click continue", async () => {
+    await page.waitForSelector(
+      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
+    );
+    await page.click(
+      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
+    );
+  });
 
-  // await navigationPromise;
+  await navigationPromise;
 
   await synthetics.executeStep("Enter password", async () => {
     await page.waitForSelector(".govuk-grid-row #password");
