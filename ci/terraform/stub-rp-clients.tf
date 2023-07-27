@@ -19,7 +19,7 @@ resource "random_string" "stub_rp_client_id" {
 resource "aws_dynamodb_table_item" "stub_rp_client" {
   count = length(var.stub_rp_clients)
 
-  table_name = var.use_integration_env_for_sign_in_journey ? "build-client-registry" : "${var.environment}-client-registry"
+  table_name = var.use_integration_env_for_sign_in_journey ? "integration-client-registry" : "${var.environment}-client-registry"
   hash_key   = "ClientID"
 
   item = jsonencode({
