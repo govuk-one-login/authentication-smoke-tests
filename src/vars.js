@@ -9,12 +9,15 @@ const text = {
 
 const urls = {
     signIn: "sign-in-or-create",
-    email: "enter-email"
+    email: "enter-email",
+    password: "enter-password"
 }
 
 const selectors = {
     signInButton: "#main-content #sign-in-button",
-    emailContinueButton: "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
+    submitFormButton: "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button",
+    passwordInput: ".govuk-grid-row #password",
+    otpCodeInput: ".govuk-grid-row #code"
 }
 
 module.exports = { text, urls, selectors }
