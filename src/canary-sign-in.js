@@ -2,8 +2,8 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
-const { validateText, checkTimeBefore, checkTimeAfter } = require("./helpers");
-const { text } = require("./vars");
+const { validateText, checkTimeBefore, checkTimeAfter, validateNoText, getAllParams, validateUrl } = require("./helpers");
+const { text, urls } = require("./vars");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -17,10 +17,14 @@ SYNTHETICS_CONFIG.setConfig({
 });
 
 const basicCustomEntryPoint = async () => {
-  log.info(`Running smoke tests 02`);
+  log.info(`Running smoke tests 27`);
+
+  // const { bucketName, email, password } = 
+  //   getAllParams(["bucket", "email", "password"])
 
   const bucketName = await getParameter("bucket");
   const email = await getParameter("username");
+  const password = await getParameter("password");
   const phoneNumber = await getParameter("phone");
   const clientBaseUrl = await getParameter("client-base-url");
   const clientId = await getParameter("client-id");
@@ -40,9 +44,6 @@ const basicCustomEntryPoint = async () => {
   await emptyOtpBucket(bucketName, phoneNumber);
 
   let page = await synthetics.getPage();
-  const navigationPromise = page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
 
   if (CANARY_NAME.includes("integration")) {
     log.info("Running against INTEGRATION environment");
@@ -65,68 +66,54 @@ const basicCustomEntryPoint = async () => {
 
   await page.setViewport({ width: 1864, height: 1096 });
 
-  await navigationPromise; // TODO remove these?
 
-  await synthetics.executeStep("Click sign in", async () => {
+  await synthetics.executeStep("Sign in page", async () => {
     await page.waitForSelector("#main-content #sign-in-button");
-
-    checkTimeBefore("click sign in");
+    await validateText(text.login, page);
+    await validateUrl(urls.signIn, page);
     await Promise.all([
-      await page.click("#main-content #sign-in-button"),
-      await page.waitForNavigation({
-        waitUntil: "networkidle0",
-      })
+      page.click("#main-content #sign-in-button"),
+      page.waitForNavigation(),
     ]);
-    checkTimeAfter("click sign in");
-
-
-    await validateText(text.enterEmail, page);
+    await validateUrl(urls.email, page);
   });
-
-  await navigationPromise;
-
-  await synthetics.executeStep("Enter email", async () => {
+  
+  await synthetics.executeStep("Enter email page", async () => {
     await page.waitForSelector(".govuk-grid-row #email");
+    await page.waitForSelector(
+      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
+    );
+    await validateText(text.enterEmail, page);
     await page.type(".govuk-grid-row #email", email);
-  });
-
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
     await page.click(
       "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
     );
   });
 
-  await navigationPromise;
-
-  await synthetics.executeStep("Enter password", async () => {
+  await synthetics.executeStep("Enter password page", async () => {
+    await validateNoText(text.passwordWrongTooManyTimes, page);
     await page.waitForSelector(".govuk-grid-row #password");
-    const password = await getParameter("password");
-    await page.type(".govuk-grid-row #password", password);
-  });
-
-  await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(
       "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
     );
+    await validateText(text.password, page);
+    
+    await page.type(".govuk-grid-row #password", password);
     await page.click(
       "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
     );
+    await validateNoText(text.passwordError, page);
   });
 
-  await navigationPromise;
-
-  await synthetics.executeStep("Enter OTP code", async () => {
+  // TODO this step hasn't been run successfully
+  await synthetics.executeStep("OTP page", async () => {
     await page.waitForSelector(".govuk-grid-row #code");
+    await validateText(text.otp);
 
     const otpCode = await getOTPCode(phoneNumber, bucketName);
 
     await page.type(".govuk-grid-row #code", otpCode);
-  });
 
-  await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(
       "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
     );

@@ -1,7 +1,15 @@
 const text = {
     login: "Create a GOV.UK One Login or sign in",
     enterEmail: "Enter your email address to sign in to your GOV.UK One Login",
-    password: "Enter your password"
+    password: "Enter your password",
+    passwordError: "problem",
+    passwordWrongTooManyTimes: "You entered the wrong password too many times",
+    otp: "otp"
+}
+
+const urls = {
+    signIn: "sign-in-or-create",
+    email: "enter-email"
 }
 
 const selectors = {
@@ -9,4 +17,4 @@ const selectors = {
     emailContinueButton: "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
 }
 
-module.exports = { text, selectors }
+module.exports = { text, urls, selectors }
