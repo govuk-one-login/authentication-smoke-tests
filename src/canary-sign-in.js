@@ -6,6 +6,7 @@ const { selectors } = require("./vars");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
+const isSandpitJourney = () => CANARY_NAME.includes("sandpit");
 
 let server;
 
@@ -43,7 +44,7 @@ const basicCustomEntryPoint = async () => {
     waitUntil: "networkidle0",
   });
 
-  if (CANARY_NAME.includes("integration")) {
+  if (CANARY_NAME.includes("integration") || isSandpitJourney()) {
     log.info("Running against INTEGRATION environment");
 
     const basicAuthUsername = await getParameter("basicauth-username");
