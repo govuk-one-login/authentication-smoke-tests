@@ -4,7 +4,7 @@ const text = {
     password: "Enter your password",
     passwordError: "problem",
     passwordWrongTooManyTimes: "You entered the wrong password too many times",
-    otp: "otp"
+    problemText: "There is a problem"
 }
 
 const urls = {

@@ -17,11 +17,6 @@ SYNTHETICS_CONFIG.setConfig({
 });
 
 const basicCustomEntryPoint = async () => {
-  log.info(`Running smoke tests 36`);
-
-  // const { bucketName, email, password } = 
-  //   getAllParams(["bucket", "email", "password"])
-
   const bucketName = await getParameter("bucket");
   const email = await getParameter("username");
   const password = await getParameter("password");
@@ -97,20 +92,19 @@ const basicCustomEntryPoint = async () => {
     await validateNoText(text.passwordError, page);
   });
 
-  // TODO this step hasn't been run successfully
   await synthetics.executeStep("OTP page", async () => {
     await page.waitForSelector(selectors.otpCodeInput);
-    await validateText(text.otp, page);
 
     const otpCode = await getOTPCode(phoneNumber, bucketName);
 
     await page.type(selectors.otpCodeInput, otpCode);
 
-    await page.waitForSelector(submitSelector);
+    await page.waitForSelector(selectors.submitFormButton);
     await Promise.all([
-      page.click(submitSelector),
+      page.click(selectors.submitFormButton),
       page.waitForNavigation(),
     ]);
+    await validateNoText(text.problemText, page);
   });
 
   await synthetics.executeStep("Microclient user-info", async () => {
