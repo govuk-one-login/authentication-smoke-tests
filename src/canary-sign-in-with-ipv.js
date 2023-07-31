@@ -3,6 +3,11 @@ const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const { selectors } = require("./vars");
+const {
+  validateUrlContains,
+  validateNoText,
+  validateText,
+} = require("./helpers");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -73,6 +78,8 @@ const basicCustomEntryPoint = async () => {
       waitUntil: "domcontentloaded",
       timeout: 60000,
     });
+
+    await validateText("Prove your identity with GOV.UK One Login", page);
   });
 
   await page.setViewport({ width: 1864, height: 1096 });
@@ -81,14 +88,22 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue to prove identity", async () => {
     await page.waitForSelector("#form-tracking > button");
-    await page.click("#form-tracking > button");
+    await Promise.all([
+      page.click("#form-tracking > button"),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("sign-in-or-create", page);
   });
 
   await navigationPromise;
 
   await synthetics.executeStep("Click sign in", async () => {
     await page.waitForSelector(selectors.signInButton);
-    await page.click(selectors.signInButton);
+    await Promise.all([
+      page.click(selectors.signInButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("enter-email", page);
   });
 
   await navigationPromise;
@@ -100,7 +115,11 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("enter-password", page);
   });
 
   await navigationPromise;
@@ -112,26 +131,28 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("enter-code", page);
   });
 
   await navigationPromise;
 
   await synthetics.executeStep("Enter OTP code", async () => {
     await page.waitForSelector(selectors.otpCodeInput);
-
     const otpCode = await getOTPCode(phoneNumber, bucketName);
-
     await page.type(selectors.otpCodeInput, otpCode);
   });
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-
     await Promise.all([
       page.click(selectors.submitFormButton),
       page.waitForNavigation(),
     ]);
+    await validateNoText("There is a problem", page);
   });
 
   await synthetics.executeStep("IPV hand-off", async () => {

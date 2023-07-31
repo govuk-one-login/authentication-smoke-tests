@@ -3,6 +3,11 @@ const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const { selectors } = require("./vars");
+const {
+  validateText,
+  validateNoText,
+  validateUrlContains,
+} = require("./helpers");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -60,6 +65,8 @@ const basicCustomEntryPoint = async () => {
     await page.goto(clientBaseUrl, {
       waitUntil: "domcontentloaded",
     });
+
+    await validateText("Create a GOV.UK One Login or sign in", page);
   });
 
   await page.setViewport({ width: 1864, height: 1096 });
@@ -68,7 +75,11 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click sign in", async () => {
     await page.waitForSelector(selectors.signInButton);
-    await page.click(selectors.signInButton);
+    await Promise.all([
+      page.click(selectors.signInButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("enter-email", page);
   });
 
   await navigationPromise;
@@ -80,7 +91,11 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("enter-password", page);
   });
 
   await navigationPromise;
@@ -93,16 +108,18 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("enter-code", page);
   });
 
   await navigationPromise;
 
   await synthetics.executeStep("Enter OTP code", async () => {
     await page.waitForSelector(selectors.otpCodeInput);
-
     const otpCode = await getOTPCode(phoneNumber, bucketName);
-
     await page.type(selectors.otpCodeInput, otpCode);
   });
 
@@ -112,6 +129,7 @@ const basicCustomEntryPoint = async () => {
       page.click(selectors.submitFormButton),
       page.waitForNavigation(),
     ]);
+    await validateNoText("There is a problem", page);
   });
 
   await synthetics.executeStep("Microclient user-info", async () => {
