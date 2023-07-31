@@ -45,9 +45,6 @@ const basicCustomEntryPoint = async () => {
   await emptyOtpBucket(bucketName, phoneNumber);
 
   let page = await synthetics.getPage();
-  const navigationPromise = page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
 
   if (CANARY_NAME.includes("integration") || isSandpitJourney()) {
     log.info("Running against INTEGRATION environment");
@@ -71,8 +68,6 @@ const basicCustomEntryPoint = async () => {
 
   await page.setViewport({ width: 1864, height: 1096 });
 
-  await navigationPromise;
-
   await synthetics.executeStep("Click sign in", async () => {
     await page.waitForSelector(selectors.signInButton);
     await Promise.all([
@@ -81,8 +76,6 @@ const basicCustomEntryPoint = async () => {
     ]);
     await validateUrlContains("enter-email", page);
   });
-
-  await navigationPromise;
 
   await synthetics.executeStep("Enter email", async () => {
     await page.waitForSelector(selectors.emailInput);
@@ -98,8 +91,6 @@ const basicCustomEntryPoint = async () => {
     await validateUrlContains("enter-password", page);
   });
 
-  await navigationPromise;
-
   await synthetics.executeStep("Enter password", async () => {
     await page.waitForSelector(selectors.passwordInput);
     const password = await getParameter("password");
@@ -114,8 +105,6 @@ const basicCustomEntryPoint = async () => {
     ]);
     await validateUrlContains("enter-code", page);
   });
-
-  await navigationPromise;
 
   await synthetics.executeStep("Enter OTP code", async () => {
     await page.waitForSelector(selectors.otpCodeInput);
