@@ -33,6 +33,7 @@ module "canary_sign_in_with_ipv" {
   issuer_base_url     = var.use_integration_env_for_sign_in_journey ? var.integration_issuer_base_url : var.issuer_base_url
 
   smoke_test_cron_expression = var.smoke_test_cron_expression
+  start_canary               = false
 
   cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
   cloudwatch_log_retention = 1

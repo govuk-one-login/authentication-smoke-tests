@@ -17,7 +17,7 @@ SYNTHETICS_CONFIG.setConfig({
 });
 
 const basicCustomEntryPoint = async () => {
-  log.info(`Running smoke tests 28`);
+  log.info(`Running smoke tests 36`);
 
   // const { bucketName, email, password } = 
   //   getAllParams(["bucket", "email", "password"])
@@ -45,7 +45,7 @@ const basicCustomEntryPoint = async () => {
 
   let page = await synthetics.getPage();
 
-  if (CANARY_NAME.includes("integration")) {
+  if (CANARY_NAME.includes("integration") || CANARY_NAME.includes("sandpit"))  {
     log.info("Running against INTEGRATION environment");
 
     const basicAuthUsername = await getParameter("basicauth-username");
@@ -100,7 +100,7 @@ const basicCustomEntryPoint = async () => {
   // TODO this step hasn't been run successfully
   await synthetics.executeStep("OTP page", async () => {
     await page.waitForSelector(selectors.otpCodeInput);
-    await validateText(text.otp);
+    await validateText(text.otp, page);
 
     const otpCode = await getOTPCode(phoneNumber, bucketName);
 
