@@ -3,6 +3,7 @@ const synthetics = require("Synthetics");
 const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const crypto = require("crypto");
+const { selectors } = require("./vars");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -140,51 +141,39 @@ const basicCustomEntryPoint = async () => {
   await navigationPromise;
 
   await synthetics.executeStep("Enter email create", async () => {
-    await page.waitForSelector(".govuk-grid-row #email");
-    await page.type(".govuk-grid-row #email", email);
+    await page.waitForSelector(selectors.emailInput);
+    await page.type(selectors.emailInput, email);
   });
 
   await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+    await page.waitForSelector(selectors.submitFormButton);
+    await page.click(selectors.submitFormButton);
   });
 
   await navigationPromise;
 
   await synthetics.executeStep("Check your email", async () => {
-    await page.waitForSelector(".govuk-grid-row #code");
+    await page.waitForSelector(selectors.otpCodeInput);
     const emailOtpCode = await getOTPCode(email, bucketName);
-    await page.type(".govuk-grid-row #code", emailOtpCode);
+    await page.type(selectors.otpCodeInput, emailOtpCode);
   });
 
   await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+    await page.waitForSelector(selectors.submitFormButton);
+    await page.click(selectors.submitFormButton);
   });
 
   await navigationPromise;
 
   await synthetics.executeStep("Create password", async () => {
-    await page.waitForSelector(".govuk-grid-row #password");
-    await page.type(".govuk-grid-row #password", password);
+    await page.waitForSelector(selectors.passwordInput);
+    await page.type(selectors.passwordInput, password);
     await page.type(".govuk-grid-row #confirm-password", password);
   });
 
   await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+    await page.waitForSelector(selectors.submitFormButton);
+    await page.click(selectors.submitFormButton);
   });
 
   await navigationPromise;
@@ -195,12 +184,8 @@ const basicCustomEntryPoint = async () => {
   });
 
   await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+    await page.waitForSelector(selectors.submitFormButton);
+    await page.click(selectors.submitFormButton);
   });
 
   await navigationPromise;
@@ -211,29 +196,21 @@ const basicCustomEntryPoint = async () => {
   });
 
   await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+    await page.waitForSelector(selectors.submitFormButton);
+    await page.click(selectors.submitFormButton);
   });
 
   await synthetics.executeStep("Enter OTP code", async () => {
-    await page.waitForSelector(".govuk-grid-row #code");
+    await page.waitForSelector(selectors.otpCodeInput);
 
     const otpCode = await getOTPCode(phoneNumber, bucketName);
 
-    await page.type(".govuk-grid-row #code", otpCode);
+    await page.type(selectors.otpCodeInput, otpCode);
   });
 
   await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+    await page.waitForSelector(selectors.submitFormButton);
+    await page.click(selectors.submitFormButton);
   });
 
   await navigationPromise;
@@ -243,13 +220,9 @@ const basicCustomEntryPoint = async () => {
   });
 
   await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
+    await page.waitForSelector(selectors.submitFormButton);
     await Promise.all([
-      page.click(
-        "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-      ),
+      page.click(selectors.submitFormButton),
       page.waitForNavigation(),
     ]);
   });
