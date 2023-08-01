@@ -1,17 +1,15 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
+const { getParameter, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
-const { selectors } = require("./vars");
 const {
-  validateUrlContains,
-  validateNoText,
-  validateText,
+  setStandardViewportSize,
+  authenticateWithBasicAuth,
 } = require("./helpers");
+const steps = require("./steps");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
-const isSandpitJourney = () => CANARY_NAME.includes("sandpit");
 
 let server;
 
@@ -30,10 +28,7 @@ const basicCustomEntryPoint = async () => {
     throw "Sign in with IPV smoke test failed due to Fire Drill";
   }
 
-  // TODO: fix the reliance on hard coding here
-  const bucketName = isSandpitJourney()
-    ? "integration-smoke-test-sms-codes"
-    : await getParameter("bucket");
+  const bucketName = await getParameter("bucket");
   const email = await getParameter("username");
   const password = await getParameter("password");
   const phoneNumber = await getParameter("phone");
@@ -55,106 +50,39 @@ const basicCustomEntryPoint = async () => {
   log.info(`Empty OTP code bucket (${bucketName})`);
   await emptyOtpBucket(bucketName, phoneNumber);
 
-  let page = await synthetics.getPage();
+  const page = await synthetics.getPage();
 
-  // TODO: remove ref to sandpit - this is only temp so we can point at integration for now
-  if (CANARY_NAME.includes("integration") || isSandpitJourney()) {
+  // Currently, sandpit canaries need to be run against the integration backend
+  if (CANARY_NAME.includes("integration") || CANARY_NAME.includes("sandpit")) {
     log.info("Running against INTEGRATION environment");
-
-    const basicAuthUsername = await getParameter("basicauth-username");
-    const basicAuthPassword = await getParameter("basicauth-password");
-
-    await page.authenticate({
-      username: basicAuthUsername,
-      password: basicAuthPassword,
-    });
+    await authenticateWithBasicAuth(page);
   }
 
-  await synthetics.executeStep("Launch Client", async () => {
-    await page.goto(clientBaseUrl, {
-      waitUntil: "domcontentloaded",
-      timeout: 60000,
-    });
+  await steps.launchClient(
+    page,
+    clientBaseUrl,
+    "Prove your identity with GOV.UK One Login"
+  );
 
-    await validateText("Prove your identity with GOV.UK One Login", page);
-  });
+  setStandardViewportSize(page);
 
-  await page.setViewport({ width: 1864, height: 1096 });
+  await steps.clickContinueOnIpvStartPage(page);
 
-  await synthetics.executeStep("Click continue to prove identity", async () => {
-    await page.waitForSelector("#form-tracking > button");
-    await Promise.all([
-      page.click("#form-tracking > button"),
-      page.waitForNavigation(),
-    ]);
-    await validateUrlContains("sign-in-or-create", page);
-  });
+  await steps.clickSignIn(page);
 
-  await synthetics.executeStep("Click sign in", async () => {
-    await page.waitForSelector(selectors.signInButton);
-    await Promise.all([
-      page.click(selectors.signInButton),
-      page.waitForNavigation(),
-    ]);
-    await validateUrlContains("enter-email", page);
-  });
+  await steps.enterEmail(page, email);
 
-  await synthetics.executeStep("Enter email", async () => {
-    await page.waitForSelector(selectors.emailInput);
-    await page.type(selectors.emailInput, email);
-  });
+  await steps.submitEmail(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    await Promise.all([
-      page.click(selectors.submitFormButton),
-      page.waitForNavigation(),
-    ]);
-    await validateUrlContains("enter-password", page);
-  });
+  await steps.enterPassword(page, password);
 
-  await synthetics.executeStep("Enter password", async () => {
-    await page.waitForSelector(selectors.passwordInput);
-    await page.type(selectors.passwordInput, password);
-  });
+  await steps.submitPassword(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    await Promise.all([
-      page.click(selectors.submitFormButton),
-      page.waitForNavigation(),
-    ]);
-    await validateUrlContains("enter-code", page);
-  });
+  await steps.enterOtpCode(page, phoneNumber, bucketName);
 
-  await synthetics.executeStep("Enter OTP code", async () => {
-    await page.waitForSelector(selectors.otpCodeInput);
-    const otpCode = await getOTPCode(phoneNumber, bucketName);
-    await page.type(selectors.otpCodeInput, otpCode);
-  });
+  await steps.submitOtpCode(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    await Promise.all([
-      page.click(selectors.submitFormButton),
-      page.waitForNavigation(),
-    ]);
-    await validateNoText("There is a problem", page);
-  });
-
-  await synthetics.executeStep("IPV hand-off", async () => {
-    const pageTitleForConsole = await page.title();
-
-    log.info(pageTitleForConsole);
-
-    const hasReachedIPV =
-      (await page.title()) ===
-      "Tell us if you have one of the following types of photo ID – GOV.UK";
-
-    if (!hasReachedIPV) {
-      throw "Failed smoke test";
-    }
-  });
+  await steps.ipvHandOff(page);
 
   return "success";
 };

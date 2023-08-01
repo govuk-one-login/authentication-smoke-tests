@@ -1,3 +1,5 @@
+const { getParameter } = require("./aws");
+
 const validateText = async (expectedText, page) => {
   await page.evaluate((expectedText) => {
     // eslint-disable-next-line no-undef
@@ -24,5 +26,24 @@ const validateUrlContains = async (expectedSlug, page) => {
     throw new Error(`Url is ${url} and does not contain '${expectedSlug}'`);
   }
 };
+const setStandardViewportSize = async (page) => {
+  await page.setViewport({ width: 1864, height: 1096 });
+};
 
-module.exports = { validateText, validateNoText, validateUrlContains };
+const authenticateWithBasicAuth = async (page) => {
+  const basicAuthUsername = await getParameter("basicauth-username");
+  const basicAuthPassword = await getParameter("basicauth-password");
+
+  await page.authenticate({
+    username: basicAuthUsername,
+    password: basicAuthPassword,
+  });
+};
+
+module.exports = {
+  validateText,
+  validateNoText,
+  validateUrlContains,
+  setStandardViewportSize,
+  authenticateWithBasicAuth,
+};
