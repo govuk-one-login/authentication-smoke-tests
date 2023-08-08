@@ -1,24 +1,30 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
+const { getParameter, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
+const {
+  setStandardViewportSize,
+  authenticateWithBasicAuth,
+} = require("./helpers");
+const steps = require("./steps");
 
 const CANARY_NAME = synthetics.getCanaryName();
+
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
-
-let server;
-
 SYNTHETICS_CONFIG.setConfig({
   screenshotOnStepStart: true,
   screenshotOnStepSuccess: true,
   screenshotOnStepFailure: true,
 });
 
+let server;
+
 const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests");
 
   const bucketName = await getParameter("bucket");
   const email = await getParameter("username");
+  const password = await getParameter("password");
   const phoneNumber = await getParameter("phone");
   const clientBaseUrl = await getParameter("client-base-url");
   const clientId = await getParameter("client-id");
@@ -34,110 +40,40 @@ const basicCustomEntryPoint = async () => {
     clientPrivateKey
   );
 
-  log.info("Empty OTP code bucket");
+  log.info("Emptying OTP code bucket");
   await emptyOtpBucket(bucketName, phoneNumber);
 
-  let page = await synthetics.getPage();
-  const navigationPromise = page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
+  const page = await synthetics.getPage();
 
-  if (CANARY_NAME.includes("integration")) {
+  // Currently, sandpit canaries need to be run against the integration backend
+  if (CANARY_NAME.includes("integration") || CANARY_NAME.includes("sandpit")) {
     log.info("Running against INTEGRATION environment");
-
-    const basicAuthUsername = await getParameter("basicauth-username");
-    const basicAuthPassword = await getParameter("basicauth-password");
-
-    await page.authenticate({
-      username: basicAuthUsername,
-      password: basicAuthPassword,
-    });
+    await authenticateWithBasicAuth(page);
   }
 
-  await synthetics.executeStep("Launch Client", async () => {
-    await page.goto(clientBaseUrl, {
-      waitUntil: "domcontentloaded",
-    });
-  });
+  await steps.launchClient(
+    page,
+    clientBaseUrl,
+    "Create a GOV.UK One Login or sign in"
+  );
 
-  await page.setViewport({ width: 1864, height: 1096 });
+  setStandardViewportSize(page);
 
-  await navigationPromise;
+  await steps.clickSignIn(page);
 
-  await synthetics.executeStep("Click sign in", async () => {
-    await page.waitForSelector("#main-content #sign-in-button");
-    await page.click("#main-content #sign-in-button");
-  });
+  await steps.enterEmail(page, email);
 
-  await navigationPromise;
+  await steps.submitEmail(page);
 
-  await synthetics.executeStep("Enter email", async () => {
-    await page.waitForSelector(".govuk-grid-row #email");
-    await page.type(".govuk-grid-row #email", email);
-  });
+  await steps.enterPassword(page, password);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-  });
+  await steps.submitPassword(page);
 
-  await navigationPromise;
+  await steps.enterOtpCode(page, phoneNumber, bucketName);
 
-  await synthetics.executeStep("Enter password", async () => {
-    await page.waitForSelector(".govuk-grid-row #password");
-    const password = await getParameter("password");
-    await page.type(".govuk-grid-row #password", password);
-  });
+  await steps.submitOtpCode(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await page.click(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-  });
-
-  await navigationPromise;
-
-  await synthetics.executeStep("Enter OTP code", async () => {
-    await page.waitForSelector(".govuk-grid-row #code");
-
-    const otpCode = await getOTPCode(phoneNumber, bucketName);
-
-    await page.type(".govuk-grid-row #code", otpCode);
-  });
-
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(
-      "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-    );
-    await Promise.all([
-      page.click(
-        "#main-content > .govuk-grid-row > .govuk-grid-column-two-thirds > form > .govuk-button"
-      ),
-      page.waitForNavigation(),
-    ]);
-  });
-
-  await synthetics.executeStep("Microclient user-info", async () => {
-    await page.content();
-
-    const userInfo = await page.evaluate(() => {
-      // eslint-disable-next-line no-undef
-      return JSON.parse(document.querySelector("body").innerText);
-    });
-
-    const hasReachedUserInfo = userInfo.email === email;
-
-    if (!hasReachedUserInfo) {
-      throw "Failed smoke test";
-    }
-  });
+  await steps.microclientUserInfo(page, email);
 
   return "success";
 };
