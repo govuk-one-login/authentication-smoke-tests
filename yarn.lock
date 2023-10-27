@@ -622,10 +622,10 @@ events@1.1.1:
   resolved "https://registry.npmjs.org/events/-/events-1.1.1.tgz"
   integrity sha512-kEcvvCBByWXGnZy6JUlgAp2gBIUjfCAV6P6TgT1/aaQKcmuAEC4OZTV1I4EWQLz2gxZw76atuVyvHhTxvi0Flw==
 
-express-openid-connect@^2.16.0:
-  version "2.16.0"
-  resolved "https://registry.npmjs.org/express-openid-connect/-/express-openid-connect-2.16.0.tgz"
-  integrity sha512-BSfILqWEiE285PycycXb/HLYXtsnS/AnVRHAmvtJ5h1TZrhN6ddR6rhAI2svZlKStCAubc+W346pEXy1hIRfhQ==
+express-openid-connect@^2.17.0:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/express-openid-connect/-/express-openid-connect-2.17.0.tgz#819b83e431b845f5eb4e9da58b3de6fc8302e79c"
+  integrity sha512-1/QZKbh+JQgBxX7RpB93iKSfLDXJ8tGMtzPpOf87LQps84A7SIls3YRZBbAqwamYcg4CDmlbHAaYSh0tlTNF8A==
   dependencies:
     base64url "^3.0.1"
     clone "^2.1.2"
