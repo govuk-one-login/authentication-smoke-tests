@@ -2,7 +2,7 @@ resource "random_string" "subject_id_sign_in" {
   lower   = true
   upper   = true
   special = false
-  number  = true
+  numeric = true
   length  = 32
 }
 
@@ -10,8 +10,12 @@ resource "random_string" "public_subject_id_sign_in" {
   lower   = true
   upper   = true
   special = false
-  number  = true
+  numeric = true
   length  = 32
+}
+
+resource "random_bytes" "salt_sign_in" {
+  length = 32
 }
 
 resource "aws_dynamodb_table_item" "user_credential_sign_in_smoke_test" {
@@ -73,6 +77,9 @@ resource "aws_dynamodb_table_item" "user_profile_sign_in_smoke_test" {
     },
     "Created" = {
       "S" = local.create_date
+    },
+    "salt" = {
+      "B" = random_bytes.salt_sign_in.base64
     }
   })
 }
