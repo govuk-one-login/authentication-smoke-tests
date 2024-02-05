@@ -14,7 +14,7 @@ resource "aws_s3_bucket" "smoketest_artefact_bucket" {
   tags = local.default_tags
 }
 
-resource "aws_s3_bucket_public_access_block" "smoketest_artefact_source_bucket" {
+resource "aws_s3_bucket_public_access_block" "smoketest_artefact_private_bucket" {
   bucket = aws_s3_bucket.smoketest_artefact_bucket.id
   block_public_acls = true
   ignore_public_acls = true
@@ -42,7 +42,7 @@ resource "aws_s3_bucket" "smoketest_source_bucket" {
   tags = local.default_tags
 }
 
-resource "aws_s3_bucket_public_access_block" "smoketest_source_bucket" {
+resource "aws_s3_bucket_public_access_block" "smoketest_source_private_bucket" {
   bucket = aws_s3_bucket.smoketest_source_bucket.id
   block_public_acls = true
   ignore_public_acls = true
