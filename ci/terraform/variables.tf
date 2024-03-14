@@ -215,3 +215,8 @@ variable "sign_in_heartbeat_ping_enabled" {
 variable "smoke_test_cron_expression" {
   type = string
 }
+
+variable "runtime_version" {
+  type    = string
+  default = "syn-nodejs-puppeteer-5.1"
+}
