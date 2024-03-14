@@ -37,6 +37,7 @@ module "canary_sign_in" {
   cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
   cloudwatch_log_retention = 1
   logging_endpoint_arns    = var.logging_endpoint_arns
+  runtime_version          = var.runtime_version
 
   depends_on = [
     aws_lambda_function.cronitor_ping_lambda

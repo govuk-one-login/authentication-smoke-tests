@@ -128,6 +128,10 @@ variable "client_private_key" {
   type = string
 }
 
+variable "runtime_version" {
+  type = string
+}
+
 variable "cloudwatch_key_arn" {
   type        = string
   description = "The ARN of the KMS key to use log encryption"
