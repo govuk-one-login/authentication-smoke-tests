@@ -218,5 +218,5 @@ variable "smoke_test_cron_expression" {
 
 variable "runtime_version" {
   type    = string
-  default = "syn-nodejs-puppeteer-5.1"
+  default = "syn-nodejs-puppeteer-7.0"
 }
