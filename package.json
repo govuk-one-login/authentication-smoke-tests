@@ -7,11 +7,11 @@
   "scripts": {
     "clean": "rm -rf dist && rm -rf node_modules  && rm -rf release-artefacts",
     "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs",
-    "build:canary": "npm ci && npm run build",
-    "build:alerts": "cd alerts && npm ci && npm run build",
-    "build:heartbeat": "cd heartbeat && npm ci && npm run build",
-    "build:slack": "cd slack && npm ci && npm run build",
-    "build:all": "npm run build:canary && npm run build:alerts && npm run build:heartbeat && npm run build slack",
+    "build:canary": "yarn ci && yarn run build",
+    "build:alerts": "cd alerts && yarn ci && yarn run build",
+    "build:heartbeat": "cd heartbeat && yarn ci && yarn run build",
+    "build:slack": "cd slack && yarn ci && yarn run build",
+    "build:all": "yarn run build:canary && yarn run build:alerts && yarn run build:heartbeat && yarn run build slack",
     "pretty": "prettier --write \"*/**/*.{js,json}\"",
     "check-pretty": "prettier --check \"*/**/*.{js,ts,json}\"",
     "lint": "eslint . --ext .js"

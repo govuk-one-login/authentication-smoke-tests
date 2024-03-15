@@ -37,10 +37,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: "npm"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
       - name: Build smoke tests
-        run: npm run build:${{ matrix.module }}
+        run: yarn run build:${{ matrix.module }}
 
       - name: Upload ${{ matrix.module }} to source bucket
         working-directory: dist
