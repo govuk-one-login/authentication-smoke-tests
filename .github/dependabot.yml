@@ -1,13 +1,40 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
       interval: daily
       time: "03:00"
     open-pull-requests-limit: 100
     target-branch: main
     labels:
-    - dependabot
+      - dependabot
     commit-message:
       prefix: BAU
+  - package-ecosystem: "npm"
+    directory: /alerts
+    schedule:
+      interval: daily
+      time: "03:00"
+    open-pull-requests-limit: 100
+    target-branch: main
+    labels:
+      - dependabot
+  - package-ecosystem: "npm"
+    directory: /heartbeat
+    schedule:
+      interval: daily
+      time: "03:00"
+    open-pull-requests-limit: 100
+    target-branch: main
+    labels:
+      - dependabot
+  - package-ecosystem: "npm"
+    directory: /slack
+    schedule:
+      interval: daily
+      time: "03:00"
+    open-pull-requests-limit: 100
+    target-branch: main
+    labels:
+      - dependabot
