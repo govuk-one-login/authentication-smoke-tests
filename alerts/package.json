@@ -4,7 +4,7 @@
   "main": "alerts.js",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.26.1"
+    "axios": "^1.6.8"
   },
   "devDependencies": {
     "aws-sdk": "^2.1099.0"
