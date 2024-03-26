@@ -34,7 +34,7 @@ USAGE
 
 BUILD=0
 TERRAFORM_OPTS="-auto-approve"
-if [[ $# == 0 ]]; then
+if [[ $# == 0 ]] || [[ $* == "-p" ]]; then
     BUILD=1
 fi
 while [[ $# -gt 0 ]]; do

@@ -11,9 +11,9 @@ module "canary_sign_in" {
   canary_handler = "canary-sign-in.handler"
   canary_name    = "smoke-in"
 
-  canary_source_bucket     = aws_s3_bucket_object.canary_source.bucket
-  canary_source_key        = aws_s3_bucket_object.canary_source.key
-  canary_source_version_id = aws_s3_bucket_object.canary_source.version_id
+  canary_source_bucket     = aws_s3_object.canary_source.bucket
+  canary_source_key        = aws_s3_object.canary_source.key
+  canary_source_version_id = aws_s3_object.canary_source.version_id
 
   sns_topic_pagerduty_p1_alerts_arn = aws_sns_topic.pagerduty_p1_alerts.arn
   sns_topic_pagerduty_p2_alerts_arn = aws_sns_topic.pagerduty_p2_alerts.arn

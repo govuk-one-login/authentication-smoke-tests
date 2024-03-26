@@ -3,9 +3,9 @@ data "aws_lambda_function" "cronitor_ping_lambda" {
 }
 
 resource "aws_cloudwatch_event_rule" "cronitor_event" {
-  count      = var.heartbeat_ping_enabled ? 1 : 0
-  name       = "${local.smoke_tester_name}-cronitor-rule"
-  is_enabled = true
+  count = var.heartbeat_ping_enabled ? 1 : 0
+  name  = "${local.smoke_tester_name}-cronitor-rule"
+  state = "ENABLED"
   event_pattern = jsonencode({
     "source" = [
       "aws.synthetics"
