@@ -13,7 +13,7 @@ resource "aws_synthetics_canary" "smoke_tester_canary" {
   s3_version = var.canary_source_version_id
 
   success_retention_period = 1
-  failure_retention_period = 7
+  failure_retention_period = 14
 
   run_config {
     active_tracing     = false

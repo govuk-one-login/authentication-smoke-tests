@@ -41,7 +41,7 @@ module "canary_create_account" {
   start_canary               = false
 
   cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
-  cloudwatch_log_retention = 1
+  cloudwatch_log_retention = 7
   logging_endpoint_arns    = var.logging_endpoint_arns
   runtime_version          = var.runtime_version
   depends_on = [
