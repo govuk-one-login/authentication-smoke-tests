@@ -60,7 +60,7 @@ resource "aws_lambda_function" "cronitor_ping_lambda" {
     }
   }
 
-  runtime = "nodejs14.x"
+  runtime = "nodejs18.x"
 
   tags = local.default_tags
 }
