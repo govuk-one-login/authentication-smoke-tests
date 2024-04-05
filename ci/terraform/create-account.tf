@@ -38,7 +38,6 @@ module "canary_create_account" {
 
   # the test will run Mon-Fri, between 0800-1700 (UTC) every 3 minutes
   smoke_test_cron_expression = "0/03 08-17 ? * MON-FRI *"
-  start_canary               = false
 
   cloudwatch_key_arn       = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
   cloudwatch_log_retention = 7
