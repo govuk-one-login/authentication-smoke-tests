@@ -5,7 +5,7 @@ locals {
 resource "aws_cloudwatch_log_group" "cronitor_lambda_log_group" {
   name              = "/aws/lambda/${local.cronitor_lambda_name}"
   kms_key_id        = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
-  retention_in_days = 1
+  retention_in_days = 7
 
   tags = local.default_tags
 }
@@ -60,7 +60,7 @@ resource "aws_lambda_function" "cronitor_ping_lambda" {
     }
   }
 
-  runtime = "nodejs14.x"
+  runtime = "nodejs18.x"
 
   tags = local.default_tags
 }
