@@ -54,7 +54,7 @@ const basicCustomEntryPoint = async () => {
   await steps.launchClient(
     page,
     clientBaseUrl,
-    "Create a GOV.UK One Login or sign in"
+    "Create your GOV.UK One Login or sign in"
   );
 
   setStandardViewportSize(page);
