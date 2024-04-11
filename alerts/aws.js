@@ -1,12 +1,12 @@
-const AWS = require("aws-sdk"); // eslint-disable-line node/no-unpublished-require
+const { SSM } = require("@aws-sdk/client-ssm");
 
-const SSM = new AWS.SSM();
+const client = new SSM();
 
 const getParameter = async (parameterName) => {
-  const result = await SSM.getParameter({
+  const result = await client.getParameter({
     Name: `${parameterName}`,
     WithDecryption: true,
-  }).promise();
+  });
 
   return result.Parameter.Value;
 };
