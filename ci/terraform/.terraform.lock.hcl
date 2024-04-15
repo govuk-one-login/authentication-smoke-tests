@@ -5,7 +5,11 @@ provider "registry.terraform.io/hashicorp/aws" {
   version     = "5.34.0"
   constraints = "5.34.0"
   hashes = [
+    "h1:1UEoNI8LGCKvrl0+60qYm0wY8uOoKmF0W+HnuAI1U4k=",
     "h1:1Y1JgV1z99QqAK06+atyfNqreZxyGZKbm4mZO4VhhT8=",
+    "h1:CUCoX4ax5hrP6BH4973oP+hgz8VR2GuNPQil3FYwEqQ=",
+    "h1:Tbq6dKE+XyXmkup6+7eQj2vH+eCJipk8R3VXhebVYi4=",
+    "h1:YSSLSKX6xN6NM2SeqKKpzvQyp6XVx9z1n3CVXwDLznQ=",
     "zh:01bb20ae12b8c66f0cacec4f417a5d6741f018009f3a66077008e67cce127aa4",
     "zh:3b0c9bdbbf846beef2c9573fc27898ceb71b69cf9d2f4b1dd2d0c2b539eab114",
     "zh:5226ecb9c21c2f6fbf1d662ac82459ffcd4ad058a9ea9c6200750a21a80ca009",
@@ -27,7 +31,11 @@ provider "registry.terraform.io/hashicorp/aws" {
 provider "registry.terraform.io/hashicorp/random" {
   version = "3.6.0"
   hashes = [
+    "h1:5KeoKSVKVHJW308uiTgslxFbjQAdWzBGUFK68vgMRWY=",
     "h1:I8MBeauYA8J8yheLJ8oSMWqB0kovn16dF/wKZ1QTdkk=",
+    "h1:R5Ucn26riKIEijcsiOMBR3uOAjuOMfI1x7XvH4P6B1w=",
+    "h1:p6WG1IPHnqx1fnJVKNjv733FBaArIugqy58HRZnpPCk=",
+    "h1:t0mRdJzegohRKhfdoQEJnv3JRISSezJRblN0HIe67vo=",
     "zh:03360ed3ecd31e8c5dac9c95fe0858be50f3e9a0d0c654b5e504109c2159287d",
     "zh:1c67ac51254ba2a2bb53a25e8ae7e4d076103483f55f39b426ec55e47d1fe211",
     "zh:24a17bba7f6d679538ff51b3a2f378cedadede97af8a1db7dad4fd8d6d50f829",
@@ -47,7 +55,11 @@ provider "registry.terraform.io/hashicorp/time" {
   version     = "0.10.0"
   constraints = ">= 0.10.0"
   hashes = [
+    "h1:EeF/Lb4db1Kl1HEHzT1StTC7RRqHn/eB7aDR3C3yjVg=",
     "h1:NAl8eupFAZXCAbE5uiHZTz+Yqler55B3fMG+jNPrjjM=",
+    "h1:QL1ivYrUSB3zvhgXcRBfQak4HDxvesT2zktM+N6StVo=",
+    "h1:rPbqd7mEyBetQPjyBDBAdwiARulKbh2LwzQp2GSl/AI=",
+    "h1:wraHzpOZSaxgC37HLOt0k5Mstl1iNrol7DvvqkSQ1kc=",
     "zh:0ab31efe760cc86c9eef9e8eb070ae9e15c52c617243bbd9041632d44ea70781",
     "zh:0ee4e906e28f23c598632eeac297ab098d6d6a90629d15516814ab90ad42aec8",
     "zh:3bbb3e9da728b82428c6f18533b5b7c014e8ff1b8d9b2587107c966b985e5bcc",
@@ -66,6 +78,10 @@ provider "registry.terraform.io/hashicorp/time" {
 provider "registry.terraform.io/hashicorp/tls" {
   version = "4.0.5"
   hashes = [
+    "h1:e4LBdJoZJNOQXPWgOAG0UuPBVhCStu98PieNlqJTmeU=",
+    "h1:jb/Rg9inGYp4t8HtBoETESsQJgdmOHoe1bzzg2uNB3w=",
+    "h1:kcw9sNLNFMY2S0HIGOkjlwKtUc8lpqZsQGsC2SG9xEQ=",
+    "h1:yLqz+skP3+EbU3yyvw8JqzflQTKDQGsC9QyZAg+S4dg=",
     "h1:zeG5RmggBZW/8JWIVrdaeSJa0OG62uFX5HY1eE8SjzY=",
     "zh:01cfb11cb74654c003f6d4e32bbef8f5969ee2856394a96d127da4949c65153e",
     "zh:0472ea1574026aa1e8ca82bb6df2c40cd0478e9336b7a8a64e652119a2fa4f32",
