@@ -15,7 +15,12 @@ const launchClient = async (page, clientBaseUrl, textToValidate) => {
       timeout: 60000,
     });
 
-    await validateText(textToValidate, page);
+    const textWithNonBreakingSpacesReplaced = textToValidate.replaceAll(
+      "&nbsp;",
+      " "
+    );
+
+    await validateText(textWithNonBreakingSpacesReplaced, page);
   });
 };
 
