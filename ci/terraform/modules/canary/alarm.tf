@@ -8,7 +8,7 @@ resource "aws_cloudwatch_metric_alarm" "smoke_tester_metric_alarm_p1" {
   namespace           = "CloudWatchSynthetics"
   period              = "600"
   statistic           = "Sum"
-  threshold           = "2"
+  threshold           = "3"
   treat_missing_data  = "notBreaching"
 
   dimensions = {
