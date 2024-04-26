@@ -106,7 +106,7 @@ const ipvHandOff = async (page) => {
 
     const hasReachedIPV =
       (await page.title()) ===
-      "Tell us if you have one of the following types of photo ID – GOV.UK";
+      "Tell us if you have one of the following types of photo ID – GOV.UK One Login";
 
     if (!hasReachedIPV) {
       throw new Error(`Failed at IPV Hand-off step`);
