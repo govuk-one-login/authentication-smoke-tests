@@ -11,7 +11,7 @@ function runTerraform() {
     pushd "${DIR}/ci/terraform/${1}" >/dev/null
     rm -rf .terraform/
     terraform init -backend-config=sandpit.hcl
-    terraform apply -var-file sandpit.tfvars -var-file sandpit-stub-clients.tfvars ${2}
+    terraform apply -var-file sandpit.tfvars -var-file sandpit-stub-clients.tfvars "${2}"
     popd >/dev/null
 }
 
@@ -66,7 +66,14 @@ if [[ $BUILD == "1" ]]; then
     echo "done!"
 fi
 
+echo -n "Setting up AWS credentials ... "
 # shellcheck source=./scripts/export_aws_creds.sh
 source "${DIR}/scripts/export_aws_creds.sh"
+echo "done!"
+
+echo -n "Getting Terraform variables from Secrets Manager ... "
+# shellcheck source=./ci/terraform/read_secrets.sh
+source "${DIR}/ci/terraform/read_secrets.sh" "${DEPLOY_ENV}"
+echo "done!"
 
 runTerraform "." "${TERRAFORM_OPTS}"
