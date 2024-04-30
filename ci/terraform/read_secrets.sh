@@ -28,4 +28,7 @@ while IFS=$'\t' read -r arn name; do
   export "TF_VAR_${name}"="${value}"
 done <<<"${secrets}"
 
-export TF_VAR_hashed_password=`echo -n "${TF_VAR_smoke_tester_password}" | argon2 $(openssl rand -hex 32) -e -id -v 13 -k 15360 -t 2 -p 1`
+# Hash the smoke tester password
+_salt="$(openssl rand -hex 32)"
+TF_VAR_hashed_password="$(echo -n "${TF_VAR_smoke_tester_password:?}" | argon2 "${_salt}" -e -id -v 13 -k 15360 -t 2 -p 1)"
+export TF_VAR_hashed_password
