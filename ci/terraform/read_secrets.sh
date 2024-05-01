@@ -10,6 +10,8 @@ ENVIRONMENT="${1}"
 
 if [ "$ENVIRONMENT" = "dev" ]; then
   ENVIRONMENT="build"
+elif [ "$ENVIRONMENT" = "sandpit" ]; then
+  ENVIRONMENT="dev"
 fi
 
 secrets="$(

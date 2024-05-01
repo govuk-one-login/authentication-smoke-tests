@@ -51,12 +51,12 @@ variable "smoke_test_lambda_zip_file" {
 }
 
 variable "alerts_lambda_zip_file" {
-  default = ""
+  default = "../../dist/alerts.zip"
   type    = string
 }
 
 variable "heartbeat_lambda_zip_file" {
-  default = ""
+  default = "../../dist/heartbeat.zip"
   type    = string
 }
 

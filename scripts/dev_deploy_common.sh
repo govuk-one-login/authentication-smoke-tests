@@ -11,7 +11,11 @@ function runTerraform() {
     pushd "${DIR}/ci/terraform/${1}" >/dev/null
     rm -rf .terraform/
     terraform init -backend-config=sandpit.hcl
-    terraform apply -var-file sandpit.tfvars -var-file sandpit-stub-clients.tfvars "${2}"
+    if [ "${RUN_SHELL}" == "1" ]; then
+        ${SHELL} -i
+    else
+        terraform apply -var-file sandpit.tfvars -var-file sandpit-stub-clients.tfvars "${2}"
+    fi
     popd >/dev/null
 }
 
@@ -27,12 +31,14 @@ function usage() {
     -b, --build               run yarn install and build tasks (default)
     --destroy                 run all terraform with the -destroy flag (destroys all managed resources)
     -p, --prompt              will prompt for plan review before applying any terraform
+    --shell                   spawn an interactive shell inside the module directory after terraform init (does not apply)
 
     If no options specified the default actions above will be carried out without prompting.
 USAGE
 }
 
 BUILD=0
+RUN_SHELL=0
 TERRAFORM_OPTS="-auto-approve"
 if [[ $# == 0 ]] || [[ $* == "-p" ]]; then
     BUILD=1
@@ -48,6 +54,10 @@ while [[ $# -gt 0 ]]; do
     -p | --prompt)
         TERRAFORM_OPTS=""
         ;;
+    --shell)
+        # shellcheck disable=SC2034
+        RUN_SHELL=1
+        ;;
     *)
         usage
         exit 1
@@ -59,7 +69,7 @@ done
 if [[ $BUILD == "1" ]]; then
     echo "Building deployment artefacts ... "
     pushd "${DIR}" >/dev/null
-    yarn clean && yarn install --production && yarn build
+    yarn clean && yarn install --production && yarn build:all
     mkdir -p ../release-artefacts/
     cp dist/*.zip ../release-artefacts/
     popd >/dev/null

@@ -30,6 +30,9 @@ test_services_api_hostname            = ""
 test_services_api_key                 = ""
 username_create_account               = ""
 
+create_account_smoke_test = false
+
+
 alerts_code_s3_key                      = "di-monitoring-utils/alerts.zip/sandpit-smoketest"
 heartbeat_code_s3_key                   = "di-monitoring-utils/heartbeat.zip/sandpit-smoketest"
 hashed_password                         = "123456"
@@ -37,3 +40,5 @@ code_s3_bucket                          = "sandpit-smoke-test-sms-codes"
 use_integration_env_for_sign_in_journey = true
 
 logging_endpoint_arns = []
+
+phone_create_account = "01234567890"

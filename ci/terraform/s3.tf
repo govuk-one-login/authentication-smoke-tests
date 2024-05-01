@@ -14,11 +14,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "smoketest_artefac
   }
 }
 
-resource "aws_s3_bucket_acl" "smoketest_artefact_bucket" {
-  bucket = aws_s3_bucket.smoketest_artefact_bucket.bucket
-
-  acl = "private"
-}
 
 resource "aws_s3_bucket_public_access_block" "smoketest_artefact_private_bucket" {
   bucket                  = aws_s3_bucket.smoketest_artefact_bucket.id
@@ -53,11 +48,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "smoketest_source_
   }
 }
 
-resource "aws_s3_bucket_acl" "smoketest_source_bucket" {
-  bucket = aws_s3_bucket.smoketest_source_bucket.bucket
-
-  acl = "private"
-}
 
 resource "aws_s3_bucket_versioning" "smoketest_source_bucket" {
   bucket = aws_s3_bucket.smoketest_source_bucket.bucket
@@ -86,7 +76,7 @@ resource "aws_s3_object" "alerts_source" {
 }
 
 resource "aws_s3_object" "heartbeat_source" {
-  count  = var.alerts_lambda_zip_file == "" ? 0 : 1
+  count  = var.heartbeat_lambda_zip_file == "" ? 0 : 1
   bucket = aws_s3_bucket.smoketest_source_bucket.bucket
   key    = "${var.environment}-heartbeat-canary.zip"
 
