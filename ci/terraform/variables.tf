@@ -220,3 +220,9 @@ variable "runtime_version" {
   type    = string
   default = "syn-nodejs-puppeteer-6.2"
 }
+
+variable "slack_channel_id" {
+  type        = string
+  default     = ""
+  description = "Slack channel ID for alerts to be sent to from alerts lambda. Populated from Secrets Manager at deploy time"
+}

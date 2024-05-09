@@ -63,6 +63,20 @@ const formatMessage = (snsMessage, colorCode, snsMessageFooter) => {
   }
 };
 
+const buildMessageRequest = (snsMessage, colorCode, snsMessageFooter) => {
+  const body = formatMessage(snsMessage, colorCode, snsMessageFooter);
+  if (process.env.DEPLOY_ENVIRONMENT === "integration") {
+    body.channel = process.env.SLACK_CHANNEL_ID;
+  }
+  return {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  };
+};
+
 // eslint-disable-next-line no-unused-vars
 const handler = async function (event, context) {
   console.log("Alert lambda triggered");
@@ -76,20 +90,16 @@ const handler = async function (event, context) {
   if (snsMessage.NewStateValue === "OK") {
     colorCode = process.env.OK_COLOR || "#36a64f";
   }
+  const messageRequest = buildMessageRequest(
+    snsMessage,
+    colorCode,
+    snsMessageFooter
+  );
 
-  var config = {
-    method: "post",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(
-      formatMessage(snsMessage, colorCode, snsMessageFooter)
-    ),
-  };
   console.log("Sending alert to slack");
   try {
     // eslint-disable-next-line no-undef
-    const response = await fetch(slackHookUrl, config);
+    const response = await fetch(slackHookUrl, messageRequest);
     const message = await response.text();
     console.log(message);
   } catch (error) {
