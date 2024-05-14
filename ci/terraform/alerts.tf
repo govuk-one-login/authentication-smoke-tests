@@ -109,7 +109,7 @@ data "aws_sns_topic" "slack_alerts" {
 resource "aws_sns_topic_subscription" "cloudfront_alerts" {
   provider = aws.cloudfront
 
-  topic_arn = data.aws_sns_topic.cloudfront_alerts
+  topic_arn = data.aws_sns_topic.cloudfront_alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.alerts_lambda.arn
 }
