@@ -24,6 +24,16 @@ provider "aws" {
   }
 }
 
+provider "aws" {
+  alias = "cloudfront"
+
+  region = "us-east-1"
+
+  assume_role {
+    role_arn = var.deployer_role_arn
+  }
+}
+
 provider "time" {}
 
 locals {

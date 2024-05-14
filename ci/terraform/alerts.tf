@@ -105,3 +105,24 @@ resource "aws_lambda_permission" "slack_alerts_with_sns" {
 data "aws_sns_topic" "slack_alerts" {
   name = "${var.environment}-slack-alerts"
 }
+
+resource "aws_sns_topic_subscription" "cloudfront_alerts" {
+  provider = aws.cloudfront
+
+  topic_arn = data.aws_sns_topic.cloudfront_alerts
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.alerts_lambda.arn
+}
+
+resource "aws_lambda_permission" "cloudfront_alerts" {
+  statement_id  = "AllowExecutionFromCloudfrontAlertsSNSTopic"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.alerts_lambda.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = data.aws_sns_topic.cloudfront_alerts.arn
+}
+
+data "aws_sns_topic" "cloudfront_alerts" {
+  provider = aws.cloudfront
+  name     = "${var.environment}-oidc-cloudfront-alerts"
+}
