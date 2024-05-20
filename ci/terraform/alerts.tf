@@ -62,6 +62,7 @@ resource "aws_lambda_function" "alerts_lambda" {
   environment {
     variables = {
       DEPLOY_ENVIRONMENT = var.environment
+      SLACK_CHANNEL_ID   = var.slack_channel_id
     }
   }
 
