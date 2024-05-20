@@ -7,7 +7,7 @@
     "cronitor": "^2.3.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.1615.0"
+    "aws-sdk": "^2.1623.0"
   },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/heartbeat.zip ."
