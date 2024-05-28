@@ -61,12 +61,10 @@ const basicCustomEntryPoint = async () => {
   await steps.launchClient(
     page,
     clientBaseUrl,
-    "Prove your identity with GOV.UK One Login"
+    "Create your GOV.UK One Login or sign in"
   );
 
   setStandardViewportSize(page);
-
-  await steps.clickContinueOnIpvStartPage(page);
 
   await steps.clickSignIn(page);
 
