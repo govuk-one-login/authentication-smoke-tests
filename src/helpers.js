@@ -1,13 +1,13 @@
 const { getParameter } = require("./aws");
 
-const validateText = async (expectedText, page) => {
-  await page.evaluate((expectedText) => {
+const validateTitle = async (expectedTitle, page) => {
+  await page.evaluate((expectedTitle) => {
     // eslint-disable-next-line no-undef
-    const bodyText = document.body.innerText;
-    if (!bodyText.includes(expectedText)) {
-      throw new Error(`Page does not contain text '${expectedText}'`);
+    const title = document.title;
+    if (!title.includes(expectedTitle)) {
+      throw new Error(`Page title does not contain text '${expectedTitle}'`);
     }
-  }, expectedText);
+  }, expectedTitle);
 };
 
 const validateNoText = async (notExpectedText, page) => {
@@ -41,7 +41,7 @@ const authenticateWithBasicAuth = async (page) => {
 };
 
 module.exports = {
-  validateText,
+  validateTitle,
   validateNoText,
   validateUrlContains,
   setStandardViewportSize,
