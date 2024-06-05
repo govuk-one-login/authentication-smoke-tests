@@ -1,6 +1,6 @@
 stub_rp_clients = [
   {
-    client_name = "di-auth-smoketest-microclient-sandpit"
+    client_name = "di-auth-stub-relying-party-authdev1"
     callback_urls = [
       "http://localhost:3032/callback",
       "http://localhost:3031/callback",
