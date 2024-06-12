@@ -3,19 +3,19 @@ const synthetics = require("Synthetics");
 const { getOTPCode } = require("./aws");
 const { selectors } = require("./vars");
 const {
-  validateText,
   validateNoText,
   validateUrlContains,
+  validateTitle,
 } = require("./helpers");
 
-const launchClient = async (page, clientBaseUrl, textToValidate) => {
+const launchClient = async (page, clientBaseUrl, titleToValidate) => {
   await synthetics.executeStep("Launch Client", async () => {
     await page.goto(clientBaseUrl, {
       waitUntil: "domcontentloaded",
       timeout: 60000,
     });
 
-    await validateText(textToValidate, page);
+    await validateTitle(titleToValidate, page);
   });
 };
 
