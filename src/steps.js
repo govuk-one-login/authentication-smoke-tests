@@ -1,4 +1,3 @@
-const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getOTPCode } = require("./aws");
 const { selectors } = require("./vars");
@@ -16,18 +15,6 @@ const launchClient = async (page, clientBaseUrl, titleToValidate) => {
     });
 
     await validateTitle(titleToValidate, page);
-  });
-};
-
-// Note only used by IPV canary
-const clickContinueOnIpvStartPage = async (page) => {
-  await synthetics.executeStep("Click continue to prove identity", async () => {
-    await page.waitForSelector("#form-tracking > button");
-    await Promise.all([
-      page.click("#form-tracking > button"),
-      page.waitForNavigation(),
-    ]);
-    await validateUrlContains("sign-in-or-create", page);
   });
 };
 
@@ -96,25 +83,7 @@ const submitOtpCode = async (page) => {
     await validateNoText("There is a problem", page);
   });
 };
-
 // Note only used by IPV canary
-const ipvHandOff = async (page) => {
-  await synthetics.executeStep("IPV hand-off", async () => {
-    const pageTitleForConsole = await page.title();
-
-    log.info(pageTitleForConsole);
-
-    const hasReachedIPV =
-      (await page.title()) ===
-      "Tell us if you have one of the following types of photo ID – GOV.UK One Login";
-
-    if (!hasReachedIPV) {
-      throw new Error(`Failed at IPV Hand-off step`);
-    }
-  });
-};
-
-// Note only used by non-IPV sign-in canary
 const microclientUserInfo = async (page, email) => {
   await synthetics.executeStep("Microclient user info", async () => {
     await page.content();
@@ -134,7 +103,6 @@ const microclientUserInfo = async (page, email) => {
 
 module.exports = {
   launchClient,
-  clickContinueOnIpvStartPage,
   clickSignIn,
   enterEmail,
   submitEmail,
@@ -142,6 +110,5 @@ module.exports = {
   submitPassword,
   enterOtpCode,
   submitOtpCode,
-  ipvHandOff,
   microclientUserInfo,
 };
