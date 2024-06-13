@@ -1,3 +1,4 @@
+const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getOTPCode } = require("./aws");
 const { selectors } = require("./vars");
@@ -83,6 +84,23 @@ const submitOtpCode = async (page) => {
     await validateNoText("There is a problem", page);
   });
 };
+
+const ipvHandOff = async (page) => {
+  await synthetics.executeStep("IPV hand-off", async () => {
+    const pageTitleForConsole = await page.title();
+
+    log.info(pageTitleForConsole);
+
+    const hasReachedIPV =
+      (await page.title()) ===
+      "Tell us if you have one of the following types of photo ID – GOV.UK One Login";
+
+    if (!hasReachedIPV) {
+      throw new Error(`Failed at IPV Hand-off step`);
+    }
+  });
+};
+
 // Note only used by IPV canary
 const microclientUserInfo = async (page, email) => {
   await synthetics.executeStep("Microclient user info", async () => {
@@ -110,5 +128,6 @@ module.exports = {
   submitPassword,
   enterOtpCode,
   submitOtpCode,
+  ipvHandOff,
   microclientUserInfo,
 };
