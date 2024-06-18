@@ -27,7 +27,7 @@
     "express-openid-connect": "^2.16.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.1561.0",
+    "aws-sdk": "^2.1643.0",
     "eslint": "^8.41.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-node": "^11.1.0",
