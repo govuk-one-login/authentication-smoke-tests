@@ -5,7 +5,7 @@ locals {
 resource "aws_cloudwatch_log_group" "alerts_lambda_log_group" {
   name              = "/aws/lambda/${local.alerts_lambda_name}"
   kms_key_id        = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
-  retention_in_days = 7
+  retention_in_days = 30
 
   tags = local.default_tags
 }
