@@ -4,7 +4,7 @@
   "main": "heartbeat.js",
   "license": "MIT",
   "dependencies": {
-    "cronitor": "^2.3.1"
+    "cronitor": "^2.4.0"
   },
   "devDependencies": {
     "aws-sdk": "^2.1615.0"
