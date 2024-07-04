@@ -135,10 +135,8 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click create account", async () => {
     await page.waitForSelector("#main-content #create-account-link");
-    await page.click("#main-content #create-account-link");
+    Promise.all([navigationPromise, page.click("#main-content #create-account-link")])
   });
-
-  await navigationPromise;
 
   await synthetics.executeStep("Enter email create", async () => {
     await page.waitForSelector(selectors.emailInput);
@@ -147,10 +145,8 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
   });
-
-  await navigationPromise;
 
   await synthetics.executeStep("Check your email", async () => {
     await page.waitForSelector(selectors.otpCodeInput);
@@ -160,10 +156,8 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
   });
-
-  await navigationPromise;
 
   await synthetics.executeStep("Create password", async () => {
     await page.waitForSelector(selectors.passwordInput);
@@ -173,10 +167,8 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
   });
-
-  await navigationPromise;
 
   await synthetics.executeStep("Choose how to get security codes", async () => {
     await page.waitForSelector(".govuk-grid-row #mfaOptions");
@@ -185,10 +177,8 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
   });
-
-  await navigationPromise;
 
   await synthetics.executeStep("Enter your mobile phone number", async () => {
     await page.waitForSelector(".govuk-grid-row #phoneNumber");
@@ -197,7 +187,7 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
   });
 
   await synthetics.executeStep("Enter OTP code", async () => {
@@ -210,10 +200,8 @@ const basicCustomEntryPoint = async () => {
 
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
-    await page.click(selectors.submitFormButton);
+    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
   });
-
-  await navigationPromise;
 
   await synthetics.executeStep("Account created confirmation", async () => {
     (await page.url()).endsWith("/account-created");
@@ -223,7 +211,7 @@ const basicCustomEntryPoint = async () => {
     await page.waitForSelector(selectors.submitFormButton);
     await Promise.all([
       page.click(selectors.submitFormButton),
-      page.waitForNavigation(),
+      navigationPromise,
     ]);
   });
 
