@@ -1,9 +1,10 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getParameter, getOTPCode, emptyOtpBucket } = require("./aws");
+const { getParameter, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const crypto = require("crypto");
-const { selectors } = require("./vars");
+const steps = require("./steps");
+const { setStandardViewportSize } = require("./helpers");
 
 const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -75,9 +76,6 @@ const basicCustomEntryPoint = async () => {
   await emptyOtpBucket(bucketName, phoneNumber);
 
   let page = await synthetics.getPage();
-  const navigationPromise = page.waitForNavigation({
-    waitUntil: "networkidle0",
-  });
 
   if (CANARY_NAME.includes("integration")) {
     log.info("Running against INTEGRATION environment");
@@ -122,116 +120,43 @@ const basicCustomEntryPoint = async () => {
     stepConfig
   );
 
-  await synthetics.executeStep("Launch Client", async () => {
-    await page.goto(clientBaseUrl, {
-      waitUntil: "domcontentloaded",
-      timeout: 60000,
-    });
-  });
+  await steps.launchClient(
+    page,
+    clientBaseUrl,
+    "Create your GOV.UK One Login or sign in"
+  );
 
-  await page.setViewport({ width: 1864, height: 1096 });
+  await setStandardViewportSize(page);
 
-  await navigationPromise;
+  await steps.clickCreateAccount(page);
 
-  await synthetics.executeStep("Click create account", async () => {
-    await page.waitForSelector("#main-content #create-account-link");
-    Promise.all([navigationPromise, page.click("#main-content #create-account-link")])
-  });
+  await steps.enterEmail(page, email);
 
-  await synthetics.executeStep("Enter email create", async () => {
-    await page.waitForSelector(selectors.emailInput);
-    await page.type(selectors.emailInput, email);
-  });
+  await steps.submitEmailCreate(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
-  });
+  await steps.enterOtpCode(page, email, bucketName);
 
-  await synthetics.executeStep("Check your email", async () => {
-    await page.waitForSelector(selectors.otpCodeInput);
-    const emailOtpCode = await getOTPCode(email, bucketName);
-    await page.type(selectors.otpCodeInput, emailOtpCode);
-  });
+  await steps.submitOtpCode(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
-  });
+  await steps.createPassword(page, password);
 
-  await synthetics.executeStep("Create password", async () => {
-    await page.waitForSelector(selectors.passwordInput);
-    await page.type(selectors.passwordInput, password);
-    await page.type(".govuk-grid-row #confirm-password", password);
-  });
+  await steps.submitCreatePassword(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
-  });
+  await steps.chooseSMSForSecurityCodes(page);
 
-  await synthetics.executeStep("Choose how to get security codes", async () => {
-    await page.waitForSelector(".govuk-grid-row #mfaOptions");
-    await page.click(".govuk-grid-row #mfaOptions");
-  });
+  await steps.submitSecurityCodesChoice(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
-  });
+  await steps.enterPhoneNumber(page, phoneNumber);
 
-  await synthetics.executeStep("Enter your mobile phone number", async () => {
-    await page.waitForSelector(".govuk-grid-row #phoneNumber");
-    await page.type(".govuk-grid-row #phoneNumber", phoneNumber);
-  });
+  await steps.submitPhoneNumber(page);
 
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
-  });
+  await steps.enterOtpCode(page, phoneNumber, bucketName);
 
-  await synthetics.executeStep("Enter OTP code", async () => {
-    await page.waitForSelector(selectors.otpCodeInput);
+  await steps.submitPhoneOTP(page);
 
-    const otpCode = await getOTPCode(phoneNumber, bucketName);
+  await steps.standardClickContinue(page);
 
-    await page.type(selectors.otpCodeInput, otpCode);
-  });
-
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    Promise.all([navigationPromise, page.click(selectors.submitFormButton)])
-  });
-
-  await synthetics.executeStep("Account created confirmation", async () => {
-    (await page.url()).endsWith("/account-created");
-  });
-
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    await Promise.all([
-      page.click(selectors.submitFormButton),
-      navigationPromise,
-    ]);
-  });
-
-  await synthetics.executeStep("Microclient user-info", async () => {
-    await page.content();
-
-    const userInfo = await page.evaluate(() => {
-      // eslint-disable-next-line no-undef
-      return JSON.parse(document.querySelector("body").innerText);
-    });
-
-    console.log("userInfo now contains the JSON");
-    console.log(userInfo);
-
-    const hasReachedUserInfo = userInfo.email === email;
-
-    if (!hasReachedUserInfo) {
-      throw "Failed smoke test";
-    }
-  });
+  await steps.microclientUserInfo(page, email);
 
   return "success";
 };
