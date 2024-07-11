@@ -9,13 +9,13 @@ const {
 
 const synthetics = require("Synthetics");
 
-const ssm = new SSM();
-const s3 = new S3();
+//const ssm = new SSM();
+//const s3 = new S3();
 
 const getParameter = async (parameterName) => {
   const canaryName = synthetics.getCanaryName();
 
-  const result = await ssm.getParameter({
+  const result = await SSM.getParameter({
     Name: `${canaryName}-${parameterName}`,
     WithDecryption: true,
   });
@@ -24,7 +24,7 @@ const getParameter = async (parameterName) => {
 };
 
 const emptyOtpBucket = async (bucketName, phoneNumber) => {
-  await s3.deleteObject({
+  await S3.deleteObject({
     Bucket: bucketName,
     Key: phoneNumber,
   });
@@ -32,7 +32,7 @@ const emptyOtpBucket = async (bucketName, phoneNumber) => {
 
 const getOTPCode = async (phoneNumber, bucketName) => {
   const response = await waitUntilObjectExists({
-    client: s3,
+    client: S3,
     minDelay: 5,
     maxWaitTime: 100,
   }, {
@@ -42,7 +42,7 @@ const getOTPCode = async (phoneNumber, bucketName) => {
 
   if (response.ContentLength > 0) {
     return (
-      await s3.getObject({ Bucket: bucketName, Key: phoneNumber })
+      await S3.getObject({ Bucket: bucketName, Key: phoneNumber })
     ).Body.toString();
   }
 };
