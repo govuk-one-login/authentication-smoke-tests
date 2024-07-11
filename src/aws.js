@@ -1,8 +1,16 @@
-const AWS = require("aws-sdk");
+const {
+  S3,
+  waitUntilObjectExists,
+} = require("@aws-sdk/client-s3");
+
+const {
+  SSM,
+} = require("@aws-sdk/client-ssm");
+
 const synthetics = require("Synthetics");
 
-const SSM = new AWS.SSM();
-const S3 = new AWS.S3();
+const SSM = new SSM();
+const S3 = new S3();
 
 const getParameter = async (parameterName) => {
   const canaryName = synthetics.getCanaryName();
@@ -10,7 +18,7 @@ const getParameter = async (parameterName) => {
   const result = await SSM.getParameter({
     Name: `${canaryName}-${parameterName}`,
     WithDecryption: true,
-  }).promise();
+  });
 
   return result.Parameter.Value;
 };
@@ -19,22 +27,22 @@ const emptyOtpBucket = async (bucketName, phoneNumber) => {
   await S3.deleteObject({
     Bucket: bucketName,
     Key: phoneNumber,
-  }).promise();
+  });
 };
 
 const getOTPCode = async (phoneNumber, bucketName) => {
-  const response = await S3.waitFor("objectExists", {
+  const response = await waitUntilObjectExists({
+    client: S3,
+    minDelay: 5,
+    maxWaitTime: 100,
+  }, {
     Bucket: bucketName,
     Key: phoneNumber,
-    $waiter: {
-      maxAttempts: 10,
-      delay: 5,
-    },
-  }).promise();
+  });
 
   if (response.ContentLength > 0) {
     return (
-      await S3.getObject({ Bucket: bucketName, Key: phoneNumber }).promise()
+      await S3.getObject({ Bucket: bucketName, Key: phoneNumber })
     ).Body.toString();
   }
 };
