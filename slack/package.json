@@ -5,7 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-ssm": "3.603.0",
-    "@aws-sdk/client-sts": "3.606.0"
+    "@aws-sdk/client-sts": "3.620.0"
   },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/slack.zip ."
