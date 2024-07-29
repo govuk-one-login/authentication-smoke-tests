@@ -1,0 +1,49 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: mixed-line-ending
+      - id: check-executables-have-shebangs
+
+  - repo: https://github.com/govuk-one-login/pre-commit-hooks.git
+    rev: 0.0.1
+    hooks:
+      - id: terraform-format
+      - id: terraform-validate
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.1
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/lalten/check-gha-pinning
+    rev: v1.3.0
+    hooks:
+      - id: check-gha-pinning
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: Run ESLint
+        language: node
+        types_or:
+          - javascript
+          - ts
+        entry: yarn run eslint --fix
+        pass_filenames: true
+      - id: prettier
+        name: Run prettier
+        language: node
+        types: [text]
+        stages: [commit]
+        entry: prettier --write --ignore-unknown
+        additional_dependencies: ["prettier@^3.3.2"]
+        pass_filenames: true
