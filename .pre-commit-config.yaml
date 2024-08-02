@@ -8,11 +8,13 @@ repos:
       - id: mixed-line-ending
       - id: check-executables-have-shebangs
 
-  - repo: https://github.com/govuk-one-login/pre-commit-hooks.git
-    rev: 0.0.1
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: debe478691c6711d19679b9973309e19368e79b6 # v1.92.1
     hooks:
-      - id: terraform-format
-      - id: terraform-validate
+      - id: terraform_validate
+        args:
+          - --hook-config=--retry-once-with-cleanup=true
+      - id: terraform_fmt
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: a23f6b85d0fdd5bb9d564e2579e678033debbdff # v0.10.0.1 # pragma: allowlist secret
