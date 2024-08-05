@@ -138,7 +138,7 @@ jobs:
       - name: Upload Smoke Tests Terraform files
         working-directory: ci/terraform
         run: |
-          echo "::group::Zip up frontend terraform"
+          echo "::group::Zip up Smoke Tests terraform"
           zip -r smoke-test.zip .
           echo "::endgroup::"
 
