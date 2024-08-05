@@ -123,3 +123,4 @@ keys/
 .vscode/
 ci/terraform/.terraform/
 ci/terraform/*.plan
+.terraform

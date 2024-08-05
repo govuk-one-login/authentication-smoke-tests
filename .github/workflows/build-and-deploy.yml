@@ -64,7 +64,8 @@ jobs:
           VERSION="$(echo "$S3_RESPONSE" | jq .VersionId -r)"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Start signing job for ${{ matrix.module }}
+      - name: Run signing job for ${{ matrix.module }}
+        id: sign-module
         run: |
           SIGNER_RESPONSE="$(aws signer start-signing-job \
             --profile-name "${SIGNING_PROFILE}" \
@@ -72,6 +73,35 @@ jobs:
             --destination "s3={bucketName=${DESTINATION_BUCKET},prefix=signed-${{ matrix.module }}-${{ github.sha }}-}")"
           JOB_ID="$(echo "$SIGNER_RESPONSE" | jq .jobId -r)"
           aws signer wait successful-signing-job --job-id "$JOB_ID"
+
+          SIGNED_OBJECT="$(aws signer describe-signing-job --job-id "${JOB_ID}" --query "signedObject.s3.key" --output=text)"
+
+          echo "Object signed: ${SIGNED_OBJECT}"
+          echo "SIGNED_OBJECT_KEY=${SIGNED_OBJECT}" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare GHA artifact
+        id: create_artifact
+        run: |
+          artifact_dir="/tmp/artifacts"
+
+          mkdir -p "${artifact_dir}"
+
+          aws s3api get-object \
+            --bucket ${{ env.DESTINATION_BUCKET }} \
+            --key ${{ steps.sign-module.outputs.SIGNED_OBJECT_KEY }} \
+            "${artifact_dir}/${{ matrix.module }}.zip"
+
+          {
+            echo "artifact_dir=${artifact_dir}"
+            echo "code_sha=${{ github.sha }}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifacts
+        id: upload-artifacts
+        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
+        with:
+          name: signed-${{ matrix.module }}
+          path: "${{ steps.create_artifact.outputs.artifact_dir }}/"
 
   deploy:
     runs-on: ubuntu-latest
@@ -92,29 +122,18 @@ jobs:
           role-to-assume: ${{ env.DEPLOY_ROLE }}
           aws-region: eu-west-2
 
-      - name: Download and copy Smoke Tests signed lambda zip
-        working-directory: ci/terraform
-        run: |
-          aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
-            --recursive --exclude "*" \
-            --include "signed-canary-${{ github.sha }}-*"
-          mv artifacts/signed-canary-*.zip artifacts/smoke-tests.zip
+      - name: Download signed artifacts
+        id: download_artifact
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          pattern: signed-*
+          path: ci/terraform/artifacts/
+          merge-multiple: true
 
-      - name: Download and copy Alerts signed lambda zip
-        working-directory: ci/terraform
+      - name: Rename Canary -> Smoke Tests
+        working-directory: ci/terraform/artifacts/
         run: |
-          aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
-            --recursive --exclude "*" \
-            --include "signed-alerts-${{ github.sha }}-*"
-          mv artifacts/signed-alerts-*.zip artifacts/alerts.zip
-
-      - name: Download and copy Heartbeat signed lambda zip
-        working-directory: ci/terraform
-        run: |
-          aws s3 cp s3://${{ env.DESTINATION_BUCKET }} ./artifacts \
-            --recursive --exclude "*" \
-            --include "signed-heartbeat-${{ github.sha }}-*"
-          mv artifacts/signed-heartbeat-*.zip artifacts/heartbeat.zip
+          mv canary.zip smoke-tests.zip
 
       - name: Upload Smoke Tests Terraform files
         working-directory: ci/terraform
