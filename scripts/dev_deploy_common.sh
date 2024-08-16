@@ -62,4 +62,4 @@ source "${DIR}/scripts/export_aws_creds.sh"
 
 rm -rf "${DIR}/ci/terraform/.terraform/"
 terraform -chdir="${DIR}/ci/terraform" init -backend-config="${DEPLOY_ENV}.hcl"
-terraform -chdir="${DIR}/ci/terraform" apply -var-file "${DEPLOY_ENV}.tfvars" -var-file sandpit-stub-clients.tfvars ${TERRAFORM_OPTS}
+terraform -chdir="${DIR}/ci/terraform" apply -var-file "${DEPLOY_ENV}.tfvars" -var-file "${DEPLOY_ENV}-stub-clients.tfvars" ${TERRAFORM_OPTS}
