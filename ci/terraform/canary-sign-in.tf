@@ -17,7 +17,7 @@ module "canary_sign_in" {
 
   sns_topic_pagerduty_p1_alerts_arn = aws_sns_topic.pagerduty_p1_alerts.arn
   sns_topic_pagerduty_p2_alerts_arn = aws_sns_topic.pagerduty_p2_alerts.arn
-  sns_topic_slack_alerts_arn        = data.aws_sns_topic.slack_events.arn
+  sns_topic_slack_alerts_arn        = ""
   create_account_smoke_test         = false
   metric_alarms_enabled             = var.sign_in_metric_alarm_enabled
   heartbeat_ping_enabled            = var.sign_in_heartbeat_ping_enabled
@@ -39,7 +39,4 @@ module "canary_sign_in" {
   logging_endpoint_arns    = var.logging_endpoint_arns
   runtime_version          = var.runtime_version
 
-  depends_on = [
-    aws_lambda_function.cronitor_ping_lambda
-  ]
 }
