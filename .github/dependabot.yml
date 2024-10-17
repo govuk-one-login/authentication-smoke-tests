@@ -41,6 +41,11 @@ updates:
     schedule:
       # Check for updates to GitHub Actions every week
       interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      gha-all-dependencies:
+        patterns:
+          - "*"
     target-branch: main
     commit-message:
       prefix: BAU
