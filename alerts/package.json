@@ -4,7 +4,7 @@
   "main": "alerts.js",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-ssm": "3.645.0",
+    "@aws-sdk/client-ssm": "3.678.0",
     "@aws-sdk/client-sts": "3.645.0"
   },
   "scripts": {
