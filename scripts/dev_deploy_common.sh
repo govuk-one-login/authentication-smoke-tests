@@ -10,8 +10,8 @@ function runTerraform() {
     echo "Running ${1} Terraform..."
     pushd "${DIR}/ci/terraform/${1}" >/dev/null
     rm -rf .terraform/
-    terraform init -backend-config=sandpit.hcl
-    terraform apply -var-file sandpit.tfvars -var-file sandpit-stub-clients.tfvars ${2}
+    terraform init -backend-config=authdev1.hcl
+    terraform apply -var-file authdev1.tfvars -var-file sandpit-stub-clients.tfvars ${2}
     popd >/dev/null
 }
 
