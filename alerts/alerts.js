@@ -87,6 +87,7 @@ const handler = async function (event, context) {
   let snsMessageFooter = process.env.MESSAGE_FOOTER || "GOV.UK Sign In alert";
 
   let snsMessage = JSON.parse(event.Records[0].Sns.Message);
+  console.log(snsMessage);
   if (snsMessage.NewStateValue === "OK") {
     colorCode = process.env.OK_COLOR || "#36a64f";
   }
