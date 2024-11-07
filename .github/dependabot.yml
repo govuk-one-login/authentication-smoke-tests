@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: daily
       time: "03:00"
+    groups:
+      npm-aws-dependencies:
+        patterns:
+          - "@aws-sdk/*"
     open-pull-requests-limit: 100
     target-branch: main
     commit-message:
@@ -14,6 +18,10 @@ updates:
     schedule:
       interval: daily
       time: "03:00"
+    groups:
+      npm-aws-dependencies:
+        patterns:
+          - "@aws-sdk/*"
     open-pull-requests-limit: 100
     target-branch: main
     commit-message:
@@ -32,6 +40,10 @@ updates:
     schedule:
       interval: daily
       time: "03:00"
+    groups:
+      npm-aws-dependencies:
+        patterns:
+          - "@aws-sdk/*"
     open-pull-requests-limit: 100
     target-branch: main
     commit-message:
