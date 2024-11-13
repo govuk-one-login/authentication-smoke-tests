@@ -12,8 +12,8 @@
     "build:heartbeat": "cd heartbeat && yarn install --production --frozen-lockfile && yarn run build",
     "build:slack": "cd slack && yarn install --production --frozen-lockfile && yarn run build",
     "build:all": "yarn run build:canary && yarn run build:alerts && yarn run build:heartbeat && yarn run build slack",
-    "pretty": "prettier --write \"*/**/*.{js,json}\"",
-    "check-pretty": "prettier --check \"*/**/*.{js,ts,json}\"",
+    "pretty": "prettier --write \"**/*.{js,json}\"",
+    "check-pretty": "prettier --check \"**/*.{js,json}\"",
     "lint": "eslint . --ext .js"
   },
   "prettier": {
