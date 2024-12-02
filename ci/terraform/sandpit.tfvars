@@ -32,7 +32,7 @@ username_create_account               = ""
 
 alerts_code_s3_key                      = "di-monitoring-utils/alerts.zip/sandpit-smoketest"
 heartbeat_code_s3_key                   = "di-monitoring-utils/heartbeat.zip/sandpit-smoketest"
-hashed_password                         = "123456"
+hashed_password                         = "$argon2id$v=19$m=15360,t=2,p=1$NmUyOGVhZTUxZTIwNDM3ZDM2MDU5MzgxMWRmZDQwNjU0MjJmNGY3MTM4M2IxZTUwOWQyNzZmZmRjMDZiZmQwZQ$HbNF54c22cOkRG5miAxrCMvDDJaSeMoIC96c2AbSllM"
 code_s3_bucket                          = "sandpit-smoke-test-sms-codes"
 use_integration_env_for_sign_in_journey = true
 
