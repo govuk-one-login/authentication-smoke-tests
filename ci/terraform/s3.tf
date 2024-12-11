@@ -1,7 +1,5 @@
 resource "aws_s3_bucket" "smoketest_artefact_bucket" {
   bucket = "${var.environment}-smoke-test-artefacts"
-
-  tags = local.default_tags
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "smoketest_artefact_bucket" {
@@ -30,8 +28,6 @@ resource "aws_s3_bucket_public_access_block" "smoketest_artefact_private_bucket"
 
 resource "aws_s3_bucket" "smoketest_source_bucket" {
   bucket = "${var.environment}-smoke-test-source"
-
-  tags = local.default_tags
 }
 
 

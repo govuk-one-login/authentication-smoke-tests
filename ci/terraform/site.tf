@@ -16,6 +16,19 @@ terraform {
   }
 }
 
+locals {
+  smoke_tests_default_tags = {
+    Environment = var.environment
+    Owner       = "di-authentication@digital.cabinet-office.gov.uk"
+    Product     = "GOV.UK Sign In"
+    System      = "Authentication"
+    Service     = "smoke-tests"
+
+    application = "smoke-tests"
+    terraform   = "authentication-smoke-tests"
+  }
+}
+
 provider "aws" {
   region = var.aws_region
 
@@ -24,6 +37,10 @@ provider "aws" {
     content {
       role_arn = assume_role.value
     }
+  }
+
+  default_tags {
+    tags = local.smoke_tests_default_tags
   }
 }
 
@@ -38,17 +55,13 @@ provider "aws" {
       role_arn = assume_role.value
     }
   }
+
+  default_tags {
+    tags = local.smoke_tests_default_tags
+  }
 }
 
 provider "time" {}
-
-locals {
-  // Using a local rather than the default_tags option on the AWS provider, as the latter has known issues which produce errors on apply.
-  default_tags = {
-    environment = var.environment
-    application = "smoke-tests"
-  }
-}
 
 data "aws_caller_identity" "current" {}
 
