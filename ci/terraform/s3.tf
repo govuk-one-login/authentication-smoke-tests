@@ -12,12 +12,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "smoketest_artefac
   }
 }
 
-resource "aws_s3_bucket_acl" "smoketest_artefact_bucket" {
-  bucket = aws_s3_bucket.smoketest_artefact_bucket.bucket
-
-  acl = "private"
-}
-
 resource "aws_s3_bucket_public_access_block" "smoketest_artefact_private_bucket" {
   bucket                  = aws_s3_bucket.smoketest_artefact_bucket.id
   block_public_acls       = true
@@ -47,12 +41,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "smoketest_source_
       sse_algorithm = "AES256"
     }
   }
-}
-
-resource "aws_s3_bucket_acl" "smoketest_source_bucket" {
-  bucket = aws_s3_bucket.smoketest_source_bucket.bucket
-
-  acl = "private"
 }
 
 resource "aws_s3_bucket_versioning" "smoketest_source_bucket" {
