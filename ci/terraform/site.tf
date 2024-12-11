@@ -1,14 +1,14 @@
 terraform {
-  required_version = ">= 1.7.1"
+  required_version = ">= 1.9.8"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "= 5.34.0"
+      version = "5.75.1"
     }
     time = {
       source  = "hashicorp/time"
-      version = ">= 0.10.0"
+      version = "0.12.1"
     }
   }
 
@@ -16,11 +16,31 @@ terraform {
   }
 }
 
+locals {
+  smoke_tests_default_tags = {
+    Environment = var.environment
+    Owner       = "di-authentication@digital.cabinet-office.gov.uk"
+    Product     = "GOV.UK Sign In"
+    System      = "Authentication"
+    Service     = "smoke-tests"
+
+    application = "smoke-tests"
+    terraform   = "authentication-smoke-tests"
+  }
+}
+
 provider "aws" {
   region = var.aws_region
 
-  assume_role {
-    role_arn = var.deployer_role_arn
+  dynamic "assume_role" {
+    for_each = var.deployer_role_arn != null ? [var.deployer_role_arn] : []
+    content {
+      role_arn = assume_role.value
+    }
+  }
+
+  default_tags {
+    tags = local.smoke_tests_default_tags
   }
 }
 
@@ -29,20 +49,19 @@ provider "aws" {
 
   region = "us-east-1"
 
-  assume_role {
-    role_arn = var.deployer_role_arn
+  dynamic "assume_role" {
+    for_each = var.deployer_role_arn != null ? [var.deployer_role_arn] : []
+    content {
+      role_arn = assume_role.value
+    }
+  }
+
+  default_tags {
+    tags = local.smoke_tests_default_tags
   }
 }
 
 provider "time" {}
-
-locals {
-  // Using a local rather than the default_tags option on the AWS provider, as the latter has known issues which produce errors on apply.
-  default_tags = {
-    environment = var.environment
-    application = "smoke-tests"
-  }
-}
 
 data "aws_caller_identity" "current" {}
 

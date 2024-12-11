@@ -6,8 +6,6 @@ resource "aws_cloudwatch_log_group" "alerts_lambda_log_group" {
   name              = "/aws/lambda/${local.alerts_lambda_name}"
   kms_key_id        = data.terraform_remote_state.shared.outputs.cloudwatch_encryption_key_arn
   retention_in_days = 30
-
-  tags = local.default_tags
 }
 
 data "aws_iam_policy_document" "alerts_execution" {
@@ -67,8 +65,6 @@ resource "aws_lambda_function" "alerts_lambda" {
   }
 
   runtime = "nodejs18.x"
-
-  tags = local.default_tags
 }
 
 resource "aws_sns_topic_subscription" "event_stream_subscription" {

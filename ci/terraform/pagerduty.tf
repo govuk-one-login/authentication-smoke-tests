@@ -1,12 +1,10 @@
 
 resource "aws_sns_topic" "pagerduty_p1_alerts" {
   name = "${var.environment}-pagerduty-p1-alerts"
-  tags = local.default_tags
 }
 
 resource "aws_sns_topic" "pagerduty_p2_alerts" {
   name = "${var.environment}-pagerduty-p2-alerts"
-  tags = local.default_tags
 }
 
 data "aws_iam_policy_document" "pagerduty_alerts_policy_document" {
@@ -44,4 +42,3 @@ resource "aws_sns_topic_subscription" "pagerduty_p2_alerts_topic_subscription" {
   protocol  = "https"
   endpoint  = var.pagerduty_p2_alerts_endpoint
 }
-

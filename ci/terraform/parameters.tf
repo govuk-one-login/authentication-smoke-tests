@@ -28,8 +28,6 @@ resource "aws_kms_key" "parameter_store_key" {
 
   customer_master_key_spec = "SYMMETRIC_DEFAULT"
   key_usage                = "ENCRYPT_DECRYPT"
-
-  tags = local.default_tags
 }
 
 resource "aws_kms_alias" "parameter_store_key_alias" {
@@ -42,14 +40,10 @@ resource "aws_ssm_parameter" "slack_hook_url" {
   type   = "SecureString"
   value  = var.slack_hook_uri
   key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
 }
 
 resource "aws_ssm_parameter" "smoke_test_client_id" {
   name  = "${var.environment}-smoke-test-client-id"
   type  = "String"
   value = random_string.stub_rp_client_id[0].result
-
-  tags = local.default_tags
 }
