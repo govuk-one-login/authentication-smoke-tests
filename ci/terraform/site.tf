@@ -1,14 +1,14 @@
 terraform {
-  required_version = ">= 1.7.1"
+  required_version = ">= 1.9.8"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "= 5.34.0"
+      version = "5.75.1"
     }
     time = {
       source  = "hashicorp/time"
-      version = ">= 0.10.0"
+      version = "0.12.1"
     }
   }
 
@@ -19,8 +19,11 @@ terraform {
 provider "aws" {
   region = var.aws_region
 
-  assume_role {
-    role_arn = var.deployer_role_arn
+  dynamic "assume_role" {
+    for_each = var.deployer_role_arn != null ? [var.deployer_role_arn] : []
+    content {
+      role_arn = assume_role.value
+    }
   }
 }
 
@@ -29,8 +32,11 @@ provider "aws" {
 
   region = "us-east-1"
 
-  assume_role {
-    role_arn = var.deployer_role_arn
+  dynamic "assume_role" {
+    for_each = var.deployer_role_arn != null ? [var.deployer_role_arn] : []
+    content {
+      role_arn = assume_role.value
+    }
   }
 }
 
