@@ -51,12 +51,12 @@ variable "smoke_test_lambda_zip_file" {
 }
 
 variable "alerts_lambda_zip_file" {
-  default = ""
+  default = "../../dist/alerts.zip"
   type    = string
 }
 
 variable "heartbeat_lambda_zip_file" {
-  default = ""
+  default = "../../dist/heartbeat.zip"
   type    = string
 }
 
@@ -225,4 +225,18 @@ variable "slack_channel_id" {
   type        = string
   default     = ""
   description = "Slack channel ID for alerts to be sent to from alerts lambda. Populated from Secrets Manager at deploy time"
+}
+
+variable "start_canaries" {
+  type = object({
+    sign-in          = bool
+    sign-in-with-ipv = bool
+    create-account   = bool
+  })
+  default = {
+    sign-in          = true
+    sign-in-with-ipv = true
+    create-account   = true
+  }
+  description = "Whether to start the canaries immediately after deployment"
 }

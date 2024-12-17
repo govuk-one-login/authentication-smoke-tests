@@ -59,7 +59,7 @@ done
 if [[ ${BUILD} == "1" ]]; then
   echo "Building deployment artefacts ... "
   pushd "${DIR}" > /dev/null
-  yarn clean && yarn install --production && yarn build
+  yarn clean && yarn install --production && yarn build:all
   mkdir -p ../release-artefacts/
   cp dist/*.zip ../release-artefacts/
   popd > /dev/null

@@ -38,6 +38,9 @@ module "canary_sign_in_with_ipv" {
   cloudwatch_log_retention = 30
   logging_endpoint_arns    = var.logging_endpoint_arns
   runtime_version          = var.runtime_version
+
+  start_canary = var.start_canaries["sign-in-with-ipv"]
+
   depends_on = [
     aws_lambda_function.cronitor_ping_lambda
   ]
