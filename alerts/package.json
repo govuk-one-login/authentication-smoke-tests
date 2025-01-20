@@ -4,8 +4,8 @@
   "main": "alerts.js",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-ssm": "3.726.1",
-    "@aws-sdk/client-sts": "3.726.1"
+    "@aws-sdk/client-ssm": "3.731.1",
+    "@aws-sdk/client-sts": "3.731.1"
   },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/alerts.zip ."
