@@ -22,7 +22,7 @@
     "semi": true
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.731.1",
+    "@aws-sdk/client-s3": "^3.733.0",
     "@aws-sdk/client-ssm": "^3.731.1",
     "crypto": "^1.0.1",
     "express": "^4.21.2",
