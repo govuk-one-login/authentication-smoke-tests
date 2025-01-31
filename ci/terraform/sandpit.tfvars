@@ -29,9 +29,10 @@ test_services_api_key                 = "not-a-real-key"
 username_create_account               = "not-real-username"
 
 # The following are all reserved by Ofcom 'for use in drama': https://www.ofcom.org.uk/phones-and-broadband/phone-numbers/numbers-for-drama/
+# They are also Notify test numbers: https://docs.notifications.service.gov.uk/rest-api.html#phone-numbers
 phone_create_account     = "07700900222"
-ipv_smoke_test_phone     = "07700900333"
-sign_in_smoke_test_phone = "07700900333"
+ipv_smoke_test_phone     = "07700900000"
+sign_in_smoke_test_phone = "07700900111"
 
 alerts_code_s3_key                      = "di-monitoring-utils/alerts.zip/sandpit-smoketest"
 heartbeat_code_s3_key                   = "di-monitoring-utils/heartbeat.zip/sandpit-smoketest"
