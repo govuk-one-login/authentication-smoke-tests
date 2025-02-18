@@ -22,15 +22,13 @@ module "canary_sign_in_with_ipv" {
   metric_alarms_enabled             = var.ipv_sign_in_metric_alarm_enabled
   heartbeat_ping_enabled            = var.ipv_sign_in_heartbeat_ping_enabled
 
-  username            = var.ipv_smoke_test_username
-  password            = var.use_integration_env_for_sign_in_journey ? var.integration_password : var.password
-  phone               = var.ipv_smoke_test_phone
-  basic_auth_username = var.use_integration_env_for_sign_in_journey ? var.integration_basic_auth_username : var.basic_auth_username
-  basic_auth_password = var.use_integration_env_for_sign_in_journey ? var.integration_basic_auth_password : var.basic_auth_password
-  client_id           = random_string.stub_rp_client_id[0].result
-  client_base_url     = var.id_enabled_client_base_url
-  client_private_key  = tls_private_key.stub_rp_client_private_key[0].private_key_pem
-  issuer_base_url     = var.use_integration_env_for_sign_in_journey ? var.integration_issuer_base_url : var.issuer_base_url
+  username           = var.ipv_smoke_test_username
+  password           = var.use_integration_env_for_sign_in_journey ? var.integration_password : var.password
+  phone              = var.ipv_smoke_test_phone
+  client_id          = random_string.stub_rp_client_id[0].result
+  client_base_url    = var.id_enabled_client_base_url
+  client_private_key = tls_private_key.stub_rp_client_private_key[0].private_key_pem
+  issuer_base_url    = var.use_integration_env_for_sign_in_journey ? var.integration_issuer_base_url : var.issuer_base_url
 
   smoke_test_cron_expression = var.smoke_test_cron_expression
 

@@ -92,14 +92,6 @@ variable "phone" {
   type = string
 }
 
-variable "basic_auth_username" {
-  type = string
-}
-
-variable "basic_auth_password" {
-  type = string
-}
-
 variable "sns_topic_pagerduty_p1_alerts_arn" {
   type = string
 }

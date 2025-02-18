@@ -101,24 +101,6 @@ resource "aws_ssm_parameter" "phone" {
   tags = local.default_tags
 }
 
-resource "aws_ssm_parameter" "basic_auth_username" {
-  name   = "${var.environment}-${var.canary_name}-basicauth-username"
-  type   = "SecureString"
-  value  = var.basic_auth_username
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
-resource "aws_ssm_parameter" "basic_auth_password" {
-  name   = "${var.environment}-${var.canary_name}-basicauth-password"
-  type   = "SecureString"
-  value  = var.basic_auth_password
-  key_id = aws_kms_alias.parameter_store_key_alias.id
-
-  tags = local.default_tags
-}
-
 resource "aws_ssm_parameter" "sms_bucket" {
   name   = "${var.environment}-${var.canary_name}-bucket"
   type   = "SecureString"

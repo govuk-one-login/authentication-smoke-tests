@@ -186,44 +186,6 @@ data "aws_iam_policy_document" "signin_parameter_policy" {
   }
 }
 
-data "aws_iam_policy_document" "basic_auth_parameter_policy" {
-  statement {
-    sid    = "AllowGetParameters"
-    effect = "Allow"
-
-    actions = [
-      "ssm:GetParameter",
-    ]
-
-    resources = [
-      aws_ssm_parameter.basic_auth_password.arn,
-      aws_ssm_parameter.basic_auth_username.arn,
-    ]
-  }
-  statement {
-    sid    = "AllowDecryptOfParameters"
-    effect = "Allow"
-
-    actions = [
-      "kms:Decrypt",
-    ]
-
-    resources = [
-      aws_kms_alias.parameter_store_key_alias.arn,
-      aws_kms_key.parameter_store_key.arn
-    ]
-  }
-}
-
-resource "aws_iam_policy" "basic_auth_parameter_policy" {
-  policy      = data.aws_iam_policy_document.basic_auth_parameter_policy.json
-  name_prefix = "${var.environment}-${var.canary_name}-basic-auth-parameter-store-policy"
-
-  depends_on = [
-    data.aws_iam_policy_document.basic_auth_parameter_policy
-  ]
-}
-
 resource "aws_iam_policy" "signin_parameter_policy" {
   count       = var.create_account_smoke_test ? 0 : 1
   policy      = data.aws_iam_policy_document.signin_parameter_policy[0].json

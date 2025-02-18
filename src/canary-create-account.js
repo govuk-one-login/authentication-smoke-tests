@@ -6,7 +6,6 @@ const crypto = require("crypto");
 const steps = require("./steps");
 const { setStandardViewportSize } = require("./helpers");
 
-const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
 
 let server;
@@ -76,18 +75,6 @@ const basicCustomEntryPoint = async () => {
   await emptyOtpBucket(bucketName, phoneNumber);
 
   let page = await synthetics.getPage();
-
-  if (CANARY_NAME.includes("integration")) {
-    log.info("Running against INTEGRATION environment");
-
-    const basicAuthUsername = await getParameter("basicauth-username");
-    const basicAuthPassword = await getParameter("basicauth-password");
-
-    await page.authenticate({
-      username: basicAuthUsername,
-      password: basicAuthPassword,
-    });
-  }
 
   log.info("Preparing call to synthetics-user DELETE");
   let syntheticsUserDeleteStepOptions = {

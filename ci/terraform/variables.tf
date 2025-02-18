@@ -85,27 +85,6 @@ variable "pagerduty_p2_alerts_endpoint" {
 variable "pagerduty_cronitor_alerts_endpoint" {
   type = string
 }
-variable "basic_auth_username" {
-  type    = string
-  default = null
-}
-
-variable "basic_auth_password" {
-  type    = string
-  default = null
-}
-
-variable "integration_basic_auth_username" {
-  type        = string
-  default     = null
-  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
-}
-
-variable "integration_basic_auth_password" {
-  type        = string
-  default     = null
-  description = "In some upstream environments e.g. sandpit, not all functionality may be enabled e.g. IPV. Sometimes we might therefore choose to use integration"
-}
 
 variable "terms_and_conditions_version" {
   default = "1.2"

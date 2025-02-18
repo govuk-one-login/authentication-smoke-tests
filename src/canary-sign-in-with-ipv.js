@@ -2,13 +2,9 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
-const {
-  setStandardViewportSize,
-  authenticateWithBasicAuth,
-} = require("./helpers");
+const { setStandardViewportSize } = require("./helpers");
 const steps = require("./steps");
 
-const CANARY_NAME = synthetics.getCanaryName();
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
 
 let server;
@@ -51,12 +47,6 @@ const basicCustomEntryPoint = async () => {
   await emptyOtpBucket(bucketName, phoneNumber);
 
   const page = await synthetics.getPage();
-
-  // Currently, sandpit canaries need to be run against the integration backend
-  if (CANARY_NAME.includes("integration") || CANARY_NAME.includes("sandpit")) {
-    log.info("Running against INTEGRATION environment");
-    await authenticateWithBasicAuth(page);
-  }
 
   await steps.launchClient(
     page,

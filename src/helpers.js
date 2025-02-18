@@ -1,5 +1,3 @@
-const { getParameter } = require("./aws");
-
 const validateTitle = async (expectedTitle, page) => {
   await page.evaluate((expectedTitle) => {
     // eslint-disable-next-line no-undef
@@ -30,20 +28,9 @@ const setStandardViewportSize = async (page) => {
   await page.setViewport({ width: 1864, height: 1096 });
 };
 
-const authenticateWithBasicAuth = async (page) => {
-  const basicAuthUsername = await getParameter("basicauth-username");
-  const basicAuthPassword = await getParameter("basicauth-password");
-
-  await page.authenticate({
-    username: basicAuthUsername,
-    password: basicAuthPassword,
-  });
-};
-
 module.exports = {
   validateTitle,
   validateNoText,
   validateUrlContains,
   setStandardViewportSize,
-  authenticateWithBasicAuth,
 };
