@@ -29,6 +29,23 @@ repos:
           - -r
           - .
 
+  - repo: local
+    hooks:
+      - id: tflint
+        name: Run tflint (terraform linter)
+        files: ^ci/terraform/
+        require_serial: true
+        types_or:
+          - hcl
+          - terraform
+        language: golang
+        additional_dependencies:
+          - github.com/terraform-linters/tflint@v0.55.0
+        entry: scripts/tflint.py
+        args:
+          - --minimum-failure-severity=warning
+          - --fix
+
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.96.2
     hooks:
@@ -97,3 +114,10 @@ repos:
     rev: v1.3.0
     hooks:
       - id: check-gha-pinning
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
