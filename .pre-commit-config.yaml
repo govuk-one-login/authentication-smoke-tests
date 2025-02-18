@@ -26,7 +26,7 @@ repos:
           - --fix
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.96.2
+    rev: v1.97.3
     hooks:
       - id: terraform_fmt
 
@@ -109,7 +109,7 @@ repos:
       - id: shellcheck
 
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.4
+    rev: v1.7.7
     hooks:
       - id: actionlint
 
@@ -119,7 +119,7 @@ repos:
       - id: check-gha-pinning
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.6
+    rev: v0.9.6
     hooks:
       - id: ruff
         args: ["--fix"]
