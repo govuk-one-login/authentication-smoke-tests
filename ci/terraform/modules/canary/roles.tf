@@ -49,13 +49,3 @@ resource "aws_iam_role_policy_attachment" "create_parameter_policy_attachment" {
     aws_iam_role.smoke_tester_role
   ]
 }
-
-resource "aws_iam_role_policy_attachment" "basic_auth_parameter_policy" {
-  policy_arn = aws_iam_policy.basic_auth_parameter_policy.arn
-  role       = aws_iam_role.smoke_tester_role.name
-
-  depends_on = [
-    aws_iam_policy.basic_auth_parameter_policy,
-    aws_iam_role.smoke_tester_role
-  ]
-}

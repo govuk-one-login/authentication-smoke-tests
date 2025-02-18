@@ -29,8 +29,6 @@ module "canary_create_account" {
   synthetics_user_delete_path = var.synthetics_user_delete_path
   username                    = var.username_create_account
   phone                       = var.phone_create_account
-  basic_auth_username         = var.basic_auth_username
-  basic_auth_password         = var.basic_auth_password
   client_id                   = random_string.stub_rp_client_id[0].result
   client_base_url             = var.client_base_url
   client_private_key          = tls_private_key.stub_rp_client_private_key[0].private_key_pem
