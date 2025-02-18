@@ -1,13 +1,20 @@
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.8 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 5.75.1 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | 2.5.2 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | 3.6.3 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | 0.12.1 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.0.6 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.75.1 |
 
 ## Modules
 
@@ -17,6 +24,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+<<<<<<< HEAD
 | [aws_cloudwatch_event_rule.cronitor_event](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
 | [aws_cloudwatch_event_target.cronitor_event_target](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_cloudwatch_log_group.canary_log_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
@@ -59,6 +67,55 @@ No modules.
 | [aws_lambda_function.cronitor_ping_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/lambda_function) | data source |
 | [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+=======
+| [aws_cloudwatch_event_rule.cronitor_event](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_target.cronitor_event_target](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/cloudwatch_event_target) | resource |
+| [aws_cloudwatch_log_group.canary_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_subscription_filter.log_subscription](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/cloudwatch_log_subscription_filter) | resource |
+| [aws_cloudwatch_metric_alarm.smoke_tester_metric_alarm_p1](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.smoke_tester_metric_alarm_p2](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_iam_policy.basic_auth_parameter_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.canary_execution](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.create_parameter_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.signin_parameter_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.sms_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_policy) | resource |
+| [aws_iam_role.smoke_tester_role](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.basic_auth_parameter_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.canary_execution](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.create_parameter_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.signin_parameter_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.sms_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_kms_alias.parameter_store_key_alias](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/kms_alias) | resource |
+| [aws_kms_key.parameter_store_key](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/kms_key) | resource |
+| [aws_lambda_permission.allow_cloudwatch_to_trigger_cronitor_lambda](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/lambda_permission) | resource |
+| [aws_ssm_parameter.basic_auth_password](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.basic_auth_username](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.client_base_url](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.client_id](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.client_private_key](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.fire_drill](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.issuer_base_url](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.password](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.phone](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.slack_hook_url](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.sms_bucket](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.synthetics-user-delete-path](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.test-services-api-hostname](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.test-services-api-key](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_ssm_parameter.username](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/ssm_parameter) | resource |
+| [aws_synthetics_canary.smoke_tester_canary](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/resources/synthetics_canary) | resource |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.basic_auth_parameter_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.canary_execution](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.create_parameter_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.key_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.lambda_can_assume_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.signin_parameter_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.sms_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/iam_policy_document) | data source |
+| [aws_lambda_function.cronitor_ping_lambda](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/lambda_function) | data source |
+| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/partition) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/5.75.1/docs/data-sources/region) | data source |
+>>>>>>> f60f2a7 (BAU: fix all tflint errors)
 
 ## Inputs
 

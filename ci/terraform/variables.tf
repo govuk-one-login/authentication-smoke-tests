@@ -1,4 +1,5 @@
 variable "aws_region" {
+  type    = string
   default = "eu-west-2"
 }
 
@@ -41,6 +42,7 @@ variable "ipv_smoke_test_phone" {
 }
 
 variable "shared_state_bucket" {
+  type    = string
   default = ""
 }
 
@@ -60,12 +62,6 @@ variable "heartbeat_lambda_zip_file" {
   type    = string
 }
 
-variable "smoke_test_rate_minutes" {
-  default     = 3
-  description = "Minutes between smoke test executions"
-  type        = number
-}
-
 variable "sign_in_smoke_test_username" {
   type = string
 }
@@ -82,11 +78,8 @@ variable "pagerduty_p2_alerts_endpoint" {
   type = string
 }
 
-variable "pagerduty_cronitor_alerts_endpoint" {
-  type = string
-}
-
 variable "terms_and_conditions_version" {
+  type    = string
   default = "1.2"
 }
 

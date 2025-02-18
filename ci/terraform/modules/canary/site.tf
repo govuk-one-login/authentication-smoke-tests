@@ -12,5 +12,4 @@ locals {
     application = "smoke-tests"
   }
   smoke_tester_name = "${var.environment}-${var.canary_name}"
-  module_name       = "canaries"
 }
