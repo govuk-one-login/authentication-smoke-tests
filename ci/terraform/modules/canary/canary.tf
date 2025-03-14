@@ -12,6 +12,8 @@ resource "aws_synthetics_canary" "smoke_tester_canary" {
   s3_key     = var.canary_source_key
   s3_version = var.canary_source_version_id
 
+  delete_lambda = true // This will delete the lambda function when the canary is updated
+
   success_retention_period = 1
   failure_retention_period = 14
 
