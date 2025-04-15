@@ -39,10 +39,10 @@ combined-stream@^1.0.8:
   dependencies:
     delayed-stream "~1.0.0"
 
-cronitor@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/cronitor/-/cronitor-2.5.0.tgz#81a836531410ed96e7de20f7cb7a3f6fab91e8aa"
-  integrity sha512-TIYMsxiiLlBxCoHtnrKP6ASgfuDUaTM6NgRnI/LU5QDeeTusU53BcbiWNCmB+7w3ZXZq3odhy1S//w1D+4A6Vw==
+cronitor@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/cronitor/-/cronitor-2.5.1.tgz#57e27fd0ae7f89ab823aaedb18d87811d33d534c"
+  integrity sha512-lVzjl3gLR0SRpCBNmCIHxWEUgzp3Lh1IprpfW4WCWg5A2uNbb4Vq0m4tViJQjN63pV0xH1KIDBhoUnYCZwUtxA==
   dependencies:
     axios "^1.6.5"
     js-yaml "^4.1.0"
