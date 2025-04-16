@@ -109,9 +109,13 @@ const ipvHandOff = async (page) => {
 
     log.info(pageTitleForConsole);
 
+    const pageTitle = await page.title();
     const hasReachedIPV =
-      (await page.title()) ===
-      "Do you live in the UK, the Channel Islands or the Isle of Man? – GOV.UK One Login";
+      pageTitle ===
+        "Do you live in the UK, the Channel Islands or the Isle of Man? – GOV.UK One Login" || // new identity
+      pageTitle ===
+        "You have already proved your identity – GOV.UK One Login" || // identity reuse
+      pageTitle.startsWith("You need to confirm your "); // reuse with fraud check
 
     if (!hasReachedIPV) {
       throw new Error(`Failed at IPV Hand-off step`);
@@ -119,6 +123,58 @@ const ipvHandOff = async (page) => {
   });
 };
 
+const identityReuse = async (page) => {
+  const pageTitle = await page.title();
+  if (
+    pageTitle === "You have already proved your identity – GOV.UK One Login"
+  ) {
+    await confirmIdentityReuse(page);
+  } else if (pageTitle.startsWith("You need to confirm your ")) {
+    await confirmIdentityReuseWithFraudCheck(page);
+  }
+};
+
+const confirmIdentityReuse = async (page) => {
+  await synthetics.executeStep("Confirm identity reuse", async () => {
+    await page.waitForSelector(selectors.submitFormButton);
+    await Promise.all([
+      // "You have already proved your identity" page
+      page.click(selectors.submitFormButton),
+      // Wait for spinner element to appear
+      page.waitForSelector(".ccms-loader"),
+    ]);
+  });
+};
+
+const confirmIdentityReuseWithFraudCheck = async (page) => {
+  await synthetics.executeStep(
+    "Confirm identity reuse with fraud check",
+    async () => {
+      // "You need to confirm your details" details page
+      await page.waitForSelector(selectors.submitFormButton);
+      await Promise.all([
+        page.click(selectors.detailsCorrect),
+        page.click(selectors.submitFormButton),
+        // "We need to check your details" page
+        waitForNavigationAndClick(page, selectors.submitFormButton),
+        // "Continue to the service you need to use" page
+        waitForNavigationAndClick(page, selectors.submitFormButton),
+        // Wait for spinner element to appear
+        page.waitForSelector(".ccms-loader"),
+      ]);
+    }
+  );
+};
+const waitForSpinner = async (page, clientBaseUrl) => {
+  await synthetics.executeStep("Wait for spinner", async () => {
+    await Promise.all([
+      page.waitForNavigation({
+        timeout: 60000, // Minute timeout
+      }),
+    ]);
+    await validateUrlContains(clientBaseUrl, page);
+  });
+};
 // Steps only used by Create Account canary
 
 const clickCreateAccount = async (page) => {
@@ -220,6 +276,10 @@ module.exports = {
   enterOtpCode,
   submitOtpCode,
   ipvHandOff,
+  identityReuse,
+  confirmIdentityReuse,
+  confirmIdentityReuseWithFraudCheck,
+  waitForSpinner,
   microclientUserInfo,
   clickCreateAccount,
   submitEmailCreate,
