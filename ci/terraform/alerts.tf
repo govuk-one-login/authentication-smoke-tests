@@ -64,7 +64,7 @@ resource "aws_lambda_function" "alerts_lambda" {
     }
   }
 
-  runtime = "nodejs18.x"
+  runtime = "nodejs20.x"
 }
 
 resource "aws_sns_topic_subscription" "event_stream_subscription" {
