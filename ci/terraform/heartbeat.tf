@@ -58,5 +58,5 @@ resource "aws_lambda_function" "cronitor_ping_lambda" {
     }
   }
 
-  runtime = "nodejs18.x"
+  runtime = "nodejs20.x"
 }

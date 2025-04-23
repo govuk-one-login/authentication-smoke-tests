@@ -197,7 +197,7 @@ variable "smoke_test_cron_expression" {
 
 variable "runtime_version" {
   type    = string
-  default = "syn-nodejs-puppeteer-6.2"
+  default = "syn-nodejs-puppeteer-10.0"
 }
 
 variable "slack_channel_id" {
