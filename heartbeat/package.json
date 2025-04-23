@@ -4,7 +4,7 @@
   "main": "heartbeat.js",
   "license": "MIT",
   "dependencies": {
-    "cronitor": "^2.5.0"
+    "cronitor": "^2.5.1"
   },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/heartbeat.zip ."
