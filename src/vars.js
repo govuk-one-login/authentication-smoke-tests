@@ -9,6 +9,7 @@ const selectors = {
   otpCodeInput: ".govuk-grid-row #code",
   smsMfaRadio: ".govuk-grid-row #mfaOptions",
   phoneNumberInput: ".govuk-grid-row #phoneNumber",
+  detailsCorrect: ".govuk-grid-row #up-to-date",
 };
 
 module.exports = { selectors };
