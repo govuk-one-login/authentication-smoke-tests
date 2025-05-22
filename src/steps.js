@@ -123,6 +123,26 @@ const ipvHandOff = async (page) => {
   });
 };
 
+// This is only used to test the fraud check identity reuse journey manually at the moment
+const forceFraudCheck = async (page) => {
+  await synthetics.executeStep("Force fraud check", async () => {
+    const url = await page.url();
+    const baseUrl = url.match(/^https?:\/\/.+\.gov\.uk\//);
+    const forceFraudCheckUrl =
+      baseUrl + "ipv/usefeatureset?featureSet=zeroHourFraudVcExpiry";
+    await page.goto(forceFraudCheckUrl, {
+      waitUntil: "domcontentloaded",
+      timeout: 60000,
+    });
+
+    await validateTitle("Feature Set", page);
+  });
+  // Back to ipv reuse page
+  await page.goBack();
+  // Back to redirect to IPV
+  await page.goBack();
+};
+
 const identityReuse = async (page) => {
   const pageTitle = await page.title();
   if (
@@ -150,26 +170,39 @@ const confirmIdentityReuseWithFraudCheck = async (page) => {
   await synthetics.executeStep(
     "Confirm identity reuse with fraud check",
     async () => {
-      // "You need to confirm your details" details page
+      // "You need to confirm your details" page
       await page.waitForSelector(selectors.submitFormButton);
+      await page.click(selectors.detailsCorrect);
       await Promise.all([
-        page.click(selectors.detailsCorrect),
         page.click(selectors.submitFormButton),
-        // "We need to check your details" page
-        waitForNavigationAndClick(page, selectors.submitFormButton),
-        // "Continue to the service you need to use" page
-        waitForNavigationAndClick(page, selectors.submitFormButton),
-        // Wait for spinner element to appear
-        page.waitForSelector(".ccms-loader"),
+        page.waitForNavigation(),
       ]);
     }
   );
+  await synthetics.executeStep("We need to check your details", async () => {
+    await page.waitForSelector(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("page-ipv-success", page);
+  });
+
+  await synthetics.executeStep("Continue to the service", async () => {
+    await page.waitForSelector(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await page.waitForSelector(".ccms-loader");
+  });
 };
+
 const waitForSpinner = async (page, clientBaseUrl) => {
   await synthetics.executeStep("Wait for spinner", async () => {
     await Promise.all([
       page.waitForNavigation({
-        timeout: 60000, // Minute timeout
+        timeout: 120000, // 2 minute timeout
       }),
     ]);
     await validateUrlContains(clientBaseUrl, page);
@@ -276,6 +309,7 @@ module.exports = {
   enterOtpCode,
   submitOtpCode,
   ipvHandOff,
+  forceFraudCheck,
   identityReuse,
   confirmIdentityReuse,
   confirmIdentityReuseWithFraudCheck,
