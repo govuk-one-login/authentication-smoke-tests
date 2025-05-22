@@ -72,6 +72,19 @@ const basicCustomEntryPoint = async () => {
 
   await steps.ipvHandOff(page);
 
+  const title = await page.title();
+  if (
+    title !==
+    "Do you live in the UK, the Channel Islands or the Isle of Man? – GOV.UK One Login"
+  ) {
+    // Force fraud check by enabling the zeroHourFraudVcExpiry feature set
+    await steps.forceFraudCheck(page);
+
+    // Journey is not a new identity (identity reuse or fraud check)
+    await steps.identityReuse(page);
+    await steps.waitForSpinner(page, clientBaseUrl);
+  }
+
   return "success";
 };
 
