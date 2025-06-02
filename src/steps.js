@@ -110,8 +110,7 @@ const ipvHandOff = async (page) => {
     log.info(pageTitleForConsole);
 
     const hasReachedIPV =
-      (await page.title()) ===
-      "Do you live in the UK, the Channel Islands or the Isle of Man? – GOV.UK One Login";
+      (await page.title()) === "Where do you live? – GOV.UK One Login";
 
     if (!hasReachedIPV) {
       throw new Error(`Failed at IPV Hand-off step`);
