@@ -3,7 +3,7 @@ Transform:
   - AWS::LanguageExtensions
   - AWS::Serverless-2016-10-31
 
-Description: 'GOV.UK Sign In Authentication Smoke Tests Infrastructure'
+Description: "GOV.UK Sign In Authentication Smoke Tests Infrastructure"
 
 Parameters:
   VpcStackName:
@@ -19,12 +19,11 @@ Parameters:
     Description: "The ARN of the permissions boundary to apply when creating IAM roles"
     Type: String
     Default: "nonenonenonenonenone"
-  
+
   SlackHookUri:
     Type: String
     Description: Webhook URI for Slack notifications
     NoEcho: true
-
 
   Environment:
     Description: "The name of the environment to deploy to"
@@ -177,13 +176,12 @@ Resources:
         - Key: Application
           Value: smoke-tests
 
-
   # IAM Roles and Policies
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -232,7 +230,7 @@ Resources:
         - Env: !Ref Environment
       TargetKeyId: !Ref KmsKey
 
-  # Lambda Function
+  # Alert Lambda Function
   AlertsLambda:
     Type: AWS::Serverless::Function
     Properties:
