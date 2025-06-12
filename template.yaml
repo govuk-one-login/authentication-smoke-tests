@@ -137,7 +137,7 @@ Globals:
 Resources:
   # S3 Buckets
   SmokeTestArtefactBucket:
-    Type:
+    Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${Environment}-smoke-new-test-artefacts"
       BucketEncryption:
