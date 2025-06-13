@@ -42,11 +42,11 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [!Ref CodeSigningConfigArn, none]]
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
-  IsProduction: !Equals [!Ref Environment, "production"]
-  Isnotbuild: !Not [!Equals [!Ref Environment, "build"]]
-  IsnotIntegration: !Not [!Equals [!Ref Environment, "integration"]]
-  MetricAlarmsEnabled: !Equals [!Ref MetricAlarmsEnabled, "true"]
-  HeartbeatPingEnabled: !Equals [!Ref HeartbeatPingEnabled, "true"]
+  IsNotBuild:
+    Fn::Not:
+      - Fn::Equals:
+          - !Ref Environment
+          - build
 
 Mappings:
   EnvironmentConfiguration:
@@ -138,6 +138,7 @@ Resources:
   # S3 Buckets
   SmokeTestArtefactBucket:
     Type: AWS::S3::Bucket
+    Condition: IsNotBuild
     Properties:
       BucketName: !Sub "${Environment}-smoke-new-test-artefacts"
       BucketEncryption:
@@ -242,6 +243,9 @@ Resources:
       Environment:
         Variables:
           DEPLOY_ENVIRONMENT: !Ref Environment
-          SLACK_CHANNEL_ID: !Ref SlackChannelId
-      LoggingConfig:
-        LogGroup: !Ref AlertsLambdaFunctionLogGroup
+          SLACK_CHANNEL_ID:
+            - !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                SlackChannelId,
+              ]
