@@ -20,15 +20,11 @@ Parameters:
     Type: String
     Default: "nonenonenonenonenone"
 
-  SlackHookUri:
-    Type: String
-    Description: Webhook URI for Slack notifications
-    NoEcho: true
-
   Environment:
     Description: "The name of the environment to deploy to"
     Type: "String"
     AllowedValues:
+      - dev
       - build
       - staging
       - production
@@ -50,6 +46,10 @@ Conditions:
 
 Mappings:
   EnvironmentConfiguration:
+    dev:
+      cloudwatchLogRetentionInDays: 30
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      SlackChannelId: C07TMK4CGH2
     build:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
@@ -232,11 +232,11 @@ Resources:
       TargetKeyId: !Ref KmsKey
 
   # Alert Lambda Function
-  AlertsLambda:
+  AlertsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "${Environment}-alerts"
-      CodeUri: ./dist/alert.zip
+      CodeUri: dist/alerts.zip
       Handler: alerts.handler
       Runtime: nodejs20.x
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -244,8 +244,8 @@ Resources:
         Variables:
           DEPLOY_ENVIRONMENT: !Ref Environment
           SLACK_CHANNEL_ID:
-            - !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                SlackChannelId,
-              ]
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              SlackChannelId,
+            ]
