@@ -6,6 +6,5 @@ s3_bucket = "smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj"
 region = "eu-west-2"
 confirm_changeset = true
 capabilities = "CAPABILITY_NAMED_IAM"
-parameter_overrides = "VpcStackName=\"vpc\" CodeSigningConfigArn=\"arn:aws:lambda:eu-west-2:975050272416:code-signing-config:csc-03cfcdb0683a16b5d\" PermissionsBoundary=\"arn:aws:iam::975050272416:policy/smoke-test-pipeline-AppProgrammaticPermissionsBoundary-028c908e3813\" Environment=\"dev\" LambdaDeploymentPreference=\"AllAtOnce\""
+parameter_overrides = "VpcStackName=\"vpc\" Environment=\"dev\""
 image_repositories = []
-signing_profiles = "AlertsLambdaFunction=\"SigningProfile_bdzyxbYzrSD8\""

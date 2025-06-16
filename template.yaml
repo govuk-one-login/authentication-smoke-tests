@@ -18,7 +18,7 @@ Parameters:
   PermissionsBoundary:
     Description: "The ARN of the permissions boundary to apply when creating IAM roles"
     Type: String
-    Default: "nonenonenonenonenone"
+    Default: "none"
 
   Environment:
     Description: "The name of the environment to deploy to"
@@ -38,6 +38,7 @@ Parameters:
 Conditions:
   UseCodeSigning: !Not [!Equals [!Ref CodeSigningConfigArn, none]]
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
+  IsProduction: !Equals [!Ref Environment, "production"]
   IsNotBuild:
     Fn::Not:
       - Fn::Equals:
@@ -50,22 +51,51 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       SlackChannelId: C07TMK4CGH2
+      CronitorApiKey: "not-a-real-key"
+      CronitorMonitorKey: "not-a-real-key"
+      BackendAccountID: "653994557586"
+      PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
+      PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+
     build:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       SlackChannelId: C07TMK4CGH2
+      CronitorApiKey: "not-a-real-key"
+      CronitorMonitorKey: "not-a-real-key"
+      BackendAccountID: "761723964695"
+      PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
+      PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+
     staging:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       SlackChannelId: C07TMK4CGH2
+      CronitorApiKey: "not-a-real-key"
+      CronitorMonitorKey: "not-a-real-key"
+      BackendAccountID: "758531536632"
+      PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
+      PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+
     integration:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       SlackChannelId: C07TMK4CGH2
+      CronitorApiKey: "not-a-real-key"
+      CronitorMonitorKey: "not-a-real-key"
+      BackendAccountID: "761723964695"
+      PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
+      PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+
     production:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
       SlackChannelId: C07TMK4CGH2
+      CronitorApiKey: "not-a-real-key"
+      CronitorMonitorKey: "not-a-real-key"
+      BackendAccountID: "172348255554"
+      PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
+      PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
 
 Globals:
   Function:
@@ -178,7 +208,22 @@ Resources:
           Value: smoke-tests
 
   # IAM Roles and Policies
-  LambdaExecutionRole:
+
+  AlertsLambdaExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${Environment}-alerts-execution-policy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowLogging
+            Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: "arn:aws:logs:*:*:*"
+
+  AlertsLambdaLambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -189,12 +234,67 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Ref AlertsLambdaExecutionPolicy
+        - !Ref ParameterStorePolicy
       Tags:
         - Key: Environment
           Value: !Ref Environment
         - Key: Application
           Value: smoke-tests
+
+  HeartbeatLambdaExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${Environment}-cronitor-execution-policy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowLogging
+            Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: "arn:aws:logs:*:*:*"
+
+  HeartbeatLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Environment}-cronitor-execution-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref HeartbeatLambdaExecutionPolicy
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  ParameterStorePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${Environment}-parameter-store-policy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowGetParameters
+            Effect: Allow
+            Action:
+              - ssm:GetParameter
+            Resource:
+              - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter*/${Environment}-slack-hook-url/*
+          - Sid: AllowDecryptOfParameters
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource:
+              - !GetAtt ParameterStoreKey.Arn
+              - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${Environment}-slack-hook-url/*
 
   KmsKey:
     Type: AWS::KMS::Key
@@ -226,10 +326,171 @@ Resources:
   KmsKeyAlias:
     Type: "AWS::KMS::Alias"
     Properties:
-      AliasName: !Sub
-        - "alias/${Env}-smoke-test-lambda-main-kms-alias"
-        - Env: !Ref Environment
+      AliasName: !Sub "alias/${Environment}-smoke-test-lambda-main-kms-alias"
       TargetKeyId: !Ref KmsKey
+
+  ParameterStoreKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: KMS key for parameter store
+      EnableKeyRotation: true
+      PendingWindowInDays: 30
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: key-policy-ssm
+        Statement:
+          - Sid: Enable IAM User Permissions for root user
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: SYMMETRIC_DEFAULT
+      KeyUsage: ENCRYPT_DECRYPT
+
+  ParameterStoreKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${Environment}-parameter-store-encryption-key"
+      TargetKeyId: !Ref ParameterStoreKey
+
+  # Parameter Store
+  SlackHookUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-slack-hook-url"
+      Type: String
+      Value: "placeholder" # Will be updated manually post-deployment
+      Description: Slack hook URL for alerts
+
+  SmokeTestClientIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-test-client-id"
+      Type: "String"
+      Value: !GetAtt SmokeTestClientIdString.RandomString
+
+  SmokeTestClientIdString:
+    Type: Custom::RandomString
+    Properties:
+      ServiceToken: !GetAtt RandomStringFunction.Arn
+      Length: 16
+      Special: false
+
+  RandomStringFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !GetAtt RandomStringFunctionRole.Arn
+      Runtime: nodejs20.x
+      Code:
+        ZipFile: |
+          const crypto = require('crypto');
+          const https = require('https');
+
+          exports.handler = async (event, context) => {
+            console.log('Event:', JSON.stringify(event));
+
+            // Generate random string regardless of event type
+            const length = event.ResourceProperties?.Length || 16;
+            const special = event.ResourceProperties?.Special === 'true';
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' + (special ? '!@#$%^&*()' : '');
+
+            let randomString = '';
+            const randomValues = crypto.randomBytes(parseInt(length));
+
+            for (let i = 0; i < length; i++) {
+              randomString += charset.charAt(randomValues[i] % charset.length);
+            }
+
+            // For Delete events, just return success
+            if (event.RequestType === 'Delete') {
+              return sendCfnResponse(event, context, 'SUCCESS');
+            }
+
+            // For Create/Update events, return the generated string
+            return sendCfnResponse(event, context, 'SUCCESS', { RandomString: randomString });
+          };
+
+          // Simplified CloudFormation response function
+          function sendCfnResponse(event, context, status, data = {}) {
+            // If no ResponseURL is provided, just log and return
+            if (!event.ResponseURL) {
+              console.log(`No ResponseURL found. Status: ${status}, Data:`, data);
+              return Promise.resolve();
+            }
+
+            const responseBody = JSON.stringify({
+              Status: status,
+              Reason: status === 'FAILED' ? 'See CloudWatch logs for details' : 'OK',
+              PhysicalResourceId: context.logStreamName || 'random-string-generator',
+              StackId: event.StackId || '',
+              RequestId: event.RequestId || '',
+              LogicalResourceId: event.LogicalResourceId || '',
+              Data: data
+            });
+
+            console.log('Sending response:', responseBody);
+
+            // Parse URL safely
+            let urlParts;
+            try {
+              const url = new URL(event.ResponseURL);
+              urlParts = {
+                hostname: url.hostname,
+                path: url.pathname + url.search,
+                method: 'PUT'
+              };
+            } catch (e) {
+              console.error('Invalid ResponseURL:', event.ResponseURL);
+              return Promise.resolve();
+            }
+
+            const options = {
+              hostname: urlParts.hostname,
+              port: 443,
+              path: urlParts.path,
+              method: 'PUT',
+              headers: {
+                'Content-Type': '',
+                'Content-Length': responseBody.length
+              }
+            };
+
+            return new Promise((resolve) => {
+              try {
+                const req = https.request(options, (res) => {
+                  console.log(`Response status code: ${res.statusCode}`);
+                  res.on('data', () => {});
+                  res.on('end', () => resolve());
+                });
+
+                req.on('error', (e) => {
+                  console.error('Request error:', e);
+                  resolve(); // Resolve anyway to prevent Lambda from hanging
+                });
+
+                req.write(responseBody);
+                req.end();
+              } catch (e) {
+                console.error('Failed to send response:', e);
+                resolve(); // Resolve anyway to prevent Lambda from hanging
+              }
+            });
+          }
+
+  RandomStringFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   # Alert Lambda Function
   AlertsLambdaFunction:
@@ -238,8 +499,7 @@ Resources:
       FunctionName: !Sub "${Environment}-alerts"
       CodeUri: dist/alerts.zip
       Handler: alerts.handler
-      Runtime: nodejs20.x
-      Role: !GetAtt LambdaExecutionRole.Arn
+      Role: !GetAtt AlertsLambdaLambdaExecutionRole.Arn
       Environment:
         Variables:
           DEPLOY_ENVIRONMENT: !Ref Environment
@@ -249,3 +509,332 @@ Resources:
               !Ref Environment,
               SlackChannelId,
             ]
+      LoggingConfig:
+        LogGroup: !Ref AlertsLambdaLogGroup
+
+  SlackEventsWithSNSPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AlertsLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Sub
+        - arn:aws:sns:${AWS::Region}:${Awsid}:${Environment}-slack-events
+        - {
+            Awsid:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                BackendAccountID,
+              ],
+          }
+      Id: AllowExecutionFromSlackEventsSNSTopic
+
+  SlackEventsSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Sub
+        - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-events
+        - {
+            AccountID:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                BackendAccountID,
+              ],
+          }
+      Protocol: lambda
+      Endpoint: !GetAtt AlertsLambdaFunction.Arn
+
+  SlackAlertsWithSNSPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AlertsLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Sub
+        - arn:aws:sns:${AWS::Region}:${Awsid}:${Environment}-slack-alerts
+        - {
+            Awsid:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                BackendAccountID,
+              ],
+          }
+      Id: AllowExecutionFromSlackAlertsSNSTopic
+
+  SlackAlertsStreamSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Sub
+        - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+        - {
+            AccountID:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                BackendAccountID,
+              ],
+          }
+      Protocol: lambda
+      Endpoint: !GetAtt AlertsLambdaFunction.Arn
+
+  # OIDC Cloufront Alerts SNS Subscription and lambda permission
+  OidcCloudfrontAlertsPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AlertsLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Sub
+        - arn:aws:sns:${AWS::Region}:${Awsid}:${Environment}-oidc-cloudfront-alerts
+        - {
+            Awsid:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                BackendAccountID,
+              ],
+          }
+      Id: AllowExecutionFromCloudfrontAlertsSNSTopic
+
+  OidcCloudfrontAlertsSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Sub
+        - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-oidc-cloudfront-alerts
+        - {
+            AccountID:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                BackendAccountID,
+              ],
+          }
+      Protocol: lambda
+      Endpoint: !GetAtt AlertsLambdaFunction.Arn
+
+  AlertsLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${Environment}-alerts"
+      RetentionInDays:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          cloudwatchLogRetentionInDays,
+        ]
+      KmsKeyId: !GetAtt KmsKey.Arn
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-AlertsLambdaLogGroup"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Source
+          Value: govuk-one-login/authentication-smoke-test/template.yaml
+
+  HeartbeatLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Environment}-cronitor-ping"
+      CodeUri: dist/heartbeat.zip
+      Handler: heartbeat.handler
+      Role: !GetAtt HeartbeatLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DEPLOY_ENVIRONMENT: !Ref Environment
+          CRONITOR_API_KEY:
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              CronitorApiKey,
+            ]
+          CRONITOR_MONITOR_KEY:
+            !FindInMap [
+              EnvironmentConfiguration,
+              !Ref Environment,
+              CronitorMonitorKey,
+            ]
+      LoggingConfig:
+        LogGroup: !Ref HeartbeatLambdaLogGroup
+
+  HeartbeatLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${Environment}-cronitor-ping"
+      RetentionInDays:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          cloudwatchLogRetentionInDays,
+        ]
+      KmsKeyId: !GetAtt KmsKey.Arn
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-HeartbeatLambdaLogGroup"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Source
+          Value: govuk-one-login/authentication-smoke-test/template.yaml
+
+  # pager Duty SNS topics and policies
+
+  PagerDutyP1Alerts:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${Environment}-pagerduty-p1-alerts"
+
+  PagerDutyP2Alerts:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${Environment}-pagerduty-p2-alerts"
+
+  PagerDutyP1AlertsPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref PagerDutyP1Alerts
+      PolicyDocument:
+        Id: !Sub "${Environment}-pagerdutyP1-alerts-sns-topic-policy"
+        Version: "2012-10-17"
+        Statement:
+          - Sid: GivePagerDutyP1AlertsSnsTopicPolicyPublish
+            Effect: Allow
+            Principal:
+              AWS: "*"
+            Action:
+              - SNS:Publish
+              - SNS:RemovePermission
+              - SNS:SetTopicAttributes
+              - SNS:DeleteTopic
+              - SNS:ListSubscriptionsByTopic
+              - SNS:GetTopicAttributes
+              - SNS:Receive
+              - SNS:AddPermission
+              - SNS:Subscribe
+            Resource: !Ref PagerDutyP1Alerts
+
+  PagerDutyP2AlertsPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref PagerDutyP2Alerts
+      PolicyDocument:
+        Id: !Sub "${Environment}-pagerdutyP2-alerts-sns-topic-policy"
+        Version: "2012-10-17"
+        Statement:
+          - Sid: GivePagerDutyP2AlertsSnsTopicPolicyPublish
+            Effect: Allow
+            Principal:
+              AWS: "*"
+            Action:
+              - SNS:Publish
+              - SNS:RemovePermission
+              - SNS:SetTopicAttributes
+              - SNS:DeleteTopic
+              - SNS:ListSubscriptionsByTopic
+              - SNS:GetTopicAttributes
+              - SNS:Receive
+              - SNS:AddPermission
+              - SNS:Subscribe
+            Resource: !Ref PagerDutyP2Alerts
+
+  PagerDutyP1AlertsSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: IsProduction
+    Properties:
+      TopicArn: !Ref PagerDutyP1Alerts
+      Protocol: https
+      Endpoint:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          PagerDutyP1AlertsEndpoint,
+        ]
+
+  PagerDutyP2AlertsSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: IsProduction
+    Properties:
+      TopicArn: !Ref PagerDutyP2Alerts
+      Protocol: https
+      Endpoint:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          PagerDutyP2AlertsEndpoint,
+        ]
+
+  # Synthetics Canaries
+  SignInCanary:
+    Type: AWS::Synthetics::Canary
+    Properties:
+      Name: !Sub "${Environment}-smoke-in"
+      ArtifactS3Location: !Sub "s3://${SmokeTestArtefactBucket}"
+      ExecutionRoleArn: !GetAtt SyntheticsCanaryRole.Arn
+      RuntimeVersion: !Ref RuntimeVersion
+      Schedule:
+        Expression: !Sub "cron(${SmokeTestCronExpression})"
+      StartCanaryAfterCreation: true
+      RunConfig:
+        TimeoutInSeconds: 60
+        MemoryInMB: 1024
+        ActiveTracing: true
+      Code:
+        S3Bucket: !Ref SmokeTestLambdaS3Bucket
+        S3Key: !Ref SmokeTestLambdaS3Key
+        Handler: canary-sign-in.handler
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  SignInWithIPVCanary:
+    Type: AWS::Synthetics::Canary
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv"
+      ArtifactS3Location: !Sub "s3://${SmokeTestArtefactBucket}"
+      ExecutionRoleArn: !GetAtt SyntheticsCanaryRole.Arn
+      RuntimeVersion: !Ref RuntimeVersion
+      Schedule:
+        Expression: !Sub "cron(${SmokeTestCronExpression})"
+      StartCanaryAfterCreation: true
+      RunConfig:
+        TimeoutInSeconds: 60
+        MemoryInMB: 1024
+        ActiveTracing: true
+      Code:
+        S3Bucket: !Ref SmokeTestLambdaS3Bucket
+        S3Key: !Ref SmokeTestLambdaS3Key
+        Handler: canary-sign-in-with-ipv.handler
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  CreateAccountCanary:
+    Type: AWS::Synthetics::Canary
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra"
+      ArtifactS3Location: !Sub "s3://${SmokeTestArtefactBucket}"
+      ExecutionRoleArn: !GetAtt SyntheticsCanaryRole.Arn
+      RuntimeVersion: !Ref RuntimeVersion
+      Schedule:
+        Expression: !Sub "cron(${SmokeTestCronExpression})"
+      StartCanaryAfterCreation: true
+      RunConfig:
+        TimeoutInSeconds: 60
+        MemoryInMB: 1024
+        ActiveTracing: true
+      Code:
+        S3Bucket: !Ref SmokeTestLambdaS3Bucket
+        S3Key: !Ref SmokeTestLambdaS3Key
+        Handler: canary-create-account.handler
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
