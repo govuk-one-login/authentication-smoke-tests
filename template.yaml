@@ -20,6 +20,16 @@ Parameters:
     Type: String
     Default: "none"
 
+  SmokeTestLambdaZipFile:
+    Type: String
+    Description: "The S3 location of the smoke test lambda zip file"
+    Default: "dist/canary.zip"
+
+  RuntimeVersion:
+    Type: String
+    Description: "The runtime version for the canary"
+    Default: "syn-nodejs-puppeteer-10.0"
+
   Environment:
     Description: "The name of the environment to deploy to"
     Type: "String"
@@ -56,6 +66,7 @@ Mappings:
       BackendAccountID: "653994557586"
       PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
       PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+      SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
 
     build:
       cloudwatchLogRetentionInDays: 30
@@ -66,6 +77,7 @@ Mappings:
       BackendAccountID: "761723964695"
       PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
       PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+      SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
 
     staging:
       cloudwatchLogRetentionInDays: 30
@@ -76,6 +88,7 @@ Mappings:
       BackendAccountID: "758531536632"
       PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
       PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+      SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
 
     integration:
       cloudwatchLogRetentionInDays: 30
@@ -86,6 +99,7 @@ Mappings:
       BackendAccountID: "761723964695"
       PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
       PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+      SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
 
     production:
       cloudwatchLogRetentionInDays: 30
@@ -96,6 +110,7 @@ Mappings:
       BackendAccountID: "172348255554"
       PagerDutyP1AlertsEndpoint: "not-a-real-endpoint"
       PagerDutyP2AlertsEndpoint: "not-a-real-endpoint"
+      SmokeTestCronExpression: "cron(0/03 * * * ? *)"
 
 Globals:
   Function:
@@ -166,7 +181,7 @@ Globals:
 
 Resources:
   # S3 Buckets
-  SmokeTestArtefactBucket:
+  SmokeTestArtefactBucket: # Bucket to store artefacts generated from the smoke test canary
     Type: AWS::S3::Bucket
     Condition: IsNotBuild
     Properties:
@@ -187,7 +202,7 @@ Resources:
           Value: smoke-tests
 
   SmokeTestSourceBucket:
-    Type: AWS::S3::Bucket
+    Type: AWS::S3::Bucket # Bucket to store the source code the builds  for the smoke test canary
     Properties:
       BucketName: !Sub "${Environment}-smoke-new-test-source"
       BucketEncryption:
@@ -206,6 +221,38 @@ Resources:
           Value: !Ref Environment
         - Key: Application
           Value: smoke-tests
+
+  # CanarySource:
+  #   Type: AWS::S3::Object
+  #   Properties:
+  #     Bucket: !Ref SmokeTestSourceBucket
+  #     Key: !Sub "${Environment}-smoke-test-canary.zip"
+  #     Source: !Ref SmokeTestLambdaZipFile
+  #     # ContentMD5: !GetAtt [SmokeTestLambdaZipFile, Value]
+
+  SmoketestSmsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${Environment}-smoke-new-test-sms-codes
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  # We need to set the bucket policy to allow the Backend lambda  function  to write in bucket
 
   # IAM Roles and Policies
 
@@ -766,24 +813,254 @@ Resources:
           PagerDutyP2AlertsEndpoint,
         ]
 
-  # Synthetics Canaries
+  # Randon bytes  function for canary
+
+  RandomBytesGeneratorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const crypto = require('crypto');
+          const https = require('https');
+          const url = require('url');
+
+          exports.handler = function(event, context) {
+            // For Delete events, just send success response
+            if (event.RequestType === 'Delete') {
+              sendResponse(event, context, 'SUCCESS', {});
+              return;
+            }
+
+            try {
+              // Get length from properties or default to 32
+              const length = parseInt(event.ResourceProperties.Length || 32);
+
+              // Generate random bytes
+              const randomBytes = crypto.randomBytes(length);
+
+              // Convert to base64
+              const base64Encoded = randomBytes.toString('base64');
+
+              // Send success response with the base64 encoded bytes
+              sendResponse(event, context, 'SUCCESS', { Base64: base64Encoded });
+            } catch (error) {
+              console.error('Error:', error);
+              sendResponse(event, context, 'FAILED', { Error: error.message });
+            }
+          };
+
+          function sendResponse(event, context, responseStatus, responseData) {
+            const responseBody = JSON.stringify({
+              Status: responseStatus,
+              Reason: responseStatus === 'FAILED' ? responseData.Error : 'See the details in CloudWatch Log Stream: ' + context.logStreamName,
+              PhysicalResourceId: context.logStreamName,
+              StackId: event.StackId,
+              RequestId: event.RequestId,
+              LogicalResourceId: event.LogicalResourceId,
+              Data: responseData
+            });
+
+            console.log('Response body:', responseBody);
+
+            const parsedUrl = url.parse(event.ResponseURL);
+            const options = {
+              hostname: parsedUrl.hostname,
+              port: 443,
+              path: parsedUrl.path,
+              method: 'PUT',
+              headers: {
+                'content-type': '',
+                'content-length': responseBody.length
+              }
+            };
+
+            const request = https.request(options, function(response) {
+              console.log('Status code:', response.statusCode);
+              context.done();
+            });
+
+            request.on('error', function(error) {
+              console.log('send response error:', error);
+              context.done();
+            });
+
+            request.write(responseBody);
+            request.end();
+          }
+      Role: !GetAtt RandomBytesGeneratorRole.Arn
+      Timeout: 30
+
+  RandomBytesGeneratorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  SaltIpvSignIn:
+    Type: Custom::RandomBytes
+    Properties:
+      ServiceToken: !GetAtt RandomBytesGeneratorFunction.Arn
+      Length: 32
+
+  # SaltIpvSignInIdParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-saltIpvSignIn"
+  #     Type: "String"
+  #     Value: !GetAtt SaltIpvSignIn.Base64
+
+  # RSA Key Pair Generation funtion
+  RSAKeyGeneratorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const crypto = require('crypto');
+          const https = require('https');
+          const url = require('url');
+
+          exports.handler = function(event, context) {
+            // For Delete events, just send success response
+            if (event.RequestType === 'Delete') {
+              sendResponse(event, context, 'SUCCESS', {});
+              return;
+            }
+
+            try {
+              // Generate RSA key pair
+              const { privateKey } = crypto.generateKeyPairSync('rsa', {
+                modulusLength: 2048,
+                publicKeyEncoding: {
+                  type: 'spki',
+                  format: 'pem'
+                },
+                privateKeyEncoding: {
+                  type: 'pkcs8',
+                  format: 'pem'
+                }
+              });
+
+              // Extract public key from private key
+              const publicKey = crypto.createPublicKey(privateKey);
+              const publicKeyPem = publicKey.export({
+                type: 'spki',
+                format: 'pem'
+              }).toString();
+
+              // Send success response with the keys
+              sendResponse(event, context, 'SUCCESS', {
+                PublicKeyPem: publicKeyPem,
+                PrivateKeyPem: privateKey
+              });
+            } catch (error) {
+              console.error('Error:', error);
+              sendResponse(event, context, 'FAILED', { Error: error.message });
+            }
+          };
+
+          function sendResponse(event, context, responseStatus, responseData) {
+            const responseBody = JSON.stringify({
+              Status: responseStatus,
+              Reason: responseStatus === 'FAILED' ? responseData.Error : 'See the details in CloudWatch Log Stream: ' + context.logStreamName,
+              PhysicalResourceId: context.logStreamName,
+              StackId: event.StackId,
+              RequestId: event.RequestId,
+              LogicalResourceId: event.LogicalResourceId,
+              Data: responseData
+            });
+
+            console.log('Response body:', responseBody);
+
+            const parsedUrl = url.parse(event.ResponseURL);
+            const options = {
+              hostname: parsedUrl.hostname,
+              port: 443,
+              path: parsedUrl.path,
+              method: 'PUT',
+              headers: {
+                'content-type': '',
+                'content-length': responseBody.length
+              }
+            };
+
+            const request = https.request(options, function(response) {
+              console.log('Status code:', response.statusCode);
+              context.done();
+            });
+
+            request.on('error', function(error) {
+              console.log('send response error:', error);
+              context.done();
+            });
+
+            request.write(responseBody);
+            request.end();
+          }
+      Role: !GetAtt RSAKeyGeneratorRole.Arn
+      Timeout: 30
+
+  RSAKeyGeneratorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  StubRpClientPrivateKey:
+    Type: Custom::RSAKeyPair
+    Properties:
+      ServiceToken: !GetAtt RSAKeyGeneratorFunction.Arn
+
+  # StubRpClientPrivateKeyParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-StubRpClientPrivateKey"
+  #     Type: "String"
+  #     Value: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+
+  # Cannary for the smoke test
   SignInCanary:
     Type: AWS::Synthetics::Canary
     Properties:
       Name: !Sub "${Environment}-smoke-in"
-      ArtifactS3Location: !Sub "s3://${SmokeTestArtefactBucket}"
-      ExecutionRoleArn: !GetAtt SyntheticsCanaryRole.Arn
+      ArtifactS3Location: !Join
+        - ""
+        - - "s3://"
+          - !Ref SmokeTestArtefactBucket
+      ExecutionRoleArn: !GetAtt SyntheticsCanaryRoleSmokeIn.Arn
       RuntimeVersion: !Ref RuntimeVersion
       Schedule:
-        Expression: !Sub "cron(${SmokeTestCronExpression})"
-      StartCanaryAfterCreation: true
+        Expression:
+          !FindInMap [
+            EnvironmentConfiguration,
+            !Ref Environment,
+            SmokeTestCronExpression,
+          ]
+      StartCanaryAfterCreation: false
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: true
       Code:
-        S3Bucket: !Ref SmokeTestLambdaS3Bucket
-        S3Key: !Ref SmokeTestLambdaS3Key
+        S3Bucket: !Ref SmokeTestSourceBucket
+        S3Key: !Sub "${Environment}-canary.zip"
         Handler: canary-sign-in.handler
       Tags:
         - Key: Environment
@@ -795,19 +1072,27 @@ Resources:
     Type: AWS::Synthetics::Canary
     Properties:
       Name: !Sub "${Environment}-smoke-ipv"
-      ArtifactS3Location: !Sub "s3://${SmokeTestArtefactBucket}"
-      ExecutionRoleArn: !GetAtt SyntheticsCanaryRole.Arn
+      ArtifactS3Location: !Join
+        - ""
+        - - "s3://"
+          - !Ref SmokeTestArtefactBucket
+      ExecutionRoleArn: !GetAtt SyntheticsCanaryRoleSmokeIpv.Arn
       RuntimeVersion: !Ref RuntimeVersion
       Schedule:
-        Expression: !Sub "cron(${SmokeTestCronExpression})"
-      StartCanaryAfterCreation: true
+        Expression:
+          !FindInMap [
+            EnvironmentConfiguration,
+            !Ref Environment,
+            SmokeTestCronExpression,
+          ]
+      StartCanaryAfterCreation: false
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: true
       Code:
-        S3Bucket: !Ref SmokeTestLambdaS3Bucket
-        S3Key: !Ref SmokeTestLambdaS3Key
+        S3Bucket: !Ref SmokeTestSourceBucket
+        S3Key: !Sub "${Environment}-canary.zip"
         Handler: canary-sign-in-with-ipv.handler
       Tags:
         - Key: Environment
@@ -819,22 +1104,405 @@ Resources:
     Type: AWS::Synthetics::Canary
     Properties:
       Name: !Sub "${Environment}-smoke-cra"
-      ArtifactS3Location: !Sub "s3://${SmokeTestArtefactBucket}"
-      ExecutionRoleArn: !GetAtt SyntheticsCanaryRole.Arn
+      ArtifactS3Location: !Join
+        - ""
+        - - "s3://"
+          - !Ref SmokeTestArtefactBucket
+      ExecutionRoleArn: !GetAtt SyntheticsCanaryRoleSmokeCra.Arn
       RuntimeVersion: !Ref RuntimeVersion
       Schedule:
-        Expression: !Sub "cron(${SmokeTestCronExpression})"
-      StartCanaryAfterCreation: true
+        Expression:
+          !FindInMap [
+            EnvironmentConfiguration,
+            !Ref Environment,
+            SmokeTestCronExpression,
+          ]
+      StartCanaryAfterCreation: false
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: true
       Code:
-        S3Bucket: !Ref SmokeTestLambdaS3Bucket
-        S3Key: !Ref SmokeTestLambdaS3Key
+        S3Bucket: !Ref SmokeTestSourceBucket
+        S3Key: !Sub "${Environment}-canary.zip"
         Handler: canary-create-account.handler
       Tags:
         - Key: Environment
           Value: !Ref Environment
         - Key: Application
           Value: smoke-tests
+
+  # Common IAM policies
+  CanaryBasePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${Environment}-canary-base-policy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowS3BucketList
+            Effect: Allow
+            Action:
+              - s3:ListAllMyBuckets
+            Resource: "*"
+          - Sid: AllowLogging
+            Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:CreateLogGroup
+              - logs:PutLogEvents
+            Resource: "arn:aws:logs:*:*:*"
+          - Sid: AllowMetricPublishing
+            Effect: Allow
+            Action:
+              - cloudwatch:PutMetricData
+            Resource: "*"
+          - Sid: AllowKMSDecrypt
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource:
+              - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${Environment}-parameter-store-encryption-key
+              - !GetAtt ParameterStoreKey.Arn
+          - Sid: AllowS3ReadingAndDeleting
+            Effect: Allow
+            Action:
+              - s3:DeleteObject
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+              - !GetAtt SmokeTestArtefactBucket.Arn
+              - !Sub "${SmokeTestArtefactBucket.Arn}/*"
+
+  # Canary IAM Roles
+  SyntheticsCanaryRoleSmokeIn:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Environment}-smoke-in-canary-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref CanaryBasePolicy
+      Policies:
+        - PolicyName: !Sub "${Environment}-smoke-in-specific-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AllowS3Publishing
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetBucketLocation
+                Resource:
+                  - !GetAtt SmokeTestArtefactBucket.Arn
+                  - !Sub "${SmokeTestArtefactBucket.Arn}/canary/${AWS::Region}/${Environment}-smoke-in/*"
+              - Sid: AllowSSMAccess
+                Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-in-*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  SyntheticsCanaryRoleSmokeCra:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Environment}-smoke-cra-canary-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref CanaryBasePolicy
+      Policies:
+        - PolicyName: !Sub "${Environment}-smoke-cra-specific-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AllowS3Publishing
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetBucketLocation
+                Resource:
+                  - !GetAtt SmokeTestArtefactBucket.Arn
+                  - !Sub "${SmokeTestArtefactBucket.Arn}/canary/${AWS::Region}/${Environment}-smoke-cra/*"
+              - Sid: AllowSSMAccess
+                Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-cra-*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  SyntheticsCanaryRoleSmokeIpv:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Environment}-smoke-ipv-canary-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref CanaryBasePolicy
+      Policies:
+        - PolicyName: !Sub "${Environment}-smoke-ipv-specific-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AllowS3Publishing
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetBucketLocation
+                Resource:
+                  - !GetAtt SmokeTestArtefactBucket.Arn
+                  - !Sub "${SmokeTestArtefactBucket.Arn}/canary/${AWS::Region}/${Environment}-smoke-ipv/*"
+              - Sid: AllowSSMAccess
+                Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-ipv-*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  # # SSM Parameters for Canaries
+  # SignInUsernameParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-in-username"
+  #     Type: SecureString
+  #     Value: !Ref SignInUsername
+  #     KeyId: !Ref ParameterStoreKeyAlias
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # SignInPasswordParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-in-password"
+  #     Type: SecureString
+  #     Value: !Ref SignInPassword
+  #     KeyId: !Ref ParameterStoreKeyAlias
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # SignInPhoneParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-in-phone"
+  #     Type: SecureString
+  #     Value: !Ref SignInPhone
+  #     KeyId: !Ref ParameterStoreKeyAlias
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # IpvUsernameParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-ipv-username"
+  #     Type: SecureString
+  #     Value: !Ref IpvUsername
+  #     KeyId: !Ref ParameterStoreKeyAlias
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # IpvPhoneParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-ipv-phone"
+  #     Type: SecureString
+  #     Value: !Ref IpvPhone
+  #     KeyId: !Ref ParameterStoreKeyAlias
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # CreateAccountUsernameParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-cra-username"
+  #     Type: SecureString
+  #     Value: !Ref CreateAccountUsername
+  #     KeyId: !Ref ParameterStoreKeyAlias
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # CreateAccountPhoneParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-cra-phone"
+  #     Type: SecureString
+  #     Value: !Ref CreateAccountPhone
+  #     KeyId: !Ref ParameterStoreKeyAlias
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # IssuerBaseUrlParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-in-issuer-base-url"
+  #     Type: String
+  #     Value: !Ref IssuerBaseUrl
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # ClientBaseUrlParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-in-client-base-url"
+  #     Type: String
+  #     Value: !Ref ClientBaseUrl
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # TestServicesApiKeyParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-cra-test-services-api-key"
+  #     Type: String
+  #     Value: !Ref TestServicesApiKey
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # TestServicesApiHostnameParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-cra-test-services-api-hostname"
+  #     Type: String
+  #     Value: !Ref TestServicesApiHostname
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # SyntheticsUserDeletePathParameter:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-cra-synthetics-user-delete-path"
+  #     Type: String
+  #     Value: !Ref SyntheticsUserDeletePath
+  #     Tags:
+  #       Environment: !Ref Environment
+  #       Application: smoke-tests
+
+  # # CloudWatch Alarms
+  # SignInCanaryAlarmP1:
+  #   Type: AWS::CloudWatch::Alarm
+  #   Condition: MetricAlarmsEnabled
+  #   Properties:
+  #     AlarmName: !Sub "${Environment}-smoke-in-metric-alarm_p1"
+  #     ComparisonOperator: GreaterThanOrEqualToThreshold
+  #     EvaluationPeriods: 1
+  #     MetricName: Failed
+  #     Namespace: CloudWatchSynthetics
+  #     Period: 600
+  #     Statistic: Sum
+  #     Threshold: 2
+  #     TreatMissingData: notBreaching
+  #     Dimensions:
+  #       - Name: CanaryName
+  #         Value: !Ref SignInCanary
+  #     AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P1 alarm"
+  #     AlarmActions:
+  #       - !If [
+  #           IsProduction,
+  #           !Ref PagerDutyP1AlertsTopic,
+  #           !ImportValue SlackEventsTopic,
+  #         ]
+  #     OKActions:
+  #       - !If [
+  #           IsProduction,
+  #           !Ref PagerDutyP1AlertsTopic,
+  #           !ImportValue SlackEventsTopic,
+  #         ]
+
+  # SignInCanaryAlarmP2:
+  #   Type: AWS::CloudWatch::Alarm
+  #   Condition: MetricAlarmsEnabled
+  #   Properties:
+  #     AlarmName: !Sub "${Environment}-smoke-in-metric-alarm_p2"
+  #     ComparisonOperator: GreaterThanOrEqualToThreshold
+  #     EvaluationPeriods: 3
+  #     MetricName: Failed
+  #     Namespace: CloudWatchSynthetics
+  #     Period: 600
+  #     Statistic: Sum
+  #     Threshold: 5
+  #     TreatMissingData: notBreaching
+  #     Dimensions:
+  #       - Name: CanaryName
+  #         Value: !Ref SignInCanary
+  #     AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P2 alarm"
+  #     AlarmActions:
+  #       - !If [
+  #           IsProduction,
+  #           !Ref PagerDutyP2AlertsTopic,
+  #           !ImportValue SlackEventsTopic,
+  #         ]
+  #     OKActions:
+  #       - !If [
+  #           IsProduction,
+  #           !Ref PagerDutyP2AlertsTopic,
+  #           !ImportValue SlackEventsTopic,
+  #         ]
+
+  # # CloudWatch Events for Heartbeat
+  # SignInCanaryHeartbeatRule:
+  #   Type: AWS::Events::Rule
+  #   Condition: HeartbeatPingEnabled
+  #   Properties:
+  #     Name: !Sub "${Environment}-smoke-in-cronitor-rule"
+  #     State: ENABLED
+  #     EventPattern:
+  #       source:
+  #         - aws.synthetics
+  #       detail-type:
+  #         - Synthetics Canary TestRun Successful
+  #         - Synthetics Canary TestRun Failure
+  #       detail:
+  #         canary-name:
+  #           - !Sub "${Environment}-smoke-in"
+  #     Targets:
+  #       - Arn: !GetAtt HeartbeatLambda.Arn
+  #         Id: HeartbeatLambdaTarget
+
+  # SignInCanaryHeartbeatPermission:
+  #   Type: AWS::Lambda::Permission
+  #   Condition: HeartbeatPingEnabled
+  #   Properties:
+  #     Action: lambda:InvokeFunction
+  #     FunctionName: !Ref HeartbeatLambda
+  #     Principal: events.amazonaws.com
+  #     SourceArn: !GetAtt SignInCanaryHeartbeatRule.Arn
