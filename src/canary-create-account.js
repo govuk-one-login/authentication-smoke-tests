@@ -1,6 +1,6 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getParameter, emptyOtpBucket } = require("./aws");
+const { getParameter, getSecret, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const crypto = require("crypto");
 const steps = require("./steps");
@@ -40,21 +40,19 @@ const basicCustomEntryPoint = async () => {
 
   const bucketName = await getParameter("bucket");
   const fireDrill = await getParameter("fire-drill");
-  const testServicesApiHostname = await getParameter(
-    "test-services-api-hostname"
-  );
-  const testServicesApiKey = await getParameter("test-services-api-key");
   const syntheticsUserDeletePath = await getParameter(
     "synthetics-user-delete-path"
   );
+  const testServicesApiHostname = await getSecret("test-services-api-hostname");
+  const testServicesApiKey = await getSecret("test-services-api-key");
+  const email = await getSecret("username");
+  const phoneNumber = await getSecret("phone");
+  const clientId = await getSecret("client-id");
+  const clientBaseUrl = await getSecret("client-base-url");
+  const issuerBaseURL = await getSecret("issuer-base-url");
+  const clientPrivateKey = await getSecret("client-private-key");
 
-  const email = await getParameter("username");
-  const phoneNumber = await getParameter("phone");
   const password = crypto.randomBytes(20).toString("base64url") + "a1";
-  const clientId = await getParameter("client-id");
-  const clientBaseUrl = await getParameter("client-base-url");
-  const issuerBaseURL = await getParameter("issuer-base-url");
-  const clientPrivateKey = await getParameter("client-private-key");
 
   if (fireDrill === "1") {
     log.info("Fire Drill! Smoke test will fail.");

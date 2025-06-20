@@ -1206,7 +1206,7 @@ Resources:
                 Action:
                   - ssm:GetParameter
                 Resource:
-                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-in-*"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/smoketest/${Environment}-smoke-in-*"
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -1244,7 +1244,7 @@ Resources:
                 Action:
                   - ssm:GetParameter
                 Resource:
-                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-cra-*"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/smoketest/${Environment}-smoke-cra-*"
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -1282,140 +1282,74 @@ Resources:
                 Action:
                   - ssm:GetParameter
                 Resource:
-                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-ipv-*"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/smoketest/${Environment}-smoke-ipv-*"
       Tags:
         - Key: Environment
           Value: !Ref Environment
         - Key: Application
           Value: smoke-tests
 
-  # # SSM Parameters for Canaries
-  # SignInUsernameParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-in-username"
-  #     Type: SecureString
-  #     Value: !Ref SignInUsername
-  #     KeyId: !Ref ParameterStoreKeyAlias
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  # Smoke-in parameters
 
-  # SignInPasswordParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-in-password"
-  #     Type: SecureString
-  #     Value: !Ref SignInPassword
-  #     KeyId: !Ref ParameterStoreKeyAlias
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  SmokeInSmsBucketParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/smoketest/${Environment}-smoke-in-bucket"
+      Type: String
+      Value: !Ref SmoketestSmsBucket
 
-  # SignInPhoneParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-in-phone"
-  #     Type: SecureString
-  #     Value: !Ref SignInPhone
-  #     KeyId: !Ref ParameterStoreKeyAlias
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  SmokeInSlackHookUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/smoketest/${Environment}-smoke-in-slack-hook-url"
+      Type: String
+      Value: "placeholder" # Will be updated manually post-deployment
 
-  # IpvUsernameParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-ipv-username"
-  #     Type: SecureString
-  #     Value: !Ref IpvUsername
-  #     KeyId: !Ref ParameterStoreKeyAlias
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  # Smoke-ipv parameters
 
-  # IpvPhoneParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-ipv-phone"
-  #     Type: SecureString
-  #     Value: !Ref IpvPhone
-  #     KeyId: !Ref ParameterStoreKeyAlias
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  SmokeIpvSmsBucketParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/smoketest/${Environment}-smoke-ipv-bucket"
+      Type: String
+      Value: !Ref SmoketestSmsBucket
 
-  # CreateAccountUsernameParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-cra-username"
-  #     Type: SecureString
-  #     Value: !Ref CreateAccountUsername
-  #     KeyId: !Ref ParameterStoreKeyAlias
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  SmokeIpvSlackHookUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/smoketest/${Environment}-smoke-ipv-slack-hook-url"
+      Type: String
+      Value: "placeholder" # Will be updated manually post-deployment
 
-  # CreateAccountPhoneParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-cra-phone"
-  #     Type: SecureString
-  #     Value: !Ref CreateAccountPhone
-  #     KeyId: !Ref ParameterStoreKeyAlias
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  # Smoke-cra parameters
+  SmokeCraFireDrillParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/smoketest/${Environment}-smoke-cra-fire-drill"
+      Type: String
+      Value: "0"
 
-  # IssuerBaseUrlParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-in-issuer-base-url"
-  #     Type: String
-  #     Value: !Ref IssuerBaseUrl
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  SmokeCraSyntheticsUserDeletePathParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/smoketest/${Environment}-smoke-cra-synthetics-user-delete-path"
+      Type: String
+      Value: !Join ["/", ["", !Ref Environment, "synthetics-user"]]
 
-  # ClientBaseUrlParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-in-client-base-url"
-  #     Type: String
-  #     Value: !Ref ClientBaseUrl
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  SmokeCraSmsBucketParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/smoketest/${Environment}-smoke-cra-bucket"
+      Type: String
+      Value: !Ref SmoketestSmsBucket
 
-  # TestServicesApiKeyParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-cra-test-services-api-key"
-  #     Type: String
-  #     Value: !Ref TestServicesApiKey
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
+  SmokeCraSlackHookUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/smoketest/${Environment}-smoke-cra-slack-hook-url"
+      Type: String
+      Value: "placeholder" # Will be updated manually post-deployment
 
-  # TestServicesApiHostnameParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-cra-test-services-api-hostname"
-  #     Type: String
-  #     Value: !Ref TestServicesApiHostname
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
-
-  # SyntheticsUserDeletePathParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-cra-synthetics-user-delete-path"
-  #     Type: String
-  #     Value: !Ref SyntheticsUserDeletePath
-  #     Tags:
-  #       Environment: !Ref Environment
-  #       Application: smoke-tests
 
   # # CloudWatch Alarms
   # SignInCanaryAlarmP1:
@@ -1432,7 +1366,7 @@ Resources:
   #     Threshold: 2
   #     TreatMissingData: notBreaching
   #     Dimensions:
-  #       - Name: CanaryName
+  #       - Name: Canary
   #         Value: !Ref SignInCanary
   #     AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P1 alarm"
   #     AlarmActions:
@@ -1462,7 +1396,7 @@ Resources:
   #     Threshold: 5
   #     TreatMissingData: notBreaching
   #     Dimensions:
-  #       - Name: CanaryName
+  #       - Name: Canary
   #         Value: !Ref SignInCanary
   #     AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P2 alarm"
   #     AlarmActions:

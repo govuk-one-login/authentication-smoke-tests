@@ -1,6 +1,6 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getParameter, emptyOtpBucket } = require("./aws");
+const { getParameter, getSecret, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const { setStandardViewportSize } = require("./helpers");
 const steps = require("./steps");
@@ -18,13 +18,13 @@ const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests");
 
   const bucketName = await getParameter("bucket");
-  const email = await getParameter("username");
-  const password = await getParameter("password");
-  const phoneNumber = await getParameter("phone");
-  const clientBaseUrl = await getParameter("client-base-url");
-  const clientId = await getParameter("client-id");
-  const issuerBaseURL = await getParameter("issuer-base-url");
-  const clientPrivateKey = await getParameter("client-private-key");
+  const email = await getSecret("username");
+  const password = await getSecret("password");
+  const phoneNumber = await getSecret("phone");
+  const clientBaseUrl = await getSecret("client-base-url");
+  const clientId = await getSecret("client-id");
+  const issuerBaseURL = await getSecret("issuer-base-url");
+  const clientPrivateKey = await getSecret("client-private-key");
 
   server = await startClient(
     3031,
