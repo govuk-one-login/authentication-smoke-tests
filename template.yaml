@@ -49,11 +49,22 @@ Conditions:
   UseCodeSigning: !Not [!Equals [!Ref CodeSigningConfigArn, none]]
   UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
   IsProduction: !Equals [!Ref Environment, "production"]
-  IsNotBuild:
-    Fn::Not:
-      - Fn::Equals:
-          - !Ref Environment
-          - build
+  MetricAlarmsEnabled: !Equals
+    - !FindInMap [
+        EnvironmentConfiguration,
+        !Ref Environment,
+        MetricAlarmsEnabled,
+        DefaultValue: "No",
+      ]
+    - "Yes"
+  HeartbeatPingEnabled: !Equals
+    - !FindInMap [
+        EnvironmentConfiguration,
+        !Ref Environment,
+        HeartbeatPingEnabled,
+        DefaultValue: "No",
+      ]
+    - "Yes"
 
 Mappings:
   EnvironmentConfiguration:
@@ -61,6 +72,8 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       SlackChannelId: C07TMK4CGH2
+      MetricAlarmsEnabled: "Yes"
+      HeartbeatPingEnabled: "Yes"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "653994557586"
@@ -72,6 +85,8 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       SlackChannelId: C07TMK4CGH2
+      MetricAlarmsEnabled: "Yes"
+      HeartbeatPingEnabled: "Yes"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "761723964695"
@@ -83,6 +98,8 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       SlackChannelId: C07TMK4CGH2
+      MetricAlarmsEnabled: "Yes"
+      HeartbeatPingEnabled: "Yes"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "758531536632"
@@ -94,6 +111,8 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       SlackChannelId: C07TMK4CGH2
+      MetricAlarmsEnabled: "Yes"
+      HeartbeatPingEnabled: "Yes"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "761723964695"
@@ -105,6 +124,8 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
       SlackChannelId: C07TMK4CGH2
+      MetricAlarmsEnabled: "Yes"
+      HeartbeatPingEnabled: "Yes"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "172348255554"
@@ -183,7 +204,6 @@ Resources:
   # S3 Buckets
   SmokeTestArtefactBucket: # Bucket to store artefacts generated from the smoke test canary
     Type: AWS::S3::Bucket
-    Condition: IsNotBuild
     Properties:
       BucketName: !Sub "${Environment}-smoke-new-test-artefacts"
       BucketEncryption:
@@ -202,7 +222,7 @@ Resources:
           Value: smoke-tests
 
   SmokeTestSourceBucket:
-    Type: AWS::S3::Bucket # Bucket to store the source code the builds  for the smoke test canary
+    Type: AWS::S3::Bucket # Bucket to store the source code for builds  for the smoke test canary
     Properties:
       BucketName: !Sub "${Environment}-smoke-new-test-source"
       BucketEncryption:
@@ -726,7 +746,6 @@ Resources:
           Value: govuk-one-login/authentication-smoke-test/template.yaml
 
   # pager Duty SNS topics and policies
-
   PagerDutyP1Alerts:
     Type: AWS::SNS::Topic
     Properties:
@@ -1057,9 +1076,10 @@ Resources:
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
-        ActiveTracing: true
+        ActiveTracing: false
       Code:
-        S3Bucket: !Ref SmokeTestSourceBucket
+        #S3Bucket: !Ref SmokeTestSourceBucket
+        S3Bucket: smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj # This temp bucket until we srt the s3::object upload
         S3Key: !Sub "${Environment}-canary.zip"
         Handler: canary-sign-in.handler
       Tags:
@@ -1089,10 +1109,12 @@ Resources:
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
-        ActiveTracing: true
+        ActiveTracing: false
       Code:
-        S3Bucket: !Ref SmokeTestSourceBucket
+        #S3Bucket: !Ref SmokeTestSourceBucket
+        S3Bucket: smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj # This temp bucket until we srt the s3::object upload
         S3Key: !Sub "${Environment}-canary.zip"
+        #S3ObjectVersion: !Ref CanaryCodeVersion
         Handler: canary-sign-in-with-ipv.handler
       Tags:
         - Key: Environment
@@ -1121,9 +1143,10 @@ Resources:
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
-        ActiveTracing: true
+        ActiveTracing: false
       Code:
-        S3Bucket: !Ref SmokeTestSourceBucket
+        # S3Bucket: !Ref SmokeTestSourceBucket
+        S3Bucket: smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj # This temp bucket until we srt the s3::object upload
         S3Key: !Sub "${Environment}-canary.zip"
         Handler: canary-create-account.handler
       Tags:
@@ -1131,6 +1154,30 @@ Resources:
           Value: !Ref Environment
         - Key: Application
           Value: smoke-tests
+
+  # CreateAccountCanaryLogGroup:
+  #   Type: AWS::Logs::LogGroup
+  #   DependsOn: CreateAccountCanary
+  #   Properties:
+  #     LogGroupName: !Sub
+  #       - "/aws/lambda/${LambdaFunctionName}"
+  #       - LambdaFunctionName: !Select
+  #           - 6
+  #           - !Split
+  #               - ":"
+  #               - !GetAtt CreateAccountCanary.EngineArn
+  #     RetentionInDays:
+  #       !FindInMap [
+  #         EnvironmentConfiguration,
+  #         !Ref Environment,
+  #         cloudwatchLogRetentionInDays,
+  #       ]
+  #     KmsKeyId: !GetAtt KmsKey.Arn
+  #     Tags:
+  #       - Key: Environment
+  #         Value: !Ref Environment
+  #       - Key: Application
+  #         Value: smoke-tests
 
   # Common IAM policies
   CanaryBasePolicy:
@@ -1206,7 +1253,13 @@ Resources:
                 Action:
                   - ssm:GetParameter
                 Resource:
-                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/smoketest/${Environment}-smoke-in-*"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-in-*"
+              - Sid: AllowSecretsManagerAccess
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/smoketest/${Environment}-smoke-in-*"
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -1244,7 +1297,13 @@ Resources:
                 Action:
                   - ssm:GetParameter
                 Resource:
-                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/smoketest/${Environment}-smoke-cra-*"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-cra-*"
+              - Sid: AllowSecretsManagerAccess
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/smoketest/${Environment}-smoke-cra-*"
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -1282,7 +1341,13 @@ Resources:
                 Action:
                   - ssm:GetParameter
                 Resource:
-                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/smoketest/${Environment}-smoke-ipv-*"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-ipv-*"
+              - Sid: AllowSecretsManagerAccess
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/smoketest/${Environment}-smoke-ipv-*"
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -1334,7 +1399,11 @@ Resources:
     Properties:
       Name: !Sub "/smoketest/${Environment}-smoke-cra-synthetics-user-delete-path"
       Type: String
-      Value: !Join ["/", ["", !Ref Environment, "synthetics-user"]]
+      Value: !Join
+        - /
+        - - ""
+          - Ref: Environment
+          - synthetics-user
 
   SmokeCraSmsBucketParameter:
     Type: AWS::SSM::Parameter
@@ -1350,93 +1419,368 @@ Resources:
       Type: String
       Value: "placeholder" # Will be updated manually post-deployment
 
+  # CloudWatch Alarms SignInCanary
+  SignInCanaryAlarmP1:
+    Type: AWS::CloudWatch::Alarm
+    Condition: MetricAlarmsEnabled
+    Properties:
+      AlarmName: !Sub "${Environment}-smoke-in-metric-alarm-p1"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: Failed
+      Namespace: CloudWatchSynthetics
+      Period: 600
+      Statistic: Sum
+      Threshold: 2
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: Canary
+          Value: !Ref SignInCanary
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P1 alarm"
+      AlarmActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP1Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
+      OKActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP1Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
-  # # CloudWatch Alarms
-  # SignInCanaryAlarmP1:
-  #   Type: AWS::CloudWatch::Alarm
-  #   Condition: MetricAlarmsEnabled
-  #   Properties:
-  #     AlarmName: !Sub "${Environment}-smoke-in-metric-alarm_p1"
-  #     ComparisonOperator: GreaterThanOrEqualToThreshold
-  #     EvaluationPeriods: 1
-  #     MetricName: Failed
-  #     Namespace: CloudWatchSynthetics
-  #     Period: 600
-  #     Statistic: Sum
-  #     Threshold: 2
-  #     TreatMissingData: notBreaching
-  #     Dimensions:
-  #       - Name: Canary
-  #         Value: !Ref SignInCanary
-  #     AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P1 alarm"
-  #     AlarmActions:
-  #       - !If [
-  #           IsProduction,
-  #           !Ref PagerDutyP1AlertsTopic,
-  #           !ImportValue SlackEventsTopic,
-  #         ]
-  #     OKActions:
-  #       - !If [
-  #           IsProduction,
-  #           !Ref PagerDutyP1AlertsTopic,
-  #           !ImportValue SlackEventsTopic,
-  #         ]
+  SignInCanaryAlarmP2:
+    Type: AWS::CloudWatch::Alarm
+    Condition: MetricAlarmsEnabled
+    Properties:
+      AlarmName: !Sub "${Environment}-smoke-in-metric-alarm-p2"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 3
+      MetricName: Failed
+      Namespace: CloudWatchSynthetics
+      Period: 600
+      Statistic: Sum
+      Threshold: 5
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: Canary
+          Value: !Ref SignInCanary
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P2 alarm"
+      AlarmActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP2Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
+      OKActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP2Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
-  # SignInCanaryAlarmP2:
-  #   Type: AWS::CloudWatch::Alarm
-  #   Condition: MetricAlarmsEnabled
-  #   Properties:
-  #     AlarmName: !Sub "${Environment}-smoke-in-metric-alarm_p2"
-  #     ComparisonOperator: GreaterThanOrEqualToThreshold
-  #     EvaluationPeriods: 3
-  #     MetricName: Failed
-  #     Namespace: CloudWatchSynthetics
-  #     Period: 600
-  #     Statistic: Sum
-  #     Threshold: 5
-  #     TreatMissingData: notBreaching
-  #     Dimensions:
-  #       - Name: Canary
-  #         Value: !Ref SignInCanary
-  #     AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P2 alarm"
-  #     AlarmActions:
-  #       - !If [
-  #           IsProduction,
-  #           !Ref PagerDutyP2AlertsTopic,
-  #           !ImportValue SlackEventsTopic,
-  #         ]
-  #     OKActions:
-  #       - !If [
-  #           IsProduction,
-  #           !Ref PagerDutyP2AlertsTopic,
-  #           !ImportValue SlackEventsTopic,
-  #         ]
+  # CloudWatch Alarms create canary
+  CreateAccountCanaryAlarmP1:
+    Type: AWS::CloudWatch::Alarm
+    Condition: MetricAlarmsEnabled
+    Properties:
+      AlarmName: !Sub "${Environment}-smoke-cra-metric-alarm-p1"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: Failed
+      Namespace: CloudWatchSynthetics
+      Period: 600
+      Statistic: Sum
+      Threshold: 2
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: Canary
+          Value: !Ref CreateAccountCanary
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P1 alarm"
+      AlarmActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP1Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
+      OKActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP1Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
-  # # CloudWatch Events for Heartbeat
-  # SignInCanaryHeartbeatRule:
-  #   Type: AWS::Events::Rule
-  #   Condition: HeartbeatPingEnabled
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-in-cronitor-rule"
-  #     State: ENABLED
-  #     EventPattern:
-  #       source:
-  #         - aws.synthetics
-  #       detail-type:
-  #         - Synthetics Canary TestRun Successful
-  #         - Synthetics Canary TestRun Failure
-  #       detail:
-  #         canary-name:
-  #           - !Sub "${Environment}-smoke-in"
-  #     Targets:
-  #       - Arn: !GetAtt HeartbeatLambda.Arn
-  #         Id: HeartbeatLambdaTarget
+  CreateAccountCanaryAlarmP2:
+    Type: AWS::CloudWatch::Alarm
+    Condition: MetricAlarmsEnabled
+    Properties:
+      AlarmName: !Sub "${Environment}-smoke-cra-metric-alarm-p2"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 3
+      MetricName: Failed
+      Namespace: CloudWatchSynthetics
+      Period: 600
+      Statistic: Sum
+      Threshold: 5
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: Canary
+          Value: !Ref CreateAccountCanary
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P2 alarm"
+      AlarmActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP2Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
+      OKActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP2Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
-  # SignInCanaryHeartbeatPermission:
-  #   Type: AWS::Lambda::Permission
-  #   Condition: HeartbeatPingEnabled
-  #   Properties:
-  #     Action: lambda:InvokeFunction
-  #     FunctionName: !Ref HeartbeatLambda
-  #     Principal: events.amazonaws.com
-  #     SourceArn: !GetAtt SignInCanaryHeartbeatRule.Arn
+  # CloudWatch Alarms signInWithIPVCanary
+  SignInWithIPVCanaryAlarmP1:
+    Type: AWS::CloudWatch::Alarm
+    Condition: MetricAlarmsEnabled
+    Properties:
+      AlarmName: !Sub "${Environment}-smoke-ipv-metric-alarm-p1"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: Failed
+      Namespace: CloudWatchSynthetics
+      Period: 600
+      Statistic: Sum
+      Threshold: 2
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: Canary
+          Value: !Ref SignInWithIPVCanary
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-ipv P1 alarm"
+      AlarmActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP1Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
+      OKActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP1Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
+
+  SignInWithIPVCanaryAlarmP2:
+    Type: AWS::CloudWatch::Alarm
+    Condition: MetricAlarmsEnabled
+    Properties:
+      AlarmName: !Sub "${Environment}-smoke-ipv-metric-alarm-p2"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 3
+      MetricName: Failed
+      Namespace: CloudWatchSynthetics
+      Period: 600
+      Statistic: Sum
+      Threshold: 5
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: Canary
+          Value: !Ref SignInWithIPVCanary
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P2 alarm"
+      AlarmActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP2Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
+      OKActions:
+        - !If
+          - IsProduction
+          - !Ref PagerDutyP2Alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
+
+  # CloudWatch Events for Heartbeat
+  SignInCanaryHeartbeatRule:
+    Type: AWS::Events::Rule
+    Condition: HeartbeatPingEnabled
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-cronitor-rule"
+      State: ENABLED
+      EventPattern:
+        source:
+          - aws.synthetics
+        detail-type:
+          - Synthetics Canary TestRun Successful
+          - Synthetics Canary TestRun Failure
+        detail:
+          canary-name:
+            - !Sub "${Environment}-smoke-in"
+      Targets:
+        - Arn: !GetAtt HeartbeatLambdaFunction.Arn
+          Id: HeartbeatLambdaFunctionTarget
+
+  SignInCanaryHeartbeatPermission:
+    Type: AWS::Lambda::Permission
+    Condition: HeartbeatPingEnabled
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref HeartbeatLambdaFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt SignInCanaryHeartbeatRule.Arn
+
+  # CloudWatch Events for Heartbeat
+  SignInWithIPVHeartbeatRule:
+    Type: AWS::Events::Rule
+    Condition: HeartbeatPingEnabled
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-cronitor-rule"
+      State: ENABLED
+      EventPattern:
+        source:
+          - aws.synthetics
+        detail-type:
+          - Synthetics Canary TestRun Successful
+          - Synthetics Canary TestRun Failure
+        detail:
+          canary-name:
+            - !Sub "${Environment}-smoke-cra"
+      Targets:
+        - Arn: !GetAtt HeartbeatLambdaFunction.Arn
+          Id: HeartbeatLambdaFunctionTarget
+
+  SignInWithIPVHeartbeatPermission:
+    Type: AWS::Lambda::Permission
+    Condition: HeartbeatPingEnabled
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref HeartbeatLambdaFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt SignInWithIPVHeartbeatRule.Arn
+
+  # CloudWatch Events for Heartbeat
+  CreateAccountHeartbeatRule:
+    Type: AWS::Events::Rule
+    Condition: HeartbeatPingEnabled
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-cronitor-rule"
+      State: ENABLED
+      EventPattern:
+        source:
+          - aws.synthetics
+        detail-type:
+          - Synthetics Canary TestRun Successful
+          - Synthetics Canary TestRun Failure
+        detail:
+          canary-name:
+            - !Sub "${Environment}-smoke-ipv"
+      Targets:
+        - Arn: !GetAtt HeartbeatLambdaFunction.Arn
+          Id: HeartbeatLambdaFunctionTarget
+
+  CreateAccountHeartbeatPermission:
+    Type: AWS::Lambda::Permission
+    Condition: HeartbeatPingEnabled
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref HeartbeatLambdaFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt CreateAccountHeartbeatRule.Arn
