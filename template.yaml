@@ -3,6 +3,14 @@ Transform:
   - AWS::LanguageExtensions
   - AWS::Serverless-2016-10-31
 
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W1028
+        - W8003
+        - E1011
+
 Description: "GOV.UK Sign In Authentication Smoke Tests Infrastructure"
 
 Parameters:
@@ -65,6 +73,9 @@ Conditions:
         DefaultValue: "No",
       ]
     - "Yes"
+  IsSplunkEnabled: !Equals
+    - !FindInMap [EnvironmentConfiguration, !Ref Environment, IsSplunkEnabled]
+    - "Yes"
 
 Mappings:
   EnvironmentConfiguration:
@@ -74,6 +85,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
+      IsSplunkEnabled: "Yes"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "653994557586"
@@ -87,6 +99,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
+      IsSplunkEnabled: "No"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "761723964695"
@@ -100,6 +113,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
+      IsSplunkEnabled: "Yes"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "758531536632"
@@ -113,6 +127,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
+      IsSplunkEnabled: "Yes"
       CronitorApiKey: "not-a-real-key"
       CronitorMonitorKey: "not-a-real-key"
       BackendAccountID: "761723964695"
@@ -222,7 +237,7 @@ Resources:
           Value: smoke-tests
 
   SmokeTestSourceBucket:
-    Type: AWS::S3::Bucket # Bucket to store the source code for builds  for the smoke test canary
+    Type: AWS::S3::Bucket # Bucket to store the source scripts code  for the smoke test canary
     Properties:
       BucketName: !Sub "${Environment}-smoke-new-test-source"
       BucketEncryption:
@@ -251,7 +266,7 @@ Resources:
   #     # ContentMD5: !GetAtt [SmokeTestLambdaZipFile, Value]
 
   SmoketestSmsBucket:
-    Type: AWS::S3::Bucket
+    Type: AWS::S3::Bucket # Bucket to store SMS codes for the smoke test canary
     Properties:
       BucketName: !Sub ${Environment}-smoke-new-test-sms-codes
       BucketEncryption:
@@ -1088,6 +1103,33 @@ Resources:
         - Key: Application
           Value: smoke-tests
 
+  SignInCanaryLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub
+        - "/aws/lambda/cwsyn-${Environment}-smoke-in-${Lambdafunctionid}"
+        - Lambdafunctionid: !GetAtt SignInCanary.Id
+      RetentionInDays:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          cloudwatchLogRetentionInDays,
+        ]
+      KmsKeyId: !GetAtt KmsKey.Arn
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  SignInCanarySubscriptionFilter:
+    Condition: IsSplunkEnabled
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Ref LoggingSubscriptionEndpointArn
+      FilterPattern: ""
+      LogGroupName: !Ref SignInCanaryLogGroup
+
   SignInWithIPVCanary:
     Type: AWS::Synthetics::Canary
     Properties:
@@ -1122,6 +1164,33 @@ Resources:
         - Key: Application
           Value: smoke-tests
 
+  SignInWithIPVCanaryLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub
+        - "/aws/lambda/cwsyn-${Environment}-smoke-ipv-${Lambdafunctionid}"
+        - Lambdafunctionid: !GetAtt SignInWithIPVCanary.Id
+      RetentionInDays:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          cloudwatchLogRetentionInDays,
+        ]
+      KmsKeyId: !GetAtt KmsKey.Arn
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  SignInWithIPVCanarySubscriptionFilter:
+    Condition: IsSplunkEnabled
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Ref LoggingSubscriptionEndpointArn
+      FilterPattern: ""
+      LogGroupName: !Ref SignInWithIPVCanaryLogGroup
+
   CreateAccountCanary:
     Type: AWS::Synthetics::Canary
     Properties:
@@ -1155,29 +1224,32 @@ Resources:
         - Key: Application
           Value: smoke-tests
 
-  # CreateAccountCanaryLogGroup:
-  #   Type: AWS::Logs::LogGroup
-  #   DependsOn: CreateAccountCanary
-  #   Properties:
-  #     LogGroupName: !Sub
-  #       - "/aws/lambda/${LambdaFunctionName}"
-  #       - LambdaFunctionName: !Select
-  #           - 6
-  #           - !Split
-  #               - ":"
-  #               - !GetAtt CreateAccountCanary.EngineArn
-  #     RetentionInDays:
-  #       !FindInMap [
-  #         EnvironmentConfiguration,
-  #         !Ref Environment,
-  #         cloudwatchLogRetentionInDays,
-  #       ]
-  #     KmsKeyId: !GetAtt KmsKey.Arn
-  #     Tags:
-  #       - Key: Environment
-  #         Value: !Ref Environment
-  #       - Key: Application
-  #         Value: smoke-tests
+  CreateAccountCanaryLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub
+        - "/aws/lambda/cwsyn-${Environment}-smoke-cra-${Lambdafunctionid}"
+        - Lambdafunctionid: !GetAtt CreateAccountCanary.Id
+      RetentionInDays:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          cloudwatchLogRetentionInDays,
+        ]
+      KmsKeyId: !GetAtt KmsKey.Arn
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  CreateAccountCanarySubscriptionFilter:
+    Condition: IsSplunkEnabled
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Ref LoggingSubscriptionEndpointArn
+      FilterPattern: ""
+      LogGroupName: !Ref CreateAccountCanaryLogGroup
 
   # Common IAM policies
   CanaryBasePolicy:
@@ -1784,3 +1856,22 @@ Resources:
       FunctionName: !Ref HeartbeatLambdaFunction
       Principal: events.amazonaws.com
       SourceArn: !GetAtt CreateAccountHeartbeatRule.Arn
+
+Outputs:
+  SignInCanaryId:
+    Description: "ID of the SignInCanary"
+    Value: !GetAtt SignInCanary.Id
+    Export:
+      Name: !Sub "${AWS::StackName}-SignInCanary-Id"
+
+  SignInWithIPVCanaryId:
+    Description: "ID of the SignInWithIPVCanary"
+    Value: !GetAtt SignInWithIPVCanary.Id
+    Export:
+      Name: !Sub "${AWS::StackName}-SignInWithIPVCanary-Id"
+
+  CreateAccountCanaryId:
+    Description: "ID of the CreateAccountCanary"
+    Value: !GetAtt CreateAccountCanary.Id
+    Export:
+      Name: !Sub "${AWS::StackName}-CreateAccountCanary-Id"
