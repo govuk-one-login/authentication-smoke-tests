@@ -1,6 +1,6 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getParameter, getSecret, emptyOtpBucket } = require("./aws");
+const { getSecret, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const { setStandardViewportSize } = require("./helpers");
 const steps = require("./steps");
@@ -18,13 +18,13 @@ SYNTHETICS_CONFIG.setConfig({
 const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests: Sign in with IPV");
 
-  const fireDrill = await getParameter("fire-drill");
+  const fireDrill = await getSecret("fire-drill");
   if (fireDrill === "1") {
     log.info("Fire Drill! Sign in with IPV smoke test will fail.");
     throw "Sign in with IPV smoke test failed due to Fire Drill";
   }
 
-  const bucketName = await getParameter("bucket");
+  const bucketName = await getSecret("bucket");
   const email = await getSecret("username");
   const password = await getSecret("password");
   const phoneNumber = await getSecret("phone");

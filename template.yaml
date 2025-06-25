@@ -289,6 +289,206 @@ Resources:
 
   # We need to set the bucket policy to allow the Backend lambda  function  to write in bucket
 
+  # Secrets Manager required for the smoke test canary
+
+  # Signin
+  SmokeInSmsBucketSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-bucket"
+      Description: This secret conains  a s3 Sms bucket name
+      SecretString: !Ref SmoketestSmsBucket
+
+  SmokeInStubRpClientPrivateKeySecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-client-private-key"
+      SecretString: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+
+  SmokeInTestClientIDSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-client-id"
+      SecretString: !GetAtt SmokeTestClientIdString.RandomString
+
+  SmokeInClientBaseUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-client-base-url"
+      SecretString: "http://localhost:3032"
+
+  SmokeInIssuerBaseUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-issuer-base-url"
+      SecretString: !Sub "https://oidc.${Environment}.account.gov.uk"
+
+  SmokeInfireDrillSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-fire-drill"
+      SecretString: "0"
+
+  SmokeInPasswordSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-password"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeInSlackHookUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-slack-hook-url"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeInPhoneSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-phone"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeInUsernameSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-username"
+      SecretString: "digital-identity-tech-team+smoke-tests-sign-in@digital.cabinet-office.gov.uk"
+
+  # SignwithIpv
+  SmokeIpvSmsBucketSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-bucket"
+      Description: This secret conains  a s3 Sms bucket name
+      SecretString: !Ref SmoketestSmsBucket
+
+  SmokeIpvStubRpClientPrivateKeySecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-client-private-key"
+      SecretString: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+
+  SmokeIpvTestClientIDSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-client-id"
+      SecretString: !GetAtt SmokeTestClientIdString.RandomString
+
+  SmokeIpvClientBaseUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-client-base-url"
+      SecretString: "http://localhost:3032"
+
+  SmokeIpvIssuerBaseUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-issuer-base-url"
+      SecretString: !Sub "https://oidc.${Environment}.account.gov.uk"
+
+  SmokeIpvfireDrillSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-fire-drill"
+      SecretString: "0"
+
+  SmokeIpvPasswordSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-password"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeIpvSlackHookUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-slack-hook-url"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeIpvPhoneSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-phone"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeIpvUsernameSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-username"
+      SecretString: "digital-identity-tech-team+smoke-tests-ipv@digital.cabinet-office.gov.uk"
+
+  # Smokecracannary
+  SmokeCraSmsBucketSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-bucket"
+      Description: This secret conains  a s3 Sms bucket name
+      SecretString: !Ref SmoketestSmsBucket
+
+  SmokeCraStubRpClientPrivateKeySecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-client-private-key"
+      SecretString: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+
+  SmokeCraTestClientIDSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-client-id"
+      SecretString: !GetAtt SmokeTestClientIdString.RandomString
+
+  SmokeCraClientBaseUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-client-base-url"
+      SecretString: "http://localhost:3032"
+
+  SmokeCraIssuerBaseUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-issuer-base-url"
+      SecretString: !Sub "https://oidc.${Environment}.account.gov.uk"
+
+  SmokeCrafireDrillSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-fire-drill"
+      SecretString: "0"
+
+  SmokeCraSlackHookUrlSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-slack-hook-url"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeCraPhoneSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-phone"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeCraSyntheticsUserDeletePathSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-synthetics-user-delete-path"
+      SecretString: !Sub "/${Environment}/synthetics-user"
+
+  SmokeCraUsernameSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-username"
+      SecretString: "simulate-delivered@notifications.service.gov.uk"
+
+  SmokeCraTestServicesApiHostnameSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-test-services-api-hostname"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
+  SmokeCraTestServicesApiKeySecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-test-services-api-key"
+      # SecretString: "place holder" # This will be updated manually post-deployment
+
   # IAM Roles and Policies
 
   AlertsLambdaExecutionPolicy:
@@ -436,7 +636,8 @@ Resources:
       AliasName: !Sub "alias/${Environment}-parameter-store-encryption-key"
       TargetKeyId: !Ref ParameterStoreKey
 
-  # Parameter Store
+  # Parameter Store or lambda's environment variables
+
   SlackHookUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -726,18 +927,12 @@ Resources:
       Environment:
         Variables:
           DEPLOY_ENVIRONMENT: !Ref Environment
-          CRONITOR_API_KEY:
-            !FindInMap [
-              EnvironmentConfiguration,
-              !Ref Environment,
-              CronitorApiKey,
-            ]
-          CRONITOR_MONITOR_KEY:
-            !FindInMap [
-              EnvironmentConfiguration,
-              !Ref Environment,
-              CronitorMonitorKey,
-            ]
+          CRONITOR_API_KEY: !Sub
+            - "{{resolve:secretsmanager:/deploy/${env}/cronitor_api_key}}"
+            - env: !Ref Environment
+          CRONITOR_MONITOR_KEY: !Sub
+            - "{{resolve:secretsmanager:/deploy/${env}/cronitor_monitor_key}}"
+            - env: !Ref Environment
       LoggingConfig:
         LogGroup: !Ref HeartbeatLambdaLogGroup
 
@@ -827,12 +1022,9 @@ Resources:
     Properties:
       TopicArn: !Ref PagerDutyP1Alerts
       Protocol: https
-      Endpoint:
-        !FindInMap [
-          EnvironmentConfiguration,
-          !Ref Environment,
-          PagerDutyP1AlertsEndpoint,
-        ]
+      Endpoint: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/pagerduty_p1_alerts_endpoint}}"
+        - env: !Ref Environment
 
   PagerDutyP2AlertsSubscription:
     Type: AWS::SNS::Subscription
@@ -840,110 +1032,107 @@ Resources:
     Properties:
       TopicArn: !Ref PagerDutyP2Alerts
       Protocol: https
-      Endpoint:
-        !FindInMap [
-          EnvironmentConfiguration,
-          !Ref Environment,
-          PagerDutyP2AlertsEndpoint,
-        ]
+      Endpoint: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/pagerduty_p2_alerts_endpoint}}"
+        - env: !Ref Environment
 
-  # Randon bytes  function for canary
+  # Randon bytes  function required for Dynamodb item entry for sign with ipv
 
-  RandomBytesGeneratorFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      Runtime: nodejs20.x
-      Handler: index.handler
-      Code:
-        ZipFile: |
-          const crypto = require('crypto');
-          const https = require('https');
-          const url = require('url');
+  # RandomBytesGeneratorFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Runtime: nodejs20.x
+  #     Handler: index.handler
+  #     Code:
+  #       ZipFile: |
+  #         const crypto = require('crypto');
+  #         const https = require('https');
+  #         const url = require('url');
 
-          exports.handler = function(event, context) {
-            // For Delete events, just send success response
-            if (event.RequestType === 'Delete') {
-              sendResponse(event, context, 'SUCCESS', {});
-              return;
-            }
+  #         exports.handler = function(event, context) {
+  #           // For Delete events, just send success response
+  #           if (event.RequestType === 'Delete') {
+  #             sendResponse(event, context, 'SUCCESS', {});
+  #             return;
+  #           }
 
-            try {
-              // Get length from properties or default to 32
-              const length = parseInt(event.ResourceProperties.Length || 32);
+  #           try {
+  #             // Get length from properties or default to 32
+  #             const length = parseInt(event.ResourceProperties.Length || 32);
 
-              // Generate random bytes
-              const randomBytes = crypto.randomBytes(length);
+  #             // Generate random bytes
+  #             const randomBytes = crypto.randomBytes(length);
 
-              // Convert to base64
-              const base64Encoded = randomBytes.toString('base64');
+  #             // Convert to base64
+  #             const base64Encoded = randomBytes.toString('base64');
 
-              // Send success response with the base64 encoded bytes
-              sendResponse(event, context, 'SUCCESS', { Base64: base64Encoded });
-            } catch (error) {
-              console.error('Error:', error);
-              sendResponse(event, context, 'FAILED', { Error: error.message });
-            }
-          };
+  #             // Send success response with the base64 encoded bytes
+  #             sendResponse(event, context, 'SUCCESS', { Base64: base64Encoded });
+  #           } catch (error) {
+  #             console.error('Error:', error);
+  #             sendResponse(event, context, 'FAILED', { Error: error.message });
+  #           }
+  #         };
 
-          function sendResponse(event, context, responseStatus, responseData) {
-            const responseBody = JSON.stringify({
-              Status: responseStatus,
-              Reason: responseStatus === 'FAILED' ? responseData.Error : 'See the details in CloudWatch Log Stream: ' + context.logStreamName,
-              PhysicalResourceId: context.logStreamName,
-              StackId: event.StackId,
-              RequestId: event.RequestId,
-              LogicalResourceId: event.LogicalResourceId,
-              Data: responseData
-            });
+  #         function sendResponse(event, context, responseStatus, responseData) {
+  #           const responseBody = JSON.stringify({
+  #             Status: responseStatus,
+  #             Reason: responseStatus === 'FAILED' ? responseData.Error : 'See the details in CloudWatch Log Stream: ' + context.logStreamName,
+  #             PhysicalResourceId: context.logStreamName,
+  #             StackId: event.StackId,
+  #             RequestId: event.RequestId,
+  #             LogicalResourceId: event.LogicalResourceId,
+  #             Data: responseData
+  #           });
 
-            console.log('Response body:', responseBody);
+  #           console.log('Response body:', responseBody);
 
-            const parsedUrl = url.parse(event.ResponseURL);
-            const options = {
-              hostname: parsedUrl.hostname,
-              port: 443,
-              path: parsedUrl.path,
-              method: 'PUT',
-              headers: {
-                'content-type': '',
-                'content-length': responseBody.length
-              }
-            };
+  #           const parsedUrl = url.parse(event.ResponseURL);
+  #           const options = {
+  #             hostname: parsedUrl.hostname,
+  #             port: 443,
+  #             path: parsedUrl.path,
+  #             method: 'PUT',
+  #             headers: {
+  #               'content-type': '',
+  #               'content-length': responseBody.length
+  #             }
+  #           };
 
-            const request = https.request(options, function(response) {
-              console.log('Status code:', response.statusCode);
-              context.done();
-            });
+  #           const request = https.request(options, function(response) {
+  #             console.log('Status code:', response.statusCode);
+  #             context.done();
+  #           });
 
-            request.on('error', function(error) {
-              console.log('send response error:', error);
-              context.done();
-            });
+  #           request.on('error', function(error) {
+  #             console.log('send response error:', error);
+  #             context.done();
+  #           });
 
-            request.write(responseBody);
-            request.end();
-          }
-      Role: !GetAtt RandomBytesGeneratorRole.Arn
-      Timeout: 30
+  #           request.write(responseBody);
+  #           request.end();
+  #         }
+  #     Role: !GetAtt RandomBytesGeneratorRole.Arn
+  #     Timeout: 30
 
-  RandomBytesGeneratorRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  # RandomBytesGeneratorRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: lambda.amazonaws.com
+  #           Action: sts:AssumeRole
+  #     ManagedPolicyArns:
+  #       - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
-  SaltIpvSignIn:
-    Type: Custom::RandomBytes
-    Properties:
-      ServiceToken: !GetAtt RandomBytesGeneratorFunction.Arn
-      Length: 32
+  # SaltIpvSignIn:
+  #   Type: Custom::RandomBytes
+  #   Properties:
+  #     ServiceToken: !GetAtt RandomBytesGeneratorFunction.Arn
+  #     Length: 32
 
   # SaltIpvSignInIdParameter:
   #   Type: AWS::SSM::Parameter
@@ -1061,13 +1250,6 @@ Resources:
     Type: Custom::RSAKeyPair
     Properties:
       ServiceToken: !GetAtt RSAKeyGeneratorFunction.Arn
-
-  # StubRpClientPrivateKeyParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Name: !Sub "${Environment}-smoke-StubRpClientPrivateKey"
-  #     Type: "String"
-  #     Value: !GetAtt StubRpClientPrivateKey.PublicKeyPem
 
   # Cannary for the smoke test
   SignInCanary:
@@ -1425,71 +1607,6 @@ Resources:
           Value: !Ref Environment
         - Key: Application
           Value: smoke-tests
-
-  # Smoke-in parameters
-
-  SmokeInSmsBucketParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/smoketest/${Environment}-smoke-in-bucket"
-      Type: String
-      Value: !Ref SmoketestSmsBucket
-
-  SmokeInSlackHookUrlParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/smoketest/${Environment}-smoke-in-slack-hook-url"
-      Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
-
-  # Smoke-ipv parameters
-
-  SmokeIpvSmsBucketParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/smoketest/${Environment}-smoke-ipv-bucket"
-      Type: String
-      Value: !Ref SmoketestSmsBucket
-
-  SmokeIpvSlackHookUrlParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/smoketest/${Environment}-smoke-ipv-slack-hook-url"
-      Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
-
-  # Smoke-cra parameters
-  SmokeCraFireDrillParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/smoketest/${Environment}-smoke-cra-fire-drill"
-      Type: String
-      Value: "0"
-
-  SmokeCraSyntheticsUserDeletePathParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/smoketest/${Environment}-smoke-cra-synthetics-user-delete-path"
-      Type: String
-      Value: !Join
-        - /
-        - - ""
-          - Ref: Environment
-          - synthetics-user
-
-  SmokeCraSmsBucketParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/smoketest/${Environment}-smoke-cra-bucket"
-      Type: String
-      Value: !Ref SmoketestSmsBucket
-
-  SmokeCraSlackHookUrlParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/smoketest/${Environment}-smoke-cra-slack-hook-url"
-      Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
 
   # CloudWatch Alarms SignInCanary
   SignInCanaryAlarmP1:

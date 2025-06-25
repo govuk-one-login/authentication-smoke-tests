@@ -1,6 +1,6 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getParameter, getSecret, emptyOtpBucket } = require("./aws");
+const { getSecret, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const crypto = require("crypto");
 const steps = require("./steps");
@@ -38,9 +38,9 @@ const deleteSyntheticsUser = async function (res) {
 const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests");
 
-  const bucketName = await getParameter("bucket");
-  const fireDrill = await getParameter("fire-drill");
-  const syntheticsUserDeletePath = await getParameter(
+  const bucketName = await getSecret("bucket");
+  const fireDrill = await getSecret("fire-drill");
+  const syntheticsUserDeletePath = await getSecret(
     "synthetics-user-delete-path"
   );
   const testServicesApiHostname = await getSecret("test-services-api-hostname");

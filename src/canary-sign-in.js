@@ -1,6 +1,6 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getParameter, getSecret, emptyOtpBucket } = require("./aws");
+const { getSecret, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
 const { setStandardViewportSize } = require("./helpers");
 const steps = require("./steps");
@@ -17,7 +17,7 @@ let server;
 const basicCustomEntryPoint = async () => {
   log.info("Running smoke tests");
 
-  const bucketName = await getParameter("bucket");
+  const bucketName = await getSecret("bucket");
   const email = await getSecret("username");
   const password = await getSecret("password");
   const phoneNumber = await getSecret("phone");
