@@ -60,6 +60,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.DEPLOY_ROLE }}
           aws-region: eu-west-2
+
       - name: Upload Canary source code scripts zip to pipeline artifact bucket
         working-directory: dist
         run: |
