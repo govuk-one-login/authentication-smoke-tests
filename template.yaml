@@ -1162,9 +1162,8 @@ Resources:
         ActiveTracing: false
       Code:
         #S3Bucket: !Ref SmokeTestSourceBucket
-        S3Bucket: !Ref CanaryScriptbucket # This temp bucket until we get the promote script updated for canary
-        S3Key: !Sub "${Environment}-canary.zip"
-        S3ObjectVersion: latest
+        S3Bucket: !Ref CanaryScriptbucket
+        S3Key: canary.zip
         Handler: canary-sign-in.handler
       Tags:
         - Key: Environment
@@ -1222,9 +1221,8 @@ Resources:
         MemoryInMB: 1024
         ActiveTracing: false
       Code:
-        #S3Bucket: !Ref SmokeTestSourceBucket
-        S3Bucket: !Ref CanaryScriptbucket # This temp bucket until we get the promote script updated for canary
-        S3Key: !Sub "${Environment}-canary.zip"
+        S3Bucket: !Ref CanaryScriptbucket
+        S3Key: canary.zip
         Handler: canary-sign-in-with-ipv.handler
       Tags:
         - Key: Environment
@@ -1282,8 +1280,8 @@ Resources:
         MemoryInMB: 1024
         ActiveTracing: false
       Code:
-        S3Bucket: !Ref CanaryScriptbucket # This temp bucket until we get the promote script updated for canary
-        S3Key: !Sub "${Environment}-canary.zip"
+        S3Bucket: !Ref CanaryScriptbucket
+        S3Key: canary.zip
         Handler: canary-create-account.handler
       Tags:
         - Key: Environment
