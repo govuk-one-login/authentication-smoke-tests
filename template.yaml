@@ -293,27 +293,21 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-in-password"
       Type: String
-      Value: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/smoke-in-password}}"
-        - env: !Ref Environment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-in-password}}"
 
   SmokeInSlackHookUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-in-slack-hook-url"
       Type: String
-      Value: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/smoke-in-slack-hook-url}}"
-        - env: !Ref Environment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-in-slack-hook-url}}"
 
   SmokeInPhoneParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-in-phone"
       Type: String
-      Value: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/smoke-in-phone}}"
-        - env: !Ref Environment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-in-phone}}"
 
   SmokeInUsernameParameter:
     Type: AWS::SSM::Parameter
@@ -371,27 +365,21 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-password"
       Type: String
-      Value: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/smoke-ipv-password}}"
-        - env: !Ref Environment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-ipv-password}}"
 
   SmokeIpvSlackHookUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-slack-hook-url"
       Type: String
-      Value: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/smoke-ipv-slack-hook-url}}"
-        - env: !Ref Environment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-ipv-slack-hook-url}}"
 
   SmokeIpvPhoneParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-phone"
       Type: String
-      Value: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/smoke-ipv-phone}}"
-        - env: !Ref Environment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-ipv-phone}}"
 
   SmokeIpvUsernameParameter:
     Type: AWS::SSM::Parameter
@@ -449,18 +437,14 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-slack-hook-url"
       Type: String
-      Value: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/smoke-cra-slack-hook-url}}"
-        - env: !Ref Environment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-cra-slack-hook-url}}"
 
   SmokeCraPhoneParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-cra-phone"
       Type: String
-      Value: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/smoke-cra-phone}}"
-        - env: !Ref Environment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-cra-phone}}"
 
   SmokeCraSyntheticsUserDeletePathParameter:
     Type: AWS::SSM::Parameter
@@ -820,12 +804,8 @@ Resources:
       Environment:
         Variables:
           DEPLOY_ENVIRONMENT: !Ref Environment
-          CRONITOR_API_KEY: !Sub
-            - "{{resolve:secretsmanager:/deploy/${env}/cronitor_api_key}}"
-            - env: !Ref Environment
-          CRONITOR_MONITOR_KEY: !Sub
-            - "{{resolve:secretsmanager:/deploy/${env}/cronitor_monitor_key}}"
-            - env: !Ref Environment
+          CRONITOR_API_KEY: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/cronitor_api_key}}"
+          CRONITOR_MONITOR_KEY: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/cronitor_monitor_key}}"
       LoggingConfig:
         LogGroup: !Ref HeartbeatLambdaLogGroup
 
@@ -915,9 +895,7 @@ Resources:
     Properties:
       TopicArn: !Ref PagerDutyP1Alerts
       Protocol: https
-      Endpoint: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/pagerduty_p1_alerts_endpoint}}"
-        - env: !Ref Environment
+      Endpoint: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/pagerduty_p1_alerts_endpoint}}"
 
   PagerDutyP2AlertsSubscription:
     Type: AWS::SNS::Subscription
@@ -925,9 +903,7 @@ Resources:
     Properties:
       TopicArn: !Ref PagerDutyP2Alerts
       Protocol: https
-      Endpoint: !Sub
-        - "{{resolve:secretsmanager:/deploy/${env}/pagerduty_p2_alerts_endpoint}}"
-        - env: !Ref Environment
+      Endpoint: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/pagerduty_p2_alerts_endpoint}}"
 
   # RSA Key Pair Generation funtion
   RSAKeyGeneratorFunction:
