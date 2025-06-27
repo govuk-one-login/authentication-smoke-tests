@@ -28,11 +28,6 @@ Parameters:
     Type: String
     Default: "none"
 
-  CanaryScriptbucket:
-    Description: "The bucket name where the canary scripts are stored"
-    Type: String
-    Default: "smoke-test-pipeline-githubartifactsourcebucket-fvdnfg2bqo3n"
-
   SmokeTestLambdaZipFile:
     Type: String
     Description: "The S3 location of the smoke test lambda zip file"
@@ -90,6 +85,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
+      CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj
       IsSplunkEnabled: "Yes"
       BackendAccountID: "653994557586"
       SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
@@ -100,6 +96,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
+      CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-fvdnfg2bqo3n
       IsSplunkEnabled: "No"
       BackendAccountID: "761723964695"
       SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
@@ -110,6 +107,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
+      CanaryScriptbucket: smoke-test-pipeline-artifactpromotionbucket-em4xyoxb51ns
       IsSplunkEnabled: "Yes"
       BackendAccountID: "758531536632"
       SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
@@ -120,6 +118,7 @@ Mappings:
     #   SlackChannelId: C07TMK4CGH2
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
+    #   CanaryScriptbucket: ""
     #   IsSplunkEnabled: "Yes"
     #   BackendAccountID: "761723964695"
     #   SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
@@ -130,6 +129,7 @@ Mappings:
     #   SlackChannelId: C07TMK4CGH2
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
+    #   CanaryScriptbucket: ""
     #   BackendAccountID: "172348255554"
     #   SmokeTestCronExpression: "cron(0/03 * * * ? *)"
 
@@ -245,27 +245,6 @@ Resources:
         - Key: Application
           Value: smoke-tests
 
-  SmokeTestSourceBucket:
-    Type: AWS::S3::Bucket # Bucket to store the source scripts zip for deploying canary
-    Properties:
-      BucketName: !Sub "${Environment}-smoke-new-test-source"
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      VersioningConfiguration:
-        Status: Enabled
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        IgnorePublicAcls: true
-        BlockPublicPolicy: true
-        RestrictPublicBuckets: true
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Application
-          Value: smoke-tests
-
   # Signin Parameters
   SmokeInSmsBucketParameter:
     Type: AWS::SSM::Parameter
@@ -314,21 +293,27 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-in-password"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/smoke-in-password}}"
+        - env: !Ref Environment
 
   SmokeInSlackHookUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-in-slack-hook-url"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/smoke-in-slack-hook-url}}"
+        - env: !Ref Environment
 
   SmokeInPhoneParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-in-phone"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/smoke-in-phone}}"
+        - env: !Ref Environment
 
   SmokeInUsernameParameter:
     Type: AWS::SSM::Parameter
@@ -386,21 +371,27 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-password"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/smoke-ipv-password}}"
+        - env: !Ref Environment
 
   SmokeIpvSlackHookUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-slack-hook-url"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/smoke-ipv-slack-hook-url}}"
+        - env: !Ref Environment
 
   SmokeIpvPhoneParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-phone"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/smoke-ipv-phone}}"
+        - env: !Ref Environment
 
   SmokeIpvUsernameParameter:
     Type: AWS::SSM::Parameter
@@ -458,14 +449,18 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-slack-hook-url"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/smoke-cra-slack-hook-url}}"
+        - env: !Ref Environment
 
   SmokeCraPhoneParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-cra-phone"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub
+        - "{{resolve:secretsmanager:/deploy/${env}/smoke-cra-phone}}"
+        - env: !Ref Environment
 
   SmokeCraSyntheticsUserDeletePathParameter:
     Type: AWS::SSM::Parameter
@@ -652,106 +647,13 @@ Resources:
       Special: false
 
   RandomStringFunction:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
+      FunctionName: !Sub "${Environment}-random-string-generator"
+      Handler: randomstring.handler
       Role: !GetAtt RandomStringFunctionRole.Arn
       Runtime: nodejs20.x
-      Code:
-        ZipFile: |
-          const crypto = require('crypto');
-          const https = require('https');
-
-          exports.handler = async (event, context) => {
-            console.log('Event:', JSON.stringify(event));
-
-            // Generate random string regardless of event type
-            const length = event.ResourceProperties?.Length || 16;
-            const special = event.ResourceProperties?.Special === 'true';
-            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' + (special ? '!@#$%^&*()' : '');
-
-            let randomString = '';
-            const randomValues = crypto.randomBytes(parseInt(length));
-
-            for (let i = 0; i < length; i++) {
-              randomString += charset.charAt(randomValues[i] % charset.length);
-            }
-
-            // For Delete events, just return success
-            if (event.RequestType === 'Delete') {
-              return sendCfnResponse(event, context, 'SUCCESS');
-            }
-
-            // For Create/Update events, return the generated string
-            return sendCfnResponse(event, context, 'SUCCESS', { RandomString: randomString });
-          };
-
-          // Simplified CloudFormation response function
-          function sendCfnResponse(event, context, status, data = {}) {
-            // If no ResponseURL is provided, just log and return
-            if (!event.ResponseURL) {
-              console.log(`No ResponseURL found. Status: ${status}, Data:`, data);
-              return Promise.resolve();
-            }
-
-            const responseBody = JSON.stringify({
-              Status: status,
-              Reason: status === 'FAILED' ? 'See CloudWatch logs for details' : 'OK',
-              PhysicalResourceId: context.logStreamName || 'random-string-generator',
-              StackId: event.StackId || '',
-              RequestId: event.RequestId || '',
-              LogicalResourceId: event.LogicalResourceId || '',
-              Data: data
-            });
-
-            console.log('Sending response:', responseBody);
-
-            // Parse URL safely
-            let urlParts;
-            try {
-              const url = new URL(event.ResponseURL);
-              urlParts = {
-                hostname: url.hostname,
-                path: url.pathname + url.search,
-                method: 'PUT'
-              };
-            } catch (e) {
-              console.error('Invalid ResponseURL:', event.ResponseURL);
-              return Promise.resolve();
-            }
-
-            const options = {
-              hostname: urlParts.hostname,
-              port: 443,
-              path: urlParts.path,
-              method: 'PUT',
-              headers: {
-                'Content-Type': '',
-                'Content-Length': responseBody.length
-              }
-            };
-
-            return new Promise((resolve) => {
-              try {
-                const req = https.request(options, (res) => {
-                  console.log(`Response status code: ${res.statusCode}`);
-                  res.on('data', () => {});
-                  res.on('end', () => resolve());
-                });
-
-                req.on('error', (e) => {
-                  console.error('Request error:', e);
-                  resolve(); // Resolve anyway to prevent Lambda from hanging
-                });
-
-                req.write(responseBody);
-                req.end();
-              } catch (e) {
-                console.error('Failed to send response:', e);
-                resolve(); // Resolve anyway to prevent Lambda from hanging
-              }
-            });
-          }
+      CodeUri: dist/utils.zip
 
   RandomStringFunctionRole:
     Type: AWS::IAM::Role
@@ -1029,93 +931,12 @@ Resources:
 
   # RSA Key Pair Generation funtion
   RSAKeyGeneratorFunction:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Environment}-rsa-key-generator"
       Runtime: nodejs20.x
-      Handler: index.handler
-      Code:
-        ZipFile: |
-          const crypto = require('crypto');
-          const https = require('https');
-          const url = require('url');
-
-          exports.handler = function(event, context) {
-            // For Delete events, just send success response
-            if (event.RequestType === 'Delete') {
-              sendResponse(event, context, 'SUCCESS', {});
-              return;
-            }
-
-            try {
-              // Generate RSA key pair
-              const { privateKey } = crypto.generateKeyPairSync('rsa', {
-                modulusLength: 2048,
-                publicKeyEncoding: {
-                  type: 'spki',
-                  format: 'pem'
-                },
-                privateKeyEncoding: {
-                  type: 'pkcs8',
-                  format: 'pem'
-                }
-              });
-
-              // Extract public key from private key
-              const publicKey = crypto.createPublicKey(privateKey);
-              const publicKeyPem = publicKey.export({
-                type: 'spki',
-                format: 'pem'
-              }).toString();
-
-              // Send success response with the keys
-              sendResponse(event, context, 'SUCCESS', {
-                PublicKeyPem: publicKeyPem,
-                PrivateKeyPem: privateKey
-              });
-            } catch (error) {
-              console.error('Error:', error);
-              sendResponse(event, context, 'FAILED', { Error: error.message });
-            }
-          };
-
-          function sendResponse(event, context, responseStatus, responseData) {
-            const responseBody = JSON.stringify({
-              Status: responseStatus,
-              Reason: responseStatus === 'FAILED' ? responseData.Error : 'See the details in CloudWatch Log Stream: ' + context.logStreamName,
-              PhysicalResourceId: context.logStreamName,
-              StackId: event.StackId,
-              RequestId: event.RequestId,
-              LogicalResourceId: event.LogicalResourceId,
-              Data: responseData
-            });
-
-            console.log('Response body:', responseBody);
-
-            const parsedUrl = url.parse(event.ResponseURL);
-            const options = {
-              hostname: parsedUrl.hostname,
-              port: 443,
-              path: parsedUrl.path,
-              method: 'PUT',
-              headers: {
-                'content-type': '',
-                'content-length': responseBody.length
-              }
-            };
-
-            const request = https.request(options, function(response) {
-              console.log('Status code:', response.statusCode);
-              context.done();
-            });
-
-            request.on('error', function(error) {
-              console.log('send response error:', error);
-              context.done();
-            });
-
-            request.write(responseBody);
-            request.end();
-          }
+      Handler: rsakeygenerator.handler
+      CodeUri: dist/utils.zip
       Role: !GetAtt RSAKeyGeneratorRole.Arn
       Timeout: 30
 
@@ -1162,7 +983,12 @@ Resources:
         ActiveTracing: false
       Code:
         #S3Bucket: !Ref SmokeTestSourceBucket
-        S3Bucket: !Ref CanaryScriptbucket
+        S3Bucket:
+          !FindInMap [
+            EnvironmentConfiguration,
+            !Ref Environment,
+            CanaryScriptbucket,
+          ]
         S3Key: canary.zip
         Handler: canary-sign-in.handler
       Tags:
@@ -1221,7 +1047,12 @@ Resources:
         MemoryInMB: 1024
         ActiveTracing: false
       Code:
-        S3Bucket: !Ref CanaryScriptbucket
+        S3Bucket:
+          !FindInMap [
+            EnvironmentConfiguration,
+            !Ref Environment,
+            CanaryScriptbucket,
+          ]
         S3Key: canary.zip
         Handler: canary-sign-in-with-ipv.handler
       Tags:
@@ -1280,7 +1111,12 @@ Resources:
         MemoryInMB: 1024
         ActiveTracing: false
       Code:
-        S3Bucket: !Ref CanaryScriptbucket
+        S3Bucket:
+          !FindInMap [
+            EnvironmentConfiguration,
+            !Ref Environment,
+            CanaryScriptbucket,
+          ]
         S3Key: canary.zip
         Handler: canary-create-account.handler
       Tags:
