@@ -460,6 +460,20 @@ Resources:
       Type: String
       Value: "simulate-delivered@notifications.service.gov.uk"
 
+  SmokeCraTestServicesApiHostnameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-test-services-api-hostname"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-cra-phone}}"
+
+  SmokeCraTestServicesApiKeyParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-test-services-api-key"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-cra-phone}}"
+
   # IAM Roles and Policies
   AlertsLambdaExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
