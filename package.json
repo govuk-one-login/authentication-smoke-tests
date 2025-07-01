@@ -9,9 +9,10 @@
     "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs",
     "build:canary": "yarn install --production --frozen-lockfile && yarn run build",
     "build:alerts": "cd alerts && yarn install --production --frozen-lockfile && yarn run build",
+    "build:utils": "cd utils && yarn install --production --frozen-lockfile && yarn run build",
     "build:heartbeat": "cd heartbeat && yarn install --production --frozen-lockfile && yarn run build",
     "build:slack": "cd slack && yarn install --production --frozen-lockfile && yarn run build",
-    "build:all": "yarn run build:canary && yarn run build:alerts && yarn run build:heartbeat && yarn run build slack",
+    "build:all": "yarn run build:canary && yarn run build:alerts && yarn run build:heartbeat && yarn run build:slack && yarn run build:utils",
     "pretty": "prettier --write \"**/*.{js,json}\"",
     "check-pretty": "prettier --check \"**/*.{js,json}\"",
     "lint": "eslint ."
