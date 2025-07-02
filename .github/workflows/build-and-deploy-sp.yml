@@ -16,14 +16,6 @@ jobs:
 
   deploy:
     needs: pr-data
-    strategy:
-      matrix:
-        module:
-          - canary
-          - alerts
-          - heartbeat
-          - slack
-          - utils
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -41,7 +33,7 @@ jobs:
         run: yarn install --production --frozen-lockfile
 
       - name: Build smoke tests
-        run: yarn run build:${{ matrix.module }}
+        run: yarn run build:all
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
