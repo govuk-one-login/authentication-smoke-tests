@@ -259,7 +259,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-in-client-private-key"
       Type: String
-      Value: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_private_key}}"
 
   SmokeInTestClientIDParameter:
     Type: AWS::SSM::Parameter
@@ -331,7 +331,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-client-private-key"
       Type: String
-      Value: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_private_key}}"
 
   SmokeIpvTestClientIDParameter:
     Type: AWS::SSM::Parameter
@@ -403,7 +403,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-client-private-key"
       Type: String
-      Value: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_private_key}}"
 
   SmokeCraTestClientIDParameter:
     Type: AWS::SSM::Parameter
@@ -875,23 +875,6 @@ Resources:
       Protocol: https
       Endpoint: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/pagerduty_p2_alerts_endpoint}}"
 
-  # RSA Key Pair Generation funtion
-  RSAKeyGeneratorFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "${Environment}-rsa-key-generator"
-      Runtime: nodejs20.x
-      Handler: rsakeygenerator.handler
-      CodeUri: dist/utils.zip
-      Timeout: 30
-      Policies:
-        - AWSLambdaBasicExecutionRole
-
-  StubRpClientPrivateKey:
-    Type: Custom::RSAKeyPair
-    Properties:
-      ServiceToken: !GetAtt RSAKeyGeneratorFunction.Arn
-
   # Canary for the smoke test
   SignInCanary:
     Type: AWS::Synthetics::Canary
@@ -1122,7 +1105,6 @@ Resources:
   SyntheticsCanaryRoleSmokeIn:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${Environment}-smoke-in-canary-role"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -1172,7 +1154,6 @@ Resources:
   SyntheticsCanaryRoleSmokeCra:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${Environment}-smoke-cra-canary-role"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -1222,7 +1203,6 @@ Resources:
   SyntheticsCanaryRoleSmokeIpv:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${Environment}-smoke-ipv-canary-role"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
