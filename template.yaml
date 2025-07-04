@@ -26,7 +26,7 @@ Parameters:
   PermissionsBoundary:
     Description: "The ARN of the permissions boundary to apply when creating IAM roles"
     Type: String
-    Default: "none"
+    Default: "nonenonenonenonenone"
 
   SmokeTestLambdaZipFile:
     Type: String
@@ -55,7 +55,8 @@ Parameters:
 
 Conditions:
   UseCodeSigning: !Not [!Equals [!Ref CodeSigningConfigArn, none]]
-  UsePermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, none]]
+  UsePermissionsBoundary:
+    !Not [!Equals [!Ref PermissionsBoundary, nonenonenonenonenone]]
   IsProduction: !Equals [!Ref Environment, "production"]
   MetricAlarmsEnabled: !Equals
     - !FindInMap [
@@ -86,7 +87,7 @@ Mappings:
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj
-      IsSplunkEnabled: "Yes"
+      IsSplunkEnabled: "No"
       BackendAccountID: "653994557586"
       SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
 
@@ -489,25 +490,6 @@ Resources:
               - logs:PutLogEvents
             Resource: "arn:aws:logs:*:*:*"
 
-  AlertsLambdaLambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - !Ref AlertsLambdaExecutionPolicy
-        - !Ref ParameterStorePolicy
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Application
-          Value: smoke-tests
-
   HeartbeatLambdaExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -521,25 +503,6 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource: "arn:aws:logs:*:*:*"
-
-  HeartbeatLambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub "${Environment}-cronitor-execution-role"
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: "sts:AssumeRole"
-      ManagedPolicyArns:
-        - !Ref HeartbeatLambdaExecutionPolicy
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Application
-          Value: smoke-tests
 
   ParameterStorePolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -649,22 +612,10 @@ Resources:
     Properties:
       FunctionName: !Sub "${Environment}-random-string-generator"
       Handler: randomstring.handler
-      Role: !GetAtt RandomStringFunctionRole.Arn
       Runtime: nodejs20.x
       CodeUri: dist/utils.zip
-
-  RandomStringFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - AWSLambdaBasicExecutionRole
 
   # Alert Lambda Function
   AlertsLambdaFunction:
@@ -673,7 +624,6 @@ Resources:
       FunctionName: !Sub "${Environment}-alerts"
       CodeUri: dist/alerts.zip
       Handler: alerts.handler
-      Role: !GetAtt AlertsLambdaLambdaExecutionRole.Arn
       Environment:
         Variables:
           DEPLOY_ENVIRONMENT: !Ref Environment
@@ -685,6 +635,9 @@ Resources:
             ]
       LoggingConfig:
         LogGroup: !Ref AlertsLambdaLogGroup
+      Policies:
+        - !Ref AlertsLambdaExecutionPolicy
+        - !Ref ParameterStorePolicy
 
   SlackEventsWithSNSPermission:
     Type: AWS::Lambda::Permission
@@ -800,13 +753,14 @@ Resources:
           cloudwatchLogRetentionInDays,
         ]
       KmsKeyId: !GetAtt KmsKey.Arn
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-AlertsLambdaLogGroup"
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Source
-          Value: govuk-one-login/authentication-smoke-test/template.yaml
+
+  AlertsLambdaLogGroupSubscription:
+    Condition: IsSplunkEnabled
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Ref LoggingSubscriptionEndpointArn
+      FilterPattern: ""
+      LogGroupName: !Ref AlertsLambdaLogGroup
 
   HeartbeatLambdaFunction:
     Type: AWS::Serverless::Function
@@ -814,7 +768,6 @@ Resources:
       FunctionName: !Sub "${Environment}-cronitor-ping"
       CodeUri: dist/heartbeat.zip
       Handler: heartbeat.handler
-      Role: !GetAtt HeartbeatLambdaExecutionRole.Arn
       Environment:
         Variables:
           DEPLOY_ENVIRONMENT: !Ref Environment
@@ -822,6 +775,8 @@ Resources:
           CRONITOR_MONITOR_KEY: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/cronitor_monitor_key}}"
       LoggingConfig:
         LogGroup: !Ref HeartbeatLambdaLogGroup
+      Policies:
+        - !Ref HeartbeatLambdaExecutionPolicy
 
   HeartbeatLambdaLogGroup:
     Type: AWS::Logs::LogGroup
@@ -834,13 +789,14 @@ Resources:
           cloudwatchLogRetentionInDays,
         ]
       KmsKeyId: !GetAtt KmsKey.Arn
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-HeartbeatLambdaLogGroup"
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Source
-          Value: govuk-one-login/authentication-smoke-test/template.yaml
+
+  HeartbeatLambdaLogGroupSubscription:
+    Condition: IsSplunkEnabled
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Ref LoggingSubscriptionEndpointArn
+      FilterPattern: ""
+      LogGroupName: !Ref HeartbeatLambdaLogGroup
 
   # pager Duty SNS topics and policies
   PagerDutyP1Alerts:
@@ -927,21 +883,9 @@ Resources:
       Runtime: nodejs20.x
       Handler: rsakeygenerator.handler
       CodeUri: dist/utils.zip
-      Role: !GetAtt RSAKeyGeneratorRole.Arn
       Timeout: 30
-
-  RSAKeyGeneratorRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - AWSLambdaBasicExecutionRole
 
   StubRpClientPrivateKey:
     Type: Custom::RSAKeyPair
@@ -1000,11 +944,6 @@ Resources:
           cloudwatchLogRetentionInDays,
         ]
       KmsKeyId: !GetAtt KmsKey.Arn
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Application
-          Value: smoke-tests
 
   SignInCanarySubscriptionFilter:
     Condition: IsSplunkEnabled
@@ -1064,11 +1003,6 @@ Resources:
           cloudwatchLogRetentionInDays,
         ]
       KmsKeyId: !GetAtt KmsKey.Arn
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Application
-          Value: smoke-tests
 
   SignInWithIPVCanarySubscriptionFilter:
     Condition: IsSplunkEnabled
@@ -1223,6 +1157,12 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource:
                   - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/smoketest/${Environment}-smoke-in-*"
+      PermissionsBoundary:
+        !If [
+          UsePermissionsBoundary,
+          !Ref PermissionsBoundary,
+          !Ref AWS::NoValue,
+        ]
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -1267,6 +1207,12 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource:
                   - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/smoketest/${Environment}-smoke-cra-*"
+      PermissionsBoundary:
+        !If [
+          UsePermissionsBoundary,
+          !Ref PermissionsBoundary,
+          !Ref AWS::NoValue,
+        ]
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -1311,6 +1257,12 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource:
                   - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/smoketest/${Environment}-smoke-ipv-*"
+      PermissionsBoundary:
+        !If [
+          UsePermissionsBoundary,
+          !Ref PermissionsBoundary,
+          !Ref AWS::NoValue,
+        ]
       Tags:
         - Key: Environment
           Value: !Ref Environment
