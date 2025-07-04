@@ -259,7 +259,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-in-client-private-key"
       Type: String
-      Value: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_private_key}}"
 
   SmokeInTestClientIDParameter:
     Type: AWS::SSM::Parameter
@@ -331,7 +331,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-client-private-key"
       Type: String
-      Value: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_private_key}}"
 
   SmokeIpvTestClientIDParameter:
     Type: AWS::SSM::Parameter
@@ -403,7 +403,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-client-private-key"
       Type: String
-      Value: !GetAtt StubRpClientPrivateKey.PublicKeyPem
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_private_key}}"
 
   SmokeCraTestClientIDParameter:
     Type: AWS::SSM::Parameter
