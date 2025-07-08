@@ -266,7 +266,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-in-client-id"
       Type: String
-      Value: !GetAtt SmokeTestClientIdString.RandomString
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_id}}"
 
   SmokeInClientBaseUrlParameter:
     Type: AWS::SSM::Parameter
@@ -338,7 +338,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-client-id"
       Type: String
-      Value: !GetAtt SmokeTestClientIdString.RandomString
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_id}}"
 
   SmokeIpvClientBaseUrlParameter:
     Type: AWS::SSM::Parameter
@@ -410,7 +410,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-client-id"
       Type: String
-      Value: !GetAtt SmokeTestClientIdString.RandomString
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_id}}"
 
   SmokeCraClientBaseUrlParameter:
     Type: AWS::SSM::Parameter
@@ -1103,6 +1103,8 @@ Resources:
             Resource:
               - !GetAtt SmokeTestArtefactBucket.Arn
               - !Sub "${SmokeTestArtefactBucket.Arn}/*"
+              - !GetAtt SmoketestSmsBucket.Arn
+              - !Sub "${SmoketestSmsBucket.Arn}/*"
 
   # Canary IAM Roles
   SyntheticsCanaryRoleSmokeIn:
