@@ -273,7 +273,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-in-client-base-url"
       Type: String
-      Value: "http://localhost:3032"
+      Value: "http://localhost:3031"
 
   SmokeInIssuerBaseUrlParameter:
     Type: AWS::SSM::Parameter
@@ -345,7 +345,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-client-base-url"
       Type: String
-      Value: "http://localhost:3032"
+      Value: "http://localhost:3031"
 
   SmokeIpvIssuerBaseUrlParameter:
     Type: AWS::SSM::Parameter
@@ -417,7 +417,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-client-base-url"
       Type: String
-      Value: "http://localhost:3032"
+      Value: "http://localhost:3031"
 
   SmokeCraIssuerBaseUrlParameter:
     Type: AWS::SSM::Parameter
