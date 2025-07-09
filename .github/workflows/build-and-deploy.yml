@@ -11,6 +11,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - template.yaml
+      - "scripts/dev-samconfig.toml"
+      - "scripts/create-*.sh"
 
 jobs:
   pr-data:
