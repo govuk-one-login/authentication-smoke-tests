@@ -301,7 +301,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-in-slack-hook-url"
       Type: String
-      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-in-slack-hook-url}}"
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_slack_hook_url}}"
 
   SmokeInPhoneParameter:
     Type: AWS::SSM::Parameter
@@ -373,7 +373,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-slack-hook-url"
       Type: String
-      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-ipv-slack-hook-url}}"
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_slack_hook_url}}"
 
   SmokeIpvPhoneParameter:
     Type: AWS::SSM::Parameter
@@ -438,7 +438,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-slack-hook-url"
       Type: String
-      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke-cra-slack-hook-url}}"
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_slack_hook_url}}"
 
   SmokeCraPhoneParameter:
     Type: AWS::SSM::Parameter
@@ -592,7 +592,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-slack-hook-url"
       Type: String
-      Value: "placeholder" # Will be updated manually post-deployment
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_slack_hook_url}}"
       Description: Slack hook URL for alerts
 
   SmokeTestClientIdParameter:
