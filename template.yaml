@@ -516,14 +516,16 @@ Resources:
             Action:
               - ssm:GetParameter
             Resource:
-              - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter*/${Environment}-slack-hook-url/*
+              - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-slack-hook-url
           - Sid: AllowDecryptOfParameters
             Effect: Allow
             Action:
               - kms:Decrypt
             Resource:
               - !GetAtt ParameterStoreKey.Arn
-              - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${Environment}-slack-hook-url/*
+              - !Sub
+                - arn:aws:kms:${AWS::Region}:${AWS::AccountId}:${KeyAlias}
+                - KeyAlias: !Ref ParameterStoreKeyAlias
 
   KmsKey:
     Type: AWS::KMS::Key
@@ -553,7 +555,7 @@ Resources:
                 kms:EncryptionContext:aws:logs:arn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
 
   KmsKeyAlias:
-    Type: "AWS::KMS::Alias"
+    Type: AWS::KMS::Alias
     Properties:
       AliasName: !Sub "alias/${Environment}-smoke-test-lambda-main-kms-alias"
       TargetKeyId: !Ref KmsKey
