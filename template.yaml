@@ -644,6 +644,7 @@ Resources:
 
   SlackEventsSubscription:
     Type: AWS::SNS::Subscription
+    Condition: IsProduction
     Properties:
       TopicArn: !Sub
         - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-events
@@ -678,6 +679,7 @@ Resources:
 
   SlackAlertsStreamSubscription:
     Type: AWS::SNS::Subscription
+    Condition: IsProduction
     Properties:
       TopicArn: !Sub
         - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
