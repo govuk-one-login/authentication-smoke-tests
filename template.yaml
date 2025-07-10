@@ -600,24 +600,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-test-client-id"
       Type: "String"
-      Value: !GetAtt SmokeTestClientIdString.RandomString
-
-  SmokeTestClientIdString:
-    Type: Custom::RandomString
-    Properties:
-      ServiceToken: !GetAtt RandomStringFunction.Arn
-      Length: 16
-      Special: false
-
-  RandomStringFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "${Environment}-random-string-generator"
-      Handler: randomstring.handler
-      Runtime: nodejs20.x
-      CodeUri: dist/utils.zip
-      Policies:
-        - AWSLambdaBasicExecutionRole
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_id}}"
 
   # Alert Lambda Function
   AlertsLambdaFunction:
