@@ -83,50 +83,55 @@ Mappings:
     dev:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::653994557586:role/dev/oidc-email/execution-role2025032612571369280000008d
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj
       IsSplunkEnabled: "No"
       BackendAccountID: "653994557586"
-      SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
+      SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
 
     build:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::761723964695:role/build/oidc-email/execution-role20211112165141425900000006
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-fvdnfg2bqo3n
       IsSplunkEnabled: "No"
       BackendAccountID: "761723964695"
-      SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
+      SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
 
     staging:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::758531536632:role/staging/oidc-email/execution-role20220325174827331600000020
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       CanaryScriptbucket: smoke-test-pipeline-artifactpromotionbucket-em4xyoxb51ns
       IsSplunkEnabled: "Yes"
       BackendAccountID: "758531536632"
-      SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
+      SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
 
     # integration:
     #   cloudwatchLogRetentionInDays: 30
     #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+    #   EmailSqsLambdaRoleArn:
     #   SlackChannelId: C07TMK4CGH2
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
     #   CanaryScriptbucket: ""
     #   IsSplunkEnabled: "Yes"
     #   BackendAccountID: "761723964695"
-    #   SmokeTestCronExpression: "cron(3 9-17 ? * MON-FRI *)"
+    #   SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
 
     # production:
     #   cloudwatchLogRetentionInDays: 30
     #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+    #   EmailSqsLambdaRoleArn:
     #   SlackChannelId: C07TMK4CGH2
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
@@ -226,6 +231,31 @@ Resources:
           Value: !Ref Environment
         - Key: Application
           Value: smoke-tests
+
+  SmoketestSmsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SmoketestSmsBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "WritetoSqsEmailNotificationLambda"
+            Effect: "Allow"
+            Principal:
+              AWS:
+                !FindInMap [
+                  EnvironmentConfiguration,
+                  !Ref Environment,
+                  EmailSqsLambdaRoleArn,
+                ]
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:DeleteObject"
+              - "s3:ListBucket"
+            Resource:
+              - !GetAtt SmoketestSmsBucket.Arn
+              - !Sub "${SmoketestSmsBucket.Arn}/*"
 
   SmokeTestArtefactBucket: # Bucket to store artefacts generated from the smoke test canary
     Type: AWS::S3::Bucket
@@ -345,7 +375,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-client-base-url"
       Type: String
-      Value: "http://localhost:3031"
+      Value: "http://localhost:3032"
 
   SmokeIpvIssuerBaseUrlParameter:
     Type: AWS::SSM::Parameter
