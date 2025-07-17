@@ -65,7 +65,7 @@ const formatMessage = (snsMessage, colorCode, snsMessageFooter) => {
 
 const buildMessageRequest = (snsMessage, colorCode, snsMessageFooter) => {
   const body = formatMessage(snsMessage, colorCode, snsMessageFooter);
-  if (process.env.DEPLOY_ENVIRONMENT === "integration") {
+  if (process.env.DEPLOY_ENVIRONMENT !== "production") {
     body.channel = process.env.SLACK_CHANNEL_ID;
   }
   return {
