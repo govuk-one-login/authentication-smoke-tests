@@ -90,7 +90,8 @@ Mappings:
       CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj
       IsSplunkEnabled: "No"
       BackendAccountID: "653994557586"
-      SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
+      SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartIPVCanaryAfterCreation: false
 
     build:
       cloudwatchLogRetentionInDays: 30
@@ -102,7 +103,8 @@ Mappings:
       CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-fvdnfg2bqo3n
       IsSplunkEnabled: "No"
       BackendAccountID: "761723964695"
-      SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
+      SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartIPVCanaryAfterCreation: false
 
     staging:
       cloudwatchLogRetentionInDays: 30
@@ -114,7 +116,8 @@ Mappings:
       CanaryScriptbucket: smoke-test-pipeline-artifactpromotionbucket-em4xyoxb51ns
       IsSplunkEnabled: "Yes"
       BackendAccountID: "758531536632"
-      SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
+      SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartIPVCanaryAfterCreation: true
 
     # integration:
     #   cloudwatchLogRetentionInDays: 30
@@ -913,7 +916,7 @@ Resources:
             !Ref Environment,
             SmokeTestCronExpression,
           ]
-      StartCanaryAfterCreation: false
+      StartCanaryAfterCreation: true
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
@@ -973,7 +976,12 @@ Resources:
             !Ref Environment,
             SmokeTestCronExpression,
           ]
-      StartCanaryAfterCreation: false
+      StartCanaryAfterCreation:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          StartIPVCanaryAfterCreation,
+        ]
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
@@ -1032,7 +1040,7 @@ Resources:
             !Ref Environment,
             SmokeTestCronExpression,
           ]
-      StartCanaryAfterCreation: false
+      StartCanaryAfterCreation: true
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
