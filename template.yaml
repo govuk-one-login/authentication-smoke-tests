@@ -119,7 +119,7 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       EmailSqsLambdaRoleArn: arn:aws:iam::758531536632:role/staging/oidc-email/execution-role20220325174827331600000020
-      SlackChannelId: C07TMK4CGH2
+      SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       CanaryScriptbucket: smoke-test-pipeline-artifactpromotionbucket-em4xyoxb51ns
@@ -133,7 +133,7 @@ Mappings:
     #   cloudwatchLogRetentionInDays: 30
     #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     #   EmailSqsLambdaRoleArn:
-    #   SlackChannelId: C07TMK4CGH2
+    #   SlackChannelId: C06HMLMEQ1W
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
     #   CanaryScriptbucket: ""
@@ -147,7 +147,7 @@ Mappings:
     #   cloudwatchLogRetentionInDays: 30
     #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
     #   EmailSqsLambdaRoleArn:
-    #   SlackChannelId: C07TMK4CGH2
+    #   SlackChannelId: C06HMLMEQ1W
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
     #   CanaryScriptbucket: ""
