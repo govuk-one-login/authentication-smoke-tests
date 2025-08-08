@@ -95,5 +95,8 @@ resource "aws_dynamodb_table_item" "stub_rp_client" {
     SmokeTest = {
       N = var.stub_rp_clients[count.index].smoke_test
     }
+    RateLimit = {
+      N = 5
+    }
   })
 }
