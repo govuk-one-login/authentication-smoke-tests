@@ -77,6 +77,13 @@ Conditions:
   IsSplunkEnabled: !Equals
     - !FindInMap [EnvironmentConfiguration, !Ref Environment, IsSplunkEnabled]
     - "Yes"
+  IsSlackNotifyEnabled: !Equals
+    - !FindInMap [
+        EnvironmentConfiguration,
+        !Ref Environment,
+        IsSlackNotifyEnabled,
+      ]
+    - "Yes"
 
 Mappings:
   EnvironmentConfiguration:
@@ -92,6 +99,7 @@ Mappings:
       BackendAccountID: "653994557586"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartIPVCanaryAfterCreation: false
+      IsSlackNotifyEnabled: "No"
 
     build:
       cloudwatchLogRetentionInDays: 30
@@ -105,12 +113,13 @@ Mappings:
       BackendAccountID: "761723964695"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartIPVCanaryAfterCreation: false
+      IsSlackNotifyEnabled: "No"
 
     staging:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       EmailSqsLambdaRoleArn: arn:aws:iam::758531536632:role/staging/oidc-email/execution-role20220325174827331600000020
-      SlackChannelId: C07TMK4CGH2
+      SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       CanaryScriptbucket: smoke-test-pipeline-artifactpromotionbucket-em4xyoxb51ns
@@ -118,29 +127,34 @@ Mappings:
       BackendAccountID: "758531536632"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartIPVCanaryAfterCreation: true
+      IsSlackNotifyEnabled: "Yes"
 
     # integration:
     #   cloudwatchLogRetentionInDays: 30
     #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     #   EmailSqsLambdaRoleArn:
-    #   SlackChannelId: C07TMK4CGH2
+    #   SlackChannelId: C06HMLMEQ1W
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
     #   CanaryScriptbucket: ""
     #   IsSplunkEnabled: "Yes"
     #   BackendAccountID: "761723964695"
     #   SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
+    #   StartIPVCanaryAfterCreation: true
+    #   IsSlackNotifyEnabled: "Yes"
 
     # production:
     #   cloudwatchLogRetentionInDays: 30
     #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
     #   EmailSqsLambdaRoleArn:
-    #   SlackChannelId: C07TMK4CGH2
+    #   SlackChannelId: C06HMLMEQ1W
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
     #   CanaryScriptbucket: ""
     #   BackendAccountID: "172348255554"
     #   SmokeTestCronExpression: "cron(0/03 * * * ? *)"
+    #   StartIPVCanaryAfterCreation: true
+    #   IsSlackNotifyEnabled: "Yes"
 
 Globals:
   Function:
@@ -677,7 +691,7 @@ Resources:
 
   SlackEventsSubscription:
     Type: AWS::SNS::Subscription
-    Condition: IsProduction
+    Condition: IsSlackNotifyEnabled
     Properties:
       TopicArn: !Sub
         - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-events
@@ -712,7 +726,7 @@ Resources:
 
   SlackAlertsStreamSubscription:
     Type: AWS::SNS::Subscription
-    Condition: IsProduction
+    Condition: IsSlackNotifyEnabled
     Properties:
       TopicArn: !Sub
         - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
