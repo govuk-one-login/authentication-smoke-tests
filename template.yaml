@@ -152,7 +152,7 @@ Mappings:
     #   HeartbeatPingEnabled: "Yes"
     #   CanaryScriptbucket: ""
     #   BackendAccountID: "172348255554"
-    #   SmokeTestCronExpression: "cron(0/03 * * * ? *)"
+    #   SmokeTestCronExpression: "cron(0/01 * * * ? *)"
     #   StartIPVCanaryAfterCreation: true
     #   IsSlackNotifyEnabled: "Yes"
 
