@@ -40,6 +40,11 @@ const basicCustomEntryPoint = async () => {
 
   const page = await synthetics.getPage();
 
+  var headers = {};
+  headers["test-header"] = "something-unique";
+
+  await page.setExtraHTTPHeaders(headers);
+
   await steps.launchClient(
     page,
     clientBaseUrl,
