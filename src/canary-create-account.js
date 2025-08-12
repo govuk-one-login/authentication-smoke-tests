@@ -76,6 +76,11 @@ const basicCustomEntryPoint = async () => {
 
   let page = await synthetics.getPage();
 
+  var headers = {};
+  headers["test-header"] = "something-unique";
+
+  await page.setExtraHTTPHeaders(headers);
+
   log.info("Preparing call to synthetics-user DELETE");
   let syntheticsUserDeleteStepOptions = {
     hostname: testServicesApiHostname,
@@ -85,14 +90,14 @@ const basicCustomEntryPoint = async () => {
     protocol: "https:",
   };
 
-  var headers = {};
-  headers["User-Agent"] = [
+  var deleteSyntheticsUserHeaders = {};
+  deleteSyntheticsUserHeaders["User-Agent"] = [
     synthetics.getCanaryUserAgentString(),
-    headers["User-Agent"],
+    deleteSyntheticsUserHeaders["User-Agent"],
   ].join(" ");
-  headers["x-api-key"] = testServicesApiKey;
+  deleteSyntheticsUserHeaders["x-api-key"] = testServicesApiKey;
 
-  syntheticsUserDeleteStepOptions["headers"] = headers;
+  syntheticsUserDeleteStepOptions["headers"] = deleteSyntheticsUserHeaders;
 
   const stepConfig = {
     includeResponseHeaders: true,
