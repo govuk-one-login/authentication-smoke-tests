@@ -29,6 +29,7 @@ const startClient = async (
         scope: scope,
         vtr: isP2LevelOfConfidenceJourney ? '["P2.Cl.Cm"]' : '["Cl.Cm"]',
       },
+      httpTimeout: 10000,
     })
   );
   app.get("/", async (req, res) => {
