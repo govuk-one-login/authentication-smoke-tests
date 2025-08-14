@@ -2,6 +2,11 @@
 
 Contains source code which is run by AWS Lambdas. The live status of smoke tests can be viewed in AWS CloudWatch under Synthetics Canaries.
 
+## Deploying to Dev
+
+Changes to smoke tests can be tested by deploying to the Dev environment.
+Running `./scripts/sam-deploy-dev.sh` will trigger a GHA workflow on current checkout branch ( build-and-deploy-dev-sp.yml) and the GHA workflow trigger's codepipeline dev-smoke-test-pipeline
+
 ## Deploying to sandpit
 
 Changes to smoke tests can be tested by deploying to the sandpit environment.
@@ -13,15 +18,20 @@ Using the integration credentials and backend on sandpit tests can result in occ
 if they are scheduled to run at the same time. To prevent this, the integration cron expression is configured to run tests on the hour
 (and then every three minutes), whereas the sandpit tests begin at one minute past the hour.
 
-Currently, there are some hacks needed in order to deploy to / run in the sandpit environment:
+Currently, there are some manual steps needed to deploy to/run in the sandpit environment:
 
-- If running against the integration backend, put the relevant integration credentials into `sandpit.tfvars` file for the relevant smoke test. These credentials can be retrieved from AWS SSM Parameter Store. To ensure this file isn't accidentally commited, temporarily ignore the file in git with the following:
+- If running against the integration backend, put the relevant integration credentials into the `sandpit.tfvars` file for the relevant smoke test. These credentials can be retrieved from AWS SSM Parameter Store. To ensure this file isn't accidentally committed, temporarily ignore the file in git:
 
-  - `git update-index --assume-unchanged [path-to-file]` to ignore
-  - `git update-index --no-assume-unchanged [path-to-file]` to un-ignore
+  ```bash
+  # To ignore changes
+  git update-index --assume-unchanged [path-to-file]
 
-- It may be necessary to edit the variables files for each of the smoke tests:
-  - set `sns_topic_slack_alerts_arn` to an empty string
+  # To un-ignore changes
+  git update-index --no-assume-unchanged [path-to-file]
+  ```
+
+- It may be necessary to edit the variables files for each smoke test:
+  - Set `sns_topic_slack_alerts_arn` to an empty string
 
 ## Formatting
 
