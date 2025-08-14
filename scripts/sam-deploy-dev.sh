@@ -21,7 +21,7 @@ fi
 
 echo "Triggering GitHub workflow to deploy to dev"
 echo
-gh workflow run "build-and-deploy-dev-sp.yml" --ref "${current_branch}" -f "environment=dev"
+gh workflow run "build-and-deploy-dev-sp.yml" --ref "${current_branch}"
 
 echo
 echo "Now watching workflow progress"
