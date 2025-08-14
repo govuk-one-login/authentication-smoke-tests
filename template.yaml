@@ -94,7 +94,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
-      CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-uog04vs8nxvj
+      CanaryScriptbucket: dev-smoke-test-pipeline-githubartifactsourcebucket-jhweooji1sgc
       IsSplunkEnabled: "No"
       BackendAccountID: "653994557586"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
