@@ -120,19 +120,24 @@ const ipvHandOff = async (page) => {
 
 // Steps only used by Create Account canary
 
+const stepConfig = {
+  includeRequestHeaders: true,
+  includeRequestBody: true,
+};
+
 const clickCreateAccount = async (page) => {
   await synthetics.executeStep("Click create account", async () => {
     await page.waitForSelector("#main-content #create-account-link");
     await waitForNavigationAndClick(page, selectors.createAccountButton);
     await validateUrlContains("enter-email-create", page);
-  });
+  }, stepConfig);
 };
 
 const submitEmailCreate = async (page) => {
   await synthetics.executeStep("Click continue", async () => {
     await page.waitForSelector(selectors.submitFormButton);
     await waitForNavigationAndClick(page, selectors.submitFormButton);
-  });
+  }, stepConfig);
   await validateUrlContains("check-your-email", page);
 };
 
@@ -141,7 +146,7 @@ const createPassword = async (page, password) => {
     await page.waitForSelector(selectors.passwordInput);
     await page.type(selectors.passwordInput, password);
     await page.type(selectors.confirmPasswordInput, password);
-  });
+  }, stepConfig);
 };
 
 const submitCreatePassword = async (page) => {
@@ -149,7 +154,7 @@ const submitCreatePassword = async (page) => {
     await page.waitForSelector(selectors.submitFormButton);
     await waitForNavigationAndClick(page, selectors.submitFormButton);
     await validateUrlContains("get-security-codes", page);
-  });
+  }, stepConfig);
 };
 
 const chooseSMSForSecurityCodes = async (page) => {
