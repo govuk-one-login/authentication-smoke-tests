@@ -7,11 +7,12 @@
   "scripts": {
     "clean": "rm -rf dist && rm -rf node_modules  && rm -rf release-artefacts",
     "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r canary.zip nodejs",
+    "build:synthetics": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r synthetics.zip nodejs",
     "build:canary": "yarn install --production --frozen-lockfile && yarn run build",
     "build:alerts": "cd alerts && yarn install --production --frozen-lockfile && yarn run build",
     "build:heartbeat": "cd heartbeat && yarn install --production --frozen-lockfile && yarn run build",
     "build:slack": "cd slack && yarn install --production --frozen-lockfile && yarn run build",
-    "build:all": "yarn run build:canary && yarn run build:alerts && yarn run build:heartbeat && yarn run build:slack",
+    "build:all": "yarn run build:canary && yarn run build:synthetics && yarn run build:alerts && yarn run build:heartbeat && yarn run build:slack",
     "pretty": "prettier --write \"**/*.{js,json}\"",
     "check-pretty": "prettier --check \"**/*.{js,json}\"",
     "lint": "eslint ."

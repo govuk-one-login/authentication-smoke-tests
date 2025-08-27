@@ -42,27 +42,15 @@ jobs:
           role-to-assume: ${{ secrets.DEV_GHA_BUILD_ROLE }}
           aws-region: eu-west-2
 
-      - name: Upload Canary source code scripts zip to pipeline artifact bucket
-        working-directory: dist
-        run: |
-          echo "::group::Upload canary artifact to S3"
-          OBJECT_VERSION="$(aws s3api put-object \
-            --bucket ${{ secrets.DEV_ARTIFACT_BUCKET }} \
-            --key canary.zip \
-            --body canary.zip \
-            --metadata '${{ toJson(fromJson(needs.pr-data.outputs.data)) }}' \
-            --query VersionId --output text)"
-          echo "::endgroup::"
-          echo "::notice title=Final artifact uploaded to S3::object: canary.zip, version: ${OBJECT_VERSION}"
-
       - name: SAM build
         run: |
           sam validate --lint -t template.yaml
           sam build --parallel -t template.yaml
 
-      - name: Deploy SAM app
-        uses: govuk-one-login/devplatform-upload-action@f6188fc96fe860179f87bfc5bdeebc17eb3e1e4f # v3.9.4
+      - name: Deploy SAM app # synthetics-directory is used for synthetics canary Artifacts upload to S3
+        uses: govuk-one-login/devplatform-upload-action@8851ef243c713dab19b860cca0edd741f9bde4e4 # PSREDEV-2607
         with:
           artifact-bucket-name: ${{ secrets.DEV_ARTIFACT_BUCKET }}
           signing-profile-name: ${{ secrets.DEV_SIGNING_PROFILE_NAME }}
-          working-directory: .aws-sam/build
+          template-file: .aws-sam/build/template.yaml
+          synthetics-directory: ./dist
