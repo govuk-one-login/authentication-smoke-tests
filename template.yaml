@@ -28,10 +28,10 @@ Parameters:
     Type: String
     Default: "nonenonenonenonenone"
 
-  SmokeTestLambdaZipFile:
+  ArtifactSourceBucket:
+    Description: The name for bucket storing code for synthetic canary
     Type: String
-    Description: "The S3 location of the smoke test lambda zip file"
-    Default: "dist/canary.zip"
+    Default: none
 
   RuntimeVersion:
     Type: String
@@ -94,7 +94,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
-      CanaryScriptbucket: dev-smoke-test-pipeline-githubartifactsourcebucket-jhweooji1sgc
+      ArtifactSourceBucket: dev-smoke-test-pipeline-githubartifactsourcebucket-jhweooji1sgc
       IsSplunkEnabled: "No"
       BackendAccountID: "653994557586"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
@@ -108,7 +108,7 @@ Mappings:
       SlackChannelId: C07TMK4CGH2
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
-      CanaryScriptbucket: smoke-test-pipeline-githubartifactsourcebucket-fvdnfg2bqo3n
+      ArtifactSourceBucket: smoke-test-pipeline-githubartifactsourcebucket-fvdnfg2bqo3n
       IsSplunkEnabled: "No"
       BackendAccountID: "761723964695"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
@@ -122,7 +122,7 @@ Mappings:
       SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
-      CanaryScriptbucket: smoke-test-pipeline-artifactpromotionbucket-em4xyoxb51ns
+      ArtifactSourceBucket: smoke-test-pipeline-artifactpromotionbucket-em4xyoxb51ns
       IsSplunkEnabled: "Yes"
       BackendAccountID: "758531536632"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
@@ -136,7 +136,7 @@ Mappings:
     #   SlackChannelId: C06HMLMEQ1W
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
-    #   CanaryScriptbucket: ""
+    #   ArtifactSourceBucket: ""
     #   IsSplunkEnabled: "Yes"
     #   BackendAccountID: "761723964695"
     #   SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
@@ -150,7 +150,7 @@ Mappings:
     #   SlackChannelId: C06HMLMEQ1W
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
-    #   CanaryScriptbucket: ""
+    #   ArtifactSourceBucket: ""
     #   BackendAccountID: "172348255554"
     #   SmokeTestCronExpression: "cron(0/01 * * * ? *)"
     #   StartIPVCanaryAfterCreation: true
@@ -941,9 +941,9 @@ Resources:
           !FindInMap [
             EnvironmentConfiguration,
             !Ref Environment,
-            CanaryScriptbucket,
+            ArtifactSourceBucket,
           ]
-        S3Key: canary.zip
+        S3Key: synthetics.zip
         Handler: canary-sign-in.handler
       Tags:
         - Key: Environment
@@ -1005,9 +1005,9 @@ Resources:
           !FindInMap [
             EnvironmentConfiguration,
             !Ref Environment,
-            CanaryScriptbucket,
+            ArtifactSourceBucket,
           ]
-        S3Key: canary.zip
+        S3Key: synthetics.zip
         Handler: canary-sign-in-with-ipv.handler
       Tags:
         - Key: Environment
@@ -1064,9 +1064,9 @@ Resources:
           !FindInMap [
             EnvironmentConfiguration,
             !Ref Environment,
-            CanaryScriptbucket,
+            ArtifactSourceBucket,
           ]
-        S3Key: canary.zip
+        S3Key: synthetics.zip
         Handler: canary-create-account.handler
       Tags:
         - Key: Environment
