@@ -83,7 +83,8 @@ create_stub_rp_client() {
       "IdentityVerificationSupported": {"N": "1"},
       "ClientType": {"S": "web"},
       "TestClient": {"N": "1"},
-      "SmokeTest": {"N": "1"}
+      "SmokeTest": {"N": "1"},
+      "RateLimit": {"N": "5"}
     }'
 }
 
