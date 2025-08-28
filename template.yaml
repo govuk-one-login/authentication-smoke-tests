@@ -849,6 +849,7 @@ Resources:
       TopicName: !Sub "${Environment}-pagerduty-p2-alerts"
 
   PagerDutyP1AlertsPolicy:
+    Condition: IsProduction
     Type: AWS::SNS::TopicPolicy
     Properties:
       Topics:
@@ -874,6 +875,7 @@ Resources:
             Resource: !Ref PagerDutyP1Alerts
 
   PagerDutyP2AlertsPolicy:
+    Condition: IsProduction
     Type: AWS::SNS::TopicPolicy
     Properties:
       Topics:
