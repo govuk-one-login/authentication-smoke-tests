@@ -91,7 +91,7 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       EmailSqsLambdaRoleArn: arn:aws:iam::653994557586:role/dev/oidc-email/execution-role2025032612571369280000008d
-      SlackChannelId: C07TMK4CGH2
+      SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       ArtifactSourceBucket: dev-smoke-test-pipeline-githubartifactsourcebucket-jhweooji1sgc
@@ -105,7 +105,7 @@ Mappings:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
       EmailSqsLambdaRoleArn: arn:aws:iam::761723964695:role/build/oidc-email/execution-role20211112165141425900000006
-      SlackChannelId: C07TMK4CGH2
+      SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       ArtifactSourceBucket: smoke-test-pipeline-githubartifactsourcebucket-fvdnfg2bqo3n
@@ -129,25 +129,25 @@ Mappings:
       StartIPVCanaryAfterCreation: true
       IsSlackNotifyEnabled: "Yes"
 
-    # integration:
-    #   cloudwatchLogRetentionInDays: 30
-    #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
-    #   EmailSqsLambdaRoleArn:
-    #   SlackChannelId: C06HMLMEQ1W
-    #   MetricAlarmsEnabled: "Yes"
-    #   HeartbeatPingEnabled: "Yes"
-    #   ArtifactSourceBucket: ""
-    #   IsSplunkEnabled: "Yes"
-    #   BackendAccountID: "761723964695"
-    #   SmokeTestCronExpression: "cron(0/3 9-17 ? * MON-FRI *)"
-    #   StartIPVCanaryAfterCreation: true
-    #   IsSlackNotifyEnabled: "Yes"
+    integration:
+      cloudwatchLogRetentionInDays: 30
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::761723964695:role/integration/oidc-email/execution-role2021111513000675590000000f
+      SlackChannelId: C06HMLMEQ1W
+      MetricAlarmsEnabled: "Yes"
+      HeartbeatPingEnabled: "Yes"
+      ArtifactSourceBucket: smoke-test-pipeline-artifactpromotionbucket-ddqtd5mulfgn
+      IsSplunkEnabled: "Yes"
+      BackendAccountID: "761723964695"
+      SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartIPVCanaryAfterCreation: true
+      IsSlackNotifyEnabled: "Yes"
 
     # production:
     #   cloudwatchLogRetentionInDays: 30
     #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
     #   EmailSqsLambdaRoleArn:
-    #   SlackChannelId: C06HMLMEQ1W
+    #   SlackChannelId:
     #   MetricAlarmsEnabled: "Yes"
     #   HeartbeatPingEnabled: "Yes"
     #   ArtifactSourceBucket: ""
@@ -837,11 +837,13 @@ Resources:
 
   # pager Duty SNS topics and policies
   PagerDutyP1Alerts:
+    Condition: IsProduction
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub "${Environment}-pagerduty-p1-alerts"
 
   PagerDutyP2Alerts:
+    Condition: IsProduction
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub "${Environment}-pagerduty-p2-alerts"
