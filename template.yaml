@@ -50,14 +50,13 @@ Parameters:
 
   LoggingSubscriptionEndpointArn:
     Type: String
-    Description: The ARN of the subscription endpoint to send logs to splunk
+    Description: The ARN of the subscription endpoint to send logs to splunk.
     Default: "arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2"
 
 Conditions:
   UseCodeSigning: !Not [!Equals [!Ref CodeSigningConfigArn, none]]
   UsePermissionsBoundary:
     !Not [!Equals [!Ref PermissionsBoundary, nonenonenonenonenone]]
-  IsProduction: !Equals [!Ref Environment, "production"]
   MetricAlarmsEnabled: !Equals
     - !FindInMap [
         EnvironmentConfiguration,
@@ -84,6 +83,13 @@ Conditions:
         IsSlackNotifyEnabled,
       ]
     - "Yes"
+  IsPagerDutyEnabled: !Equals
+    - !FindInMap [
+        EnvironmentConfiguration,
+        !Ref Environment,
+        IsPagerDutyEnabled,
+      ]
+    - "Yes"
 
 Mappings:
   EnvironmentConfiguration:
@@ -100,6 +106,7 @@ Mappings:
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartIPVCanaryAfterCreation: false
       IsSlackNotifyEnabled: "No"
+      IsPagerDutyEnabled: "No"
 
     build:
       cloudwatchLogRetentionInDays: 30
@@ -114,6 +121,7 @@ Mappings:
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartIPVCanaryAfterCreation: false
       IsSlackNotifyEnabled: "No"
+      IsPagerDutyEnabled: "No"
 
     staging:
       cloudwatchLogRetentionInDays: 30
@@ -128,6 +136,7 @@ Mappings:
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartIPVCanaryAfterCreation: true
       IsSlackNotifyEnabled: "Yes"
+      IsPagerDutyEnabled: "No"
 
     integration:
       cloudwatchLogRetentionInDays: 30
@@ -142,19 +151,21 @@ Mappings:
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartIPVCanaryAfterCreation: true
       IsSlackNotifyEnabled: "Yes"
+      IsPagerDutyEnabled: "No"
 
-    # production:
-    #   cloudwatchLogRetentionInDays: 30
-    #   dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
-    #   EmailSqsLambdaRoleArn:
-    #   SlackChannelId:
-    #   MetricAlarmsEnabled: "Yes"
-    #   HeartbeatPingEnabled: "Yes"
-    #   ArtifactSourceBucket: ""
-    #   BackendAccountID: "172348255554"
-    #   SmokeTestCronExpression: "cron(0/01 * * * ? *)"
-    #   StartIPVCanaryAfterCreation: true
-    #   IsSlackNotifyEnabled: "Yes"
+    production:
+      cloudwatchLogRetentionInDays: 30
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::172348255554:role/production/oidc-email/execution-role20211115130009912000000012
+      SlackChannelId: C06HMLMEQ1W
+      MetricAlarmsEnabled: "Yes"
+      HeartbeatPingEnabled: "Yes"
+      ArtifactSourceBucket: smoke-test-pipeline-artifactpromotionbucket-ddqtd5mulfgn
+      BackendAccountID: "172348255554"
+      SmokeTestCronExpression: "cron(0/01 * * * ? *)"
+      StartIPVCanaryAfterCreation: true
+      IsSlackNotifyEnabled: "Yes"
+      IsPagerDutyEnabled: "No"
 
 Globals:
   Function:
@@ -837,19 +848,19 @@ Resources:
 
   # pager Duty SNS topics and policies
   PagerDutyP1Alerts:
-    Condition: IsProduction
+    Condition: IsPagerDutyEnabled
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub "${Environment}-pagerduty-p1-alerts"
 
   PagerDutyP2Alerts:
-    Condition: IsProduction
+    Condition: IsPagerDutyEnabled
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub "${Environment}-pagerduty-p2-alerts"
 
   PagerDutyP1AlertsPolicy:
-    Condition: IsProduction
+    Condition: IsPagerDutyEnabled
     Type: AWS::SNS::TopicPolicy
     Properties:
       Topics:
@@ -875,7 +886,7 @@ Resources:
             Resource: !Ref PagerDutyP1Alerts
 
   PagerDutyP2AlertsPolicy:
-    Condition: IsProduction
+    Condition: IsPagerDutyEnabled
     Type: AWS::SNS::TopicPolicy
     Properties:
       Topics:
@@ -902,7 +913,7 @@ Resources:
 
   PagerDutyP1AlertsSubscription:
     Type: AWS::SNS::Subscription
-    Condition: IsProduction
+    Condition: IsPagerDutyEnabled
     Properties:
       TopicArn: !Ref PagerDutyP1Alerts
       Protocol: https
@@ -910,7 +921,7 @@ Resources:
 
   PagerDutyP2AlertsSubscription:
     Type: AWS::SNS::Subscription
-    Condition: IsProduction
+    Condition: IsPagerDutyEnabled
     Properties:
       TopicArn: !Ref PagerDutyP2Alerts
       Protocol: https
@@ -1317,7 +1328,7 @@ Resources:
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P1 alarm"
       AlarmActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1331,7 +1342,7 @@ Resources:
               }
       OKActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1363,7 +1374,7 @@ Resources:
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P2 alarm"
       AlarmActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1377,7 +1388,7 @@ Resources:
               }
       OKActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1410,7 +1421,7 @@ Resources:
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P1 alarm"
       AlarmActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1424,7 +1435,7 @@ Resources:
               }
       OKActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1456,7 +1467,7 @@ Resources:
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P2 alarm"
       AlarmActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1470,7 +1481,7 @@ Resources:
               }
       OKActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1503,7 +1514,7 @@ Resources:
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-ipv P1 alarm"
       AlarmActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1517,7 +1528,7 @@ Resources:
               }
       OKActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1549,7 +1560,7 @@ Resources:
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P2 alarm"
       AlarmActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
@@ -1563,7 +1574,7 @@ Resources:
               }
       OKActions:
         - !If
-          - IsProduction
+          - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
           - !Sub
             - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts

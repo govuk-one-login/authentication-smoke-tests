@@ -44,6 +44,9 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "yarn.lock"
 
+      - name: 🏗️ Set up SAM CLI
+        uses: aws-actions/setup-sam@2360ef6d90015369947253f53932ad954c70c9a4 # v2.0.0
+
       - name: Install dependencies
         run: yarn install
 
