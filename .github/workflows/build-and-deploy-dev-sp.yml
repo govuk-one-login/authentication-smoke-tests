@@ -48,7 +48,7 @@ jobs:
           sam build --parallel -t template.yaml
 
       - name: Deploy SAM app # synthetics-directory is used for synthetics canary Artifacts upload to S3
-        uses: govuk-one-login/devplatform-upload-action@8851ef243c713dab19b860cca0edd741f9bde4e4 # PSREDEV-2607
+        uses: govuk-one-login/devplatform-upload-action@fda75612a1b0e5a8c84ae7c44a23340e50e5bbde #v3.11.0
         with:
           artifact-bucket-name: ${{ secrets.DEV_ARTIFACT_BUCKET }}
           signing-profile-name: ${{ secrets.DEV_SIGNING_PROFILE_NAME }}
