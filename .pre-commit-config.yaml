@@ -51,7 +51,7 @@ repos:
       - id: sam-validate
         name: SAM validate
         language: system
-        entry: sam validate
+        entry: sam validate --region eu-west-2 --lint
         files: template\.ya?ml$
         pass_filenames: false
       - id: eslint
