@@ -161,6 +161,7 @@ Mappings:
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
       ArtifactSourceBucket: smoke-test-pipeline-artifactpromotionbucket-ddqtd5mulfgn
+      IsSplunkEnabled: "Yes"
       BackendAccountID: "172348255554"
       SmokeTestCronExpression: "cron(0/01 * * * ? *)"
       StartIPVCanaryAfterCreation: true
