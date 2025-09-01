@@ -48,6 +48,12 @@ repos:
 
   - repo: local
     hooks:
+      - id: sam-validate
+        name: SAM validate
+        language: system
+        entry: sam validate --region eu-west-2 --lint
+        files: template\.ya?ml$
+        pass_filenames: false
       - id: eslint
         name: Run ESLint
         language: node
