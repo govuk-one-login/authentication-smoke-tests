@@ -165,7 +165,7 @@ Mappings:
       SmokeTestCronExpression: "cron(0/01 * * * ? *)"
       StartIPVCanaryAfterCreation: true
       IsSlackNotifyEnabled: "Yes"
-      IsPagerDutyEnabled: "No"
+      IsPagerDutyEnabled: "Yes"
 
 Globals:
   Function:
@@ -338,7 +338,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-in-issuer-base-url"
       Type: String
-      Value: !Sub "https://oidc.${Environment}.account.gov.uk"
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_issuer_base_url}}"
 
   SmokeInfireDrillParameter:
     Type: AWS::SSM::Parameter
@@ -410,7 +410,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-issuer-base-url"
       Type: String
-      Value: !Sub "https://oidc.${Environment}.account.gov.uk"
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_issuer_base_url}}"
 
   SmokeIpvfireDrillParameter:
     Type: AWS::SSM::Parameter
@@ -482,7 +482,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-issuer-base-url"
       Type: String
-      Value: !Sub "https://oidc.${Environment}.account.gov.uk"
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_issuer_base_url}}"
 
   SmokeCrafireDrillParameter:
     Type: AWS::SSM::Parameter
