@@ -1324,7 +1324,7 @@ Resources:
       Threshold: 2
       TreatMissingData: notBreaching
       Dimensions:
-        - Name: Canary
+        - Name: CanaryName
           Value: !Ref SignInCanary
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P1 alarm"
       AlarmActions:
@@ -1370,7 +1370,7 @@ Resources:
       Threshold: 5
       TreatMissingData: notBreaching
       Dimensions:
-        - Name: Canary
+        - Name: CanaryName
           Value: !Ref SignInCanary
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P2 alarm"
       AlarmActions:
@@ -1417,7 +1417,7 @@ Resources:
       Threshold: 2
       TreatMissingData: notBreaching
       Dimensions:
-        - Name: Canary
+        - Name: CanaryName
           Value: !Ref CreateAccountCanary
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P1 alarm"
       AlarmActions:
@@ -1463,7 +1463,7 @@ Resources:
       Threshold: 5
       TreatMissingData: notBreaching
       Dimensions:
-        - Name: Canary
+        - Name: CanaryName
           Value: !Ref CreateAccountCanary
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P2 alarm"
       AlarmActions:
@@ -1510,7 +1510,7 @@ Resources:
       Threshold: 2
       TreatMissingData: notBreaching
       Dimensions:
-        - Name: Canary
+        - Name: CanaryName
           Value: !Ref SignInWithIPVCanary
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-ipv P1 alarm"
       AlarmActions:
@@ -1556,7 +1556,7 @@ Resources:
       Threshold: 5
       TreatMissingData: notBreaching
       Dimensions:
-        - Name: Canary
+        - Name: CanaryName
           Value: !Ref SignInWithIPVCanary
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P2 alarm"
       AlarmActions:
