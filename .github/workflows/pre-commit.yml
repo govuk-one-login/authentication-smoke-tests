@@ -34,9 +34,6 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: 🏗️ Set up Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
-
       - name: 🏗️ Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
