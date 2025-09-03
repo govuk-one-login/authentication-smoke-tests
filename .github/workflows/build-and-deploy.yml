@@ -1,20 +1,10 @@
-name: Build and deploy smoke tests
-env:
-  BUILD_ROLE: arn:aws:iam::114407264696:role/deployers/github-actions-publish-to-s3-for-code-signing
-  DEPLOY_ROLE: arn:aws:iam::761723964695:role/build-auth-deploy-pipeline-GitHubActionsRole-160U5ADTRKQ2O
-  SOURCE_BUCKET: di-auth-lambda-source-20220215170204376700000003
-  DESTINATION_BUCKET: di-auth-lambda-signed-20220215170204376200000002
-  SIGNING_PROFILE: di_auth_lambda_signing_20220215170204371800000001
-  ARTIFACT_BUCKET: build-auth-deploy-pipeli-githubartifactsourcebuck-1o4hcrnik6ayv
+name: "Build SP: Build and deploy smoke tests"
+# This workflow builds and deploys smoke tests for the authentication module.
 
 on:
   push:
     branches:
       - main
-    paths-ignore:
-      - template.yaml
-      - "scripts/dev-samconfig.toml"
-      - "scripts/create-*.sh"
 
 jobs:
   pr-data:
@@ -24,14 +14,8 @@ jobs:
       pull-requests: read
     uses: ./.github/workflows/call_get_pr_data.yml
 
-  build:
-    strategy:
-      matrix:
-        module:
-          - canary
-          - alerts
-          - heartbeat
-          - slack
+  deploy:
+    needs: pr-data
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -40,13 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+      - name: Set up SAM cli
+        uses: aws-actions/setup-sam@f664fad9e12492edfc187a31f575537dfbb0ff63 # v2
         with:
-          role-to-assume: ${{ env.BUILD_ROLE }}
-          aws-region: eu-west-2
-
+          use-installer: true
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "20.17.0"
@@ -56,102 +37,23 @@ jobs:
         run: yarn install --production --frozen-lockfile
 
       - name: Build smoke tests
-        run: yarn run build:${{ matrix.module }}
-
-      - name: Upload ${{ matrix.module }} to source bucket
-        working-directory: dist
-        run: |
-          S3_RESPONSE="$(aws s3api put-object \
-            --bucket "$SOURCE_BUCKET" \
-            --key "${{ matrix.module }}/${{ github.sha }}.zip" \
-            --body "${{ matrix.module }}.zip")"
-          VERSION="$(echo "$S3_RESPONSE" | jq .VersionId -r)"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-
-      - name: Run signing job for ${{ matrix.module }}
-        id: sign-module
-        run: |
-          SIGNER_RESPONSE="$(aws signer start-signing-job \
-            --profile-name "${SIGNING_PROFILE}" \
-            --source "s3={bucketName=${SOURCE_BUCKET},key=${{ matrix.module }}/${{ github.sha }}.zip,version=$VERSION}" \
-            --destination "s3={bucketName=${DESTINATION_BUCKET},prefix=signed-${{ matrix.module }}-${{ github.sha }}-}")"
-          JOB_ID="$(echo "$SIGNER_RESPONSE" | jq .jobId -r)"
-          aws signer wait successful-signing-job --job-id "$JOB_ID"
-
-          SIGNED_OBJECT="$(aws signer describe-signing-job --job-id "${JOB_ID}" --query "signedObject.s3.key" --output=text)"
-
-          echo "Object signed: ${SIGNED_OBJECT}"
-          echo "SIGNED_OBJECT_KEY=${SIGNED_OBJECT}" >> "$GITHUB_OUTPUT"
-
-      - name: Prepare GHA artifact
-        id: create_artifact
-        run: |
-          artifact_dir="/tmp/artifacts"
-
-          mkdir -p "${artifact_dir}"
-
-          aws s3api get-object \
-            --bucket ${{ env.DESTINATION_BUCKET }} \
-            --key ${{ steps.sign-module.outputs.SIGNED_OBJECT_KEY }} \
-            "${artifact_dir}/${{ matrix.module }}.zip"
-
-          {
-            echo "artifact_dir=${artifact_dir}"
-            echo "code_sha=${{ github.sha }}"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Upload artifacts
-        id: upload-artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: signed-${{ matrix.module }}
-          path: "${{ steps.create_artifact.outputs.artifact_dir }}/"
-
-  deploy:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    permissions:
-      id-token: write
-      contents: read
-    needs:
-      - pr-data
-      - build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        run: yarn run build:all
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
-          role-to-assume: ${{ env.DEPLOY_ROLE }}
+          role-to-assume: ${{ secrets.GHA_BUILD_ROLE }}
           aws-region: eu-west-2
 
-      - name: Download signed artifacts
-        id: download_artifact
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+      - name: SAM build
+        run: |
+          sam validate --lint -t template.yaml
+          sam build --parallel -t template.yaml
+
+      - name: Deploy SAM app # synthetics-directory is used for synthetics canary Artifacts upload to S3
+        uses: govuk-one-login/devplatform-upload-action@fda75612a1b0e5a8c84ae7c44a23340e50e5bbde #v3.11.0
         with:
-          pattern: signed-*
-          path: ci/terraform/artifacts/
-          merge-multiple: true
-
-      - name: Rename Canary -> Smoke Tests
-        working-directory: ci/terraform/artifacts/
-        run: |
-          mv canary.zip smoke-tests.zip
-
-      - name: Upload Smoke Tests Terraform files
-        working-directory: ci/terraform
-        run: |
-          echo "::group::Zip up Smoke Tests terraform"
-          zip -r smoke-test.zip .
-          echo "::endgroup::"
-
-          echo "::group::Upload artifact to S3"
-          OBJECT_VERSION="$(aws s3api put-object \
-            --bucket ${{ env.ARTIFACT_BUCKET }} \
-            --key smoke-test.zip \
-            --body smoke-test.zip \
-            --metadata '${{ toJson(fromJson(needs.pr-data.outputs.data)) }}' \
-            --query VersionId --output text)"
-          echo "::endgroup::"
-          echo "::notice title=Final artifact uploaded to S3::object: smoke-test.zip, version: ${OBJECT_VERSION}"
+          artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET }}
+          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          template-file: .aws-sam/build/template.yaml
+          synthetics-directory: ./dist
