@@ -1,21 +1,3 @@
-terraform {
-  required_version = ">= 1.9.8"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "5.75.1"
-    }
-    time = {
-      source  = "hashicorp/time"
-      version = "0.12.1"
-    }
-  }
-
-  backend "s3" {
-  }
-}
-
 locals {
   smoke_tests_default_tags = {
     Environment = var.environment
@@ -64,7 +46,5 @@ provider "aws" {
 provider "time" {}
 
 data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
 
 data "aws_partition" "current" {}

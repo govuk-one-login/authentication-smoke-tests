@@ -10,27 +10,23 @@ repos:
 
   - repo: local
     hooks:
-      - id: tfupdate-lock
-        name: update terraform lock files (may take a while)
+      - id: tflint
+        name: Run tflint (terraform linter)
+        files: ^ci/terraform/
+        require_serial: true
+        types_or:
+          - hcl
+          - terraform
         language: golang
         additional_dependencies:
-          - github.com/minamijoyo/tfupdate@v0.8.2
-        entry: tfupdate lock
-        types:
-          - file
-          - terraform
-        pass_filenames: false
+          - github.com/terraform-linters/tflint@v0.55.0
+        entry: scripts/tflint.py
         args:
-          - --platform=linux_amd64
-          - --platform=linux_arm64
-          - --platform=darwin_amd64
-          - --platform=darwin_arm64
-          - --platform=windows_amd64
-          - -r
-          - .
+          - --minimum-failure-severity=warning
+          - --fix
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.96.2
+    rev: v1.97.3
     hooks:
       - id: terraform_fmt
 
@@ -89,13 +85,37 @@ repos:
           - -s # simplify
           - -l # list files that differ
 
+      - id: tfupdate-lock
+        name: Update terraform provider locks
+        files: "/versions.tf$"
+        pass_filenames: false
+        types:
+          - file
+        language: golang
+        additional_dependencies:
+          - github.com/minamijoyo/tfupdate@v0.8.5
+        entry: tfupdate lock
+        args:
+          - --platform
+          - linux_amd64
+          - --platform
+          - linux_arm64
+          - --platform
+          - darwin_amd64
+          - --platform
+          - darwin_arm64
+          - --platform
+          - windows_amd64
+          - -r
+          - ci/terraform
+
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
     hooks:
       - id: shellcheck
 
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.4
+    rev: v1.7.7
     hooks:
       - id: actionlint
 
@@ -103,3 +123,10 @@ repos:
     rev: v1.3.0
     hooks:
       - id: check-gha-pinning
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.6
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
