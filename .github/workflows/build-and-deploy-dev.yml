@@ -1,4 +1,4 @@
-name: "Dev SP: Build and deploy smoke tests"
+name: "Dev: Build and deploy smoke tests"
 # This workflow builds and deploys smoke tests to the strategic development environment.
 
 on: workflow_dispatch
