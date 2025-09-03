@@ -1,4 +1,4 @@
-name: "Build SP: Build and deploy smoke tests"
+name: "Build : Build and deploy smoke tests"
 # This workflow builds and deploys smoke tests for the authentication module.
 
 on:
