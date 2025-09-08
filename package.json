@@ -29,8 +29,8 @@
     "express-openid-connect": "^2.18.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.34.0",
-    "eslint": "^9.34.0",
+    "@eslint/js": "^9.35.0",
+    "eslint": "^9.35.0",
     "eslint-plugin-n": "^17.21.3",
     "globals": "^16.3.0",
     "prettier": "^3.6.2"
