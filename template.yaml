@@ -140,7 +140,7 @@ Mappings:
       BackendAccountID: "761723964695"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartSignInCanaryAfterCreation: true
-      StartCraCanaryAfterCreation: false
+      StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: false
       IsSlackNotifyEnabled: "No"
       IsPagerDutyEnabled: "No"
