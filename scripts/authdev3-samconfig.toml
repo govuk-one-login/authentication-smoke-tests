@@ -1,0 +1,11 @@
+version = 0.1
+[authdev3.deploy.parameters]
+stack_name = "authdev3-smoke-test-canary"
+resolve_s3 = false
+s3_bucket = "authdev3-smoke-test-githubartifactsourcebucket"
+region = "eu-west-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_NAMED_IAM"
+parameter_overrides = "VpcStackName=\"vpc\" Environment=\"authdev3\" CodeSigningConfigArn=\"arn:aws:lambda:eu-west-2:975050272416:code-signing-config:csc-006e0d5d35d5a5545\" LambdaDeploymentPreference=\"AllAtOnce\" LoggingSubscriptionEndpointArn=\"arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2\""
+image_repositories = []
+signing_profiles = "AlertsLambdaFunction=\"SigningProfile_bdzyxbYzrSD8\" HeartbeatLambdaFunction=\"SigningProfile_bdzyxbYzrSD8\""
