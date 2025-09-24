@@ -47,6 +47,7 @@ Parameters:
       - staging
       - production
       - integration
+      - authdev3
 
   LoggingSubscriptionEndpointArn:
     Type: String
@@ -93,6 +94,23 @@ Conditions:
 
 Mappings:
   EnvironmentConfiguration:
+    authdev3:
+      cloudwatchLogRetentionInDays: 30
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::653994557586:role/authdev3/oidc-email/execution-role2025060210224139980000008c
+      SlackChannelId: C06HMLMEQ1W
+      MetricAlarmsEnabled: "Yes"
+      HeartbeatPingEnabled: "Yes"
+      ArtifactSourceBucket: authdev3-smoke-test-githubartifactsourcebucket
+      IsSplunkEnabled: "No"
+      BackendAccountID: "653994557586"
+      SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartSignInCanaryAfterCreation: false
+      StartCraCanaryAfterCreation: false
+      StartIPVCanaryAfterCreation: false
+      IsSlackNotifyEnabled: "No"
+      IsPagerDutyEnabled: "No"
+
     dev:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
@@ -104,6 +122,8 @@ Mappings:
       IsSplunkEnabled: "No"
       BackendAccountID: "653994557586"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartSignInCanaryAfterCreation: false
+      StartCraCanaryAfterCreation: false
       StartIPVCanaryAfterCreation: false
       IsSlackNotifyEnabled: "No"
       IsPagerDutyEnabled: "No"
@@ -119,6 +139,8 @@ Mappings:
       IsSplunkEnabled: "No"
       BackendAccountID: "761723964695"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartSignInCanaryAfterCreation: true
+      StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: false
       IsSlackNotifyEnabled: "No"
       IsPagerDutyEnabled: "No"
@@ -134,6 +156,8 @@ Mappings:
       IsSplunkEnabled: "Yes"
       BackendAccountID: "758531536632"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartSignInCanaryAfterCreation: true
+      StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
       IsSlackNotifyEnabled: "Yes"
       IsPagerDutyEnabled: "No"
@@ -149,6 +173,8 @@ Mappings:
       IsSplunkEnabled: "Yes"
       BackendAccountID: "761723964695"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      StartSignInCanaryAfterCreation: true
+      StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
       IsSlackNotifyEnabled: "Yes"
       IsPagerDutyEnabled: "No"
@@ -164,6 +190,8 @@ Mappings:
       IsSplunkEnabled: "Yes"
       BackendAccountID: "172348255554"
       SmokeTestCronExpression: "cron(0/01 * * * ? *)"
+      StartSignInCanaryAfterCreation: true
+      StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
       IsSlackNotifyEnabled: "Yes"
       IsPagerDutyEnabled: "Yes"
@@ -939,7 +967,12 @@ Resources:
             !Ref Environment,
             SmokeTestCronExpression,
           ]
-      StartCanaryAfterCreation: true
+      StartCanaryAfterCreation:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          StartSignInCanaryAfterCreation,
+        ]
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
@@ -1063,7 +1096,12 @@ Resources:
             !Ref Environment,
             SmokeTestCronExpression,
           ]
-      StartCanaryAfterCreation: true
+      StartCanaryAfterCreation:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          StartCraCanaryAfterCreation,
+        ]
       RunConfig:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
