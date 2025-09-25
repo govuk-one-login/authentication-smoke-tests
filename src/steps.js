@@ -28,6 +28,8 @@ const clickSignIn = async (page) => {
     ]);
     await validateUrlContains("enter-email", page);
   });
+  log.info("TESTING");
+  log.info(await page.request().headers());
 };
 
 const enterEmail = async (page, email) => {
