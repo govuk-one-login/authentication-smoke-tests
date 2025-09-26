@@ -17,6 +17,11 @@ if ! command -v sam &> /dev/null; then
   exit 1
 fi
 
+if ! command -v yq &> /dev/null; then
+  echo "Deploying template requires yq  'brew install yq' "
+  exit 1
+fi
+
 function sso_login() {
   export AWS_ACCOUNT=di-authentication-development
   export AWS_PROFILE=di-authentication-development-AWSAdministratorAccess
@@ -47,11 +52,19 @@ sso_login
 
 aws s3 cp "${DIR}/dist/synthetics.zip" s3://authdev3-smoke-test-githubartifactsourcebucket/synthetics.zip
 
+S3objectVersion=$(aws s3api head-object --bucket authdev3-smoke-test-githubartifactsourcebucket --key synthetics.zip --query 'VersionId' --output text)
+
 echo "Lint template file"
 sam validate --lint
 
 echo "Running sam build on template file"
 sam build --parallel
+
+yq -i ".Resources.SignInCanary.Properties.Code.S3ObjectVersion = \"${S3objectVersion}\"" ".aws-sam/build/template.yaml"
+
+yq -i ".Resources.SignInWithIPVCanary.Properties.Code.S3ObjectVersion = \"${S3objectVersion}\"" ".aws-sam/build/template.yaml"
+
+yq -i ".Resources.CreateAccountCanary.Properties.Code.S3ObjectVersion = \"${S3objectVersion}\"" ".aws-sam/build/template.yaml"
 
 sam deploy \
   --no-fail-on-empty-changeset \
