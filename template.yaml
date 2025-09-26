@@ -1710,50 +1710,80 @@ Resources:
       SourceArn: !GetAtt CreateAccountHeartbeatRule.Arn
 
   GetS3VersionFunction:
-    Type: AWS::Serverless::Function
+    Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Sub "${Environment}-get-s3-version"
       Runtime: nodejs20.x
       Handler: index.handler
-      InlineCode: |
-        const { S3Client, HeadObjectCommand } = require('@aws-sdk/client-s3');
-        const response = require('cfn-response');
+      Role: !GetAtt GetS3VersionRole.Arn
+      Code:
+        ZipFile: |
+          const { S3Client, HeadObjectCommand } = require('@aws-sdk/client-s3');
+          const response = require('cfn-response');
 
-        exports.handler = async (event, context) => {
-            const s3 = new S3Client({});
+          exports.handler = async (event, context) => {
+              const s3 = new S3Client({});
 
-            try {
-                const { Bucket, Key } = event.ResourceProperties;
+              try {
+                  const { Bucket, Key } = event.ResourceProperties;
 
-                const command = new HeadObjectCommand({ Bucket, Key });
-                const result = await s3.send(command);
+                  const command = new HeadObjectCommand({ Bucket, Key });
+                  const result = await s3.send(command);
 
-                await response.send(event, context, response.SUCCESS, {
-                    Version: result.VersionId || 'null'
-                });
-            } catch (error) {
-                console.error('Error:', error);
-                await response.send(event, context, response.FAILED, {});
-            }
-        };
+                  await response.send(event, context, response.SUCCESS, {
+                      Version: result.VersionId || 'null'
+                  });
+              } catch (error) {
+                  console.error('Error:', error);
+                  await response.send(event, context, response.FAILED, {});
+              }
+          };
+
+  GetS3VersionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
       Policies:
-        - AWSLambdaBasicExecutionRole
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Action:
-                - s3:GetObject
-                - s3:GetObjectVersion
-              Resource: !Sub
-                - "${BucketArn}/*"
-                - BucketArn: !Sub
-                    - "arn:aws:s3:::${Bucket}"
-                    - Bucket:
-                        !FindInMap [
-                          EnvironmentConfiguration,
-                          !Ref Environment,
-                          ArtifactSourceBucket,
-                        ]
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource: !Sub
+                  - "${BucketArn}/*"
+                  - BucketArn: !Sub
+                      - "arn:aws:s3:::${Bucket}"
+                      - Bucket:
+                          !FindInMap [
+                            EnvironmentConfiguration,
+                            !Ref Environment,
+                            ArtifactSourceBucket,
+                          ]
+      PermissionsBoundary:
+        !If [
+          UsePermissionsBoundary,
+          !Ref PermissionsBoundary,
+          !Ref AWS::NoValue,
+        ]
 
   GetSyntheticsZipVersion:
     Type: AWS::CloudFormation::CustomResource
