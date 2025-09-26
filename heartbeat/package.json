@@ -6,6 +6,9 @@
   "dependencies": {
     "cronitor": "^2.5.1"
   },
+  "resolutions": {
+    "axios": "^1.12.0"
+  },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/heartbeat.zip ."
   }
