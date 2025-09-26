@@ -8,4 +8,4 @@ confirm_changeset = true
 capabilities = "CAPABILITY_NAMED_IAM"
 parameter_overrides = "VpcStackName=\"vpc\" Environment=\"authdev3\" CodeSigningConfigArn=\"arn:aws:lambda:eu-west-2:975050272416:code-signing-config:csc-006e0d5d35d5a5545\" LambdaDeploymentPreference=\"AllAtOnce\" LoggingSubscriptionEndpointArn=\"arn:aws:logs:eu-west-2:885513274347:destination:csls_cw_logs_destination_prodpython-2\""
 image_repositories = []
-signing_profiles = "AlertsLambdaFunction=\"SigningProfile_bdzyxbYzrSD8\" HeartbeatLambdaFunction=\"SigningProfile_bdzyxbYzrSD8\""
+signing_profiles = "AlertsLambdaFunction=\"SigningProfile_bdzyxbYzrSD8\" GetS3VersionFunction\"SigningProfile_bdzyxbYzrSD8\" HeartbeatLambdaFunction=\"SigningProfile_bdzyxbYzrSD8\""
