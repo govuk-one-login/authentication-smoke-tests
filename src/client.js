@@ -2,7 +2,7 @@ const log = require("SyntheticsLogger");
 const express = require("express");
 const app = express();
 const { auth } = require("express-openid-connect");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 
 const startClient = async (
   port,

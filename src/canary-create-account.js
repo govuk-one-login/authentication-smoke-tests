@@ -2,7 +2,7 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 const steps = require("./steps");
 const { setStandardViewportSize } = require("./helpers");
 
@@ -20,11 +20,11 @@ const deleteSyntheticsUser = async function (res) {
   return new Promise((resolve) => {
     if (
       res.statusCode < 200 ||
-      (res.statusCode > 299 && !res.statusCode == 404)
+      (res.statusCode > 299 && res.statusCode !== 404)
     ) {
       throw res.statusCode + " " + res.statusMessage;
     }
-    if (res.statusCode == 404) {
+    if (res.statusCode === 404) {
       log.warn(
         "synthetics-user not found for deletion, OK to continue the test"
       );
