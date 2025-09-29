@@ -26,6 +26,8 @@ const basicCustomEntryPoint = async () => {
   const issuerBaseURL = await getParameter("issuer-base-url");
   const clientPrivateKey = await getParameter("client-private-key");
 
+  const testHeader = await getParameter("test-header");
+
   server = await startClient(
     3031,
     "openid email phone",
@@ -39,6 +41,11 @@ const basicCustomEntryPoint = async () => {
   await emptyOtpBucket(bucketName, phoneNumber);
 
   const page = await synthetics.getPage();
+
+  let headers = {};
+  headers["test-header"] = testHeader;
+
+  await page.setExtraHTTPHeaders(headers);
 
   await steps.launchClient(
     page,
