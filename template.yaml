@@ -397,6 +397,13 @@ Resources:
       Type: String
       Value: "digital-identity-tech-team+smoke-tests-sign-in@digital.cabinet-office.gov.uk"
 
+  SmokeInTestHeaderParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-in-test-header"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_header}}"
+
   # SignwithIpv Parameters
   SmokeIpvSmsBucketParameter:
     Type: AWS::SSM::Parameter
@@ -468,6 +475,13 @@ Resources:
       Name: !Sub "${Environment}-smoke-ipv-username"
       Type: String
       Value: "digital-identity-tech-team+smoke-tests-ipv@digital.cabinet-office.gov.uk"
+
+  SmokeIpvTestHeaderParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-ipv-test-header"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_header}}"
 
   # SmokeCra Parameters
   SmokeCraSmsBucketParameter:
@@ -554,6 +568,13 @@ Resources:
       Name: !Sub "${Environment}-smoke-cra-test-services-api-key"
       Type: String
       Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/test_services_api_key}}"
+
+  SmokeCraTestHeaderParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-cra-test-header"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_header}}"
 
   # IAM Roles and Policies
   AlertsLambdaExecutionPolicy:
