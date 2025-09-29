@@ -2,7 +2,7 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter, emptyOtpBucket } = require("./aws");
 const { startClient } = require("./client");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 const steps = require("./steps");
 const { setStandardViewportSize } = require("./helpers");
 
@@ -20,11 +20,11 @@ const deleteSyntheticsUser = async function (res) {
   return new Promise((resolve) => {
     if (
       res.statusCode < 200 ||
-      (res.statusCode > 299 && !res.statusCode == 404)
+      (res.statusCode > 299 && res.statusCode !== 404)
     ) {
       throw res.statusCode + " " + res.statusMessage;
     }
-    if (res.statusCode == 404) {
+    if (res.statusCode === 404) {
       log.warn(
         "synthetics-user not found for deletion, OK to continue the test"
       );
@@ -56,6 +56,8 @@ const basicCustomEntryPoint = async () => {
   const issuerBaseURL = await getParameter("issuer-base-url");
   const clientPrivateKey = await getParameter("client-private-key");
 
+  const testHeader = await getParameter("test-header");
+
   if (fireDrill === "1") {
     log.info("Fire Drill! Smoke test will fail.");
     throw "Smoke Test failed due to Fire Drill";
@@ -76,6 +78,11 @@ const basicCustomEntryPoint = async () => {
 
   let page = await synthetics.getPage();
 
+  let headers = {};
+  headers["test-header"] = testHeader;
+
+  await page.setExtraHTTPHeaders(headers);
+
   log.info("Preparing call to synthetics-user DELETE");
   let syntheticsUserDeleteStepOptions = {
     hostname: testServicesApiHostname,
@@ -85,14 +92,14 @@ const basicCustomEntryPoint = async () => {
     protocol: "https:",
   };
 
-  var headers = {};
-  headers["User-Agent"] = [
+  let deleteSyntheticsUserHeaders = {};
+  deleteSyntheticsUserHeaders["User-Agent"] = [
     synthetics.getCanaryUserAgentString(),
-    headers["User-Agent"],
+    deleteSyntheticsUserHeaders["User-Agent"],
   ].join(" ");
-  headers["x-api-key"] = testServicesApiKey;
+  deleteSyntheticsUserHeaders["x-api-key"] = testServicesApiKey;
 
-  syntheticsUserDeleteStepOptions["headers"] = headers;
+  syntheticsUserDeleteStepOptions["headers"] = deleteSyntheticsUserHeaders;
 
   const stepConfig = {
     includeResponseHeaders: true,
