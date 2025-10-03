@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "main": "heartbeat.js",
   "license": "MIT",
+  "engines": {
+    "node": "20.17.x",
+    "npm": ">=10.0.0",
+    "yarn": "Please use npm"
+  },
   "dependencies": {
     "cronitor": "^2.5.1"
   },
