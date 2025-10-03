@@ -7,11 +7,11 @@
   "scripts": {
     "clean": "rm -rf dist && rm -rf node_modules  && rm -rf release-artefacts",
     "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r synthetics.zip nodejs",
-    "build:synthetics": "yarn install --production --frozen-lockfile && yarn run build",
-    "build:alerts": "cd alerts && yarn install --production --frozen-lockfile && yarn run build",
-    "build:heartbeat": "cd heartbeat && yarn install --production --frozen-lockfile && yarn run build",
-    "build:slack": "cd slack && yarn install --production --frozen-lockfile && yarn run build",
-    "build:all": "yarn run build:synthetics && yarn run build:alerts && yarn run build:heartbeat && yarn run build:slack",
+    "build:synthetics": "npm ci --ignore-scripts --omit=dev && npm run build",
+    "build:alerts": "cd alerts && npm ci --ignore-scripts --omit=dev && npm run build",
+    "build:heartbeat": "cd heartbeat && npm ci --ignore-scripts --omit=dev && npm run build",
+    "build:slack": "cd slack && npm ci --ignore-scripts --omit=dev && npm run build",
+    "build:all": "npm run build:synthetics && npm run build:alerts && npm run build:heartbeat && npm run build:slack",
     "pretty": "prettier --write \"**/*.{js,json}\"",
     "check-pretty": "prettier --check \"**/*.{js,json}\"",
     "lint": "eslint ."
