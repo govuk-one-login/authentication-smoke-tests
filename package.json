@@ -4,6 +4,11 @@
   "main": "src/canary.js",
   "repository": "git@github.com:alphagov/di-authentication-smoke-tests.git",
   "license": "MIT",
+  "engines": {
+    "node": "20.17.x",
+    "npm": ">=10.0.0",
+    "yarn": "Please use npm"
+  },
   "scripts": {
     "clean": "rm -rf dist && rm -rf node_modules  && rm -rf release-artefacts",
     "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r synthetics.zip nodejs",
