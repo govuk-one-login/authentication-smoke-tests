@@ -77,13 +77,6 @@ Conditions:
   IsSplunkEnabled: !Equals
     - !FindInMap [EnvironmentConfiguration, !Ref Environment, IsSplunkEnabled]
     - "Yes"
-  IsSlackNotifyEnabled: !Equals
-    - !FindInMap [
-        EnvironmentConfiguration,
-        !Ref Environment,
-        IsSlackNotifyEnabled,
-      ]
-    - "Yes"
   IsPagerDutyEnabled: !Equals
     - !FindInMap [
         EnvironmentConfiguration,
@@ -108,7 +101,6 @@ Mappings:
       StartSignInCanaryAfterCreation: false
       StartCraCanaryAfterCreation: false
       StartIPVCanaryAfterCreation: false
-      IsSlackNotifyEnabled: "No"
       IsPagerDutyEnabled: "No"
 
     dev:
@@ -125,7 +117,6 @@ Mappings:
       StartSignInCanaryAfterCreation: false
       StartCraCanaryAfterCreation: false
       StartIPVCanaryAfterCreation: false
-      IsSlackNotifyEnabled: "No"
       IsPagerDutyEnabled: "No"
 
     build:
@@ -142,7 +133,6 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: false
-      IsSlackNotifyEnabled: "No"
       IsPagerDutyEnabled: "No"
 
     staging:
@@ -159,7 +149,6 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
-      IsSlackNotifyEnabled: "Yes"
       IsPagerDutyEnabled: "No"
 
     integration:
@@ -176,7 +165,6 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
-      IsSlackNotifyEnabled: "Yes"
       IsPagerDutyEnabled: "No"
 
     production:
@@ -193,7 +181,6 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
-      IsSlackNotifyEnabled: "Yes"
       IsPagerDutyEnabled: "Yes"
 
 Globals:
@@ -731,34 +718,8 @@ Resources:
       FunctionName: !Ref AlertsLambdaFunction
       Action: lambda:InvokeFunction
       Principal: sns.amazonaws.com
-      SourceArn: !Sub
-        - arn:aws:sns:${AWS::Region}:${Awsid}:${Environment}-slack-events
-        - {
-            Awsid:
-              !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                BackendAccountID,
-              ],
-          }
+      SourceArn: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-events
       Id: AllowExecutionFromSlackEventsSNSTopic
-
-  SlackEventsSubscription:
-    Type: AWS::SNS::Subscription
-    Condition: IsSlackNotifyEnabled
-    Properties:
-      TopicArn: !Sub
-        - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-events
-        - {
-            AccountID:
-              !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                BackendAccountID,
-              ],
-          }
-      Protocol: lambda
-      Endpoint: !GetAtt AlertsLambdaFunction.Arn
 
   SlackAlertsWithSNSPermission:
     Type: AWS::Lambda::Permission
@@ -766,34 +727,8 @@ Resources:
       FunctionName: !Ref AlertsLambdaFunction
       Action: lambda:InvokeFunction
       Principal: sns.amazonaws.com
-      SourceArn: !Sub
-        - arn:aws:sns:${AWS::Region}:${Awsid}:${Environment}-slack-alerts
-        - {
-            Awsid:
-              !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                BackendAccountID,
-              ],
-          }
+      SourceArn: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
       Id: AllowExecutionFromSlackAlertsSNSTopic
-
-  SlackAlertsStreamSubscription:
-    Type: AWS::SNS::Subscription
-    Condition: IsSlackNotifyEnabled
-    Properties:
-      TopicArn: !Sub
-        - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
-        - {
-            AccountID:
-              !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                BackendAccountID,
-              ],
-          }
-      Protocol: lambda
-      Endpoint: !GetAtt AlertsLambdaFunction.Arn
 
   # OIDC Cloufront Alerts SNS Subscription and lambda permission
   OidcCloudfrontAlertsPermission:
