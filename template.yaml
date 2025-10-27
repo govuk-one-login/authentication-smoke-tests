@@ -161,7 +161,7 @@ Mappings:
       ArtifactSourceBucket: smoke-test-pipeline-artifactpromotionbucket-ddqtd5mulfgn
       IsSplunkEnabled: "Yes"
       BackendAccountID: "761723964695"
-      SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
+      SmokeTestCronExpression: "cron(0/01 8-17 ? * MON-FRI *)"
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
