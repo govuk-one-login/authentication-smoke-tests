@@ -45,7 +45,7 @@ else
 fi
 
 echo "Building deployment artefacts ... "
-yarn run build:all
+npm run build:all
 echo "done!"
 
 sso_login
