@@ -15,4 +15,4 @@ Running `./sam-deploy-authdev3.sh` will trigger a local SAM deploy on current ch
 ## Formatting
 
 Run formatting on the javascript files:
-`$ yarn lint`
+`$ npm run lint`
