@@ -22,7 +22,7 @@ repos:
         types_or:
           - javascript
           - ts
-        entry: yarn run eslint --fix
+        entry: npm run eslint --fix
         pass_filenames: true
       - id: prettier
         name: Run prettier

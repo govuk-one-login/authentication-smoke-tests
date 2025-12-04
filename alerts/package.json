@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "main": "alerts.js",
   "license": "MIT",
+  "engines": {
+    "node": "20.17.x",
+    "npm": ">=10.0.0",
+    "yarn": "Please use npm"
+  },
   "dependencies": {
     "@aws-sdk/client-ssm": "3.879.0",
     "@aws-sdk/client-sts": "3.879.0"

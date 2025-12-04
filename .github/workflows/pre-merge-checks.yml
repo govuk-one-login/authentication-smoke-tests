@@ -18,13 +18,13 @@ jobs:
         with:
           node-version: "20.17.0"
       - name: Install dependencies
-        run: yarn install
+        run: npm ci --ignore-scripts
       - name: Check formatting
-        run: yarn check-pretty
+        run: npm run check-pretty
       - name: Build app
-        run: yarn build
+        run: npm run build
       - name: Run lint
-        run: yarn lint
+        run: npm run lint
 
   run-sonar-code-analysis:
     name: Run SonarCloud Scan

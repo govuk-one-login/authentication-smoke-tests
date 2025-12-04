@@ -38,14 +38,13 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "20.17.0"
-          cache: "yarn"
-          cache-dependency-path: "yarn.lock"
+          cache: "npm"
 
       - name: 🏗️ Set up SAM CLI
         uses: aws-actions/setup-sam@f664fad9e12492edfc187a31f575537dfbb0ff63 # v2
 
       - name: Install dependencies
-        run: yarn install
+        run: npm ci --ignore-scripts
 
       - name: Run pre-commit
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1

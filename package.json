@@ -4,14 +4,19 @@
   "main": "src/canary.js",
   "repository": "git@github.com:alphagov/di-authentication-smoke-tests.git",
   "license": "MIT",
+  "engines": {
+    "node": "20.17.x",
+    "npm": ">=10.0.0",
+    "yarn": "Please use npm"
+  },
   "scripts": {
     "clean": "rm -rf dist && rm -rf node_modules  && rm -rf release-artefacts",
     "build": "mkdir -p dist/nodejs/node_modules && cp -rf src/* dist/nodejs/node_modules/ && cp -rf node_modules/* dist/nodejs/node_modules/ && cd dist && zip -r synthetics.zip nodejs",
-    "build:synthetics": "yarn install --production --frozen-lockfile && yarn run build",
-    "build:alerts": "cd alerts && yarn install --production --frozen-lockfile && yarn run build",
-    "build:heartbeat": "cd heartbeat && yarn install --production --frozen-lockfile && yarn run build",
-    "build:slack": "cd slack && yarn install --production --frozen-lockfile && yarn run build",
-    "build:all": "yarn run build:synthetics && yarn run build:alerts && yarn run build:heartbeat && yarn run build:slack",
+    "build:synthetics": "npm ci --ignore-scripts --omit=dev && npm run build",
+    "build:alerts": "cd alerts && npm ci --ignore-scripts --omit=dev && npm run build",
+    "build:heartbeat": "cd heartbeat && npm ci --ignore-scripts --omit=dev && npm run build",
+    "build:slack": "cd slack && npm ci --ignore-scripts --omit=dev && npm run build",
+    "build:all": "npm run build:synthetics && npm run build:alerts && npm run build:heartbeat && npm run build:slack",
     "pretty": "prettier --write \"**/*.{js,json}\"",
     "check-pretty": "prettier --check \"**/*.{js,json}\"",
     "lint": "eslint ."
@@ -24,9 +29,13 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.879.0",
     "@aws-sdk/client-ssm": "^3.879.0",
+    "body-parser": "2.2.1",
     "crypto": "^1.0.1",
     "express": "^5.1.0",
     "express-openid-connect": "^2.18.1"
+  },
+  "overrides": {
+    "body-parser": "2.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
