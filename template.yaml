@@ -90,6 +90,7 @@ Mappings:
     authdev3:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::653994557586:role/authdev3/oidc-email/execution-role2025060210224139980000008c
       SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
@@ -105,6 +106,7 @@ Mappings:
     dev:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::653994557586:role/dev/oidc-email/execution-role2025032612571369280000008d
       SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
@@ -120,6 +122,7 @@ Mappings:
     build:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::761723964695:role/build/oidc-email/execution-role20211112165141425900000006
       SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
@@ -135,6 +138,7 @@ Mappings:
     staging:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::758531536632:role/staging/oidc-email/execution-role20220325174827331600000020
       SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
@@ -150,6 +154,7 @@ Mappings:
     integration:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::761723964695:role/integration/oidc-email/execution-role2021111513000675590000000f
       SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
@@ -165,6 +170,7 @@ Mappings:
     production:
       cloudwatchLogRetentionInDays: 30
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables
+      EmailSqsLambdaRoleArn: arn:aws:iam::172348255554:role/production/oidc-email/execution-role20211115130009912000000012
       SlackChannelId: C06HMLMEQ1W
       MetricAlarmsEnabled: "Yes"
       HeartbeatPingEnabled: "Yes"
@@ -262,6 +268,31 @@ Resources:
           Value: !Ref Environment
         - Key: Application
           Value: smoke-tests
+
+  SmoketestSmsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SmoketestSmsBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "WritetoSqsEmailNotificationLambda"
+            Effect: "Allow"
+            Principal:
+              AWS:
+                !FindInMap [
+                  EnvironmentConfiguration,
+                  !Ref Environment,
+                  EmailSqsLambdaRoleArn,
+                ]
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:DeleteObject"
+              - "s3:ListBucket"
+            Resource:
+              - !GetAtt SmoketestSmsBucket.Arn
+              - !Sub "${SmoketestSmsBucket.Arn}/*"
 
   SmokeTestArtefactBucket: # Bucket to store artefacts generated from the smoke test canary
     Type: AWS::S3::Bucket
@@ -902,13 +933,6 @@ Resources:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: false
-      VPCConfig:
-        SecurityGroupIds:
-          - !Ref CanarySecurityGroup
-        SubnetIds:
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
       Code:
         #S3Bucket: !Ref SmokeTestSourceBucket
         S3Bucket:
@@ -974,13 +998,6 @@ Resources:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: false
-      VPCConfig:
-        SecurityGroupIds:
-          - !Ref CanarySecurityGroup
-        SubnetIds:
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
       Code:
         S3Bucket:
           !FindInMap [
@@ -1045,13 +1062,6 @@ Resources:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: false
-      VPCConfig:
-        SecurityGroupIds:
-          - !Ref CanarySecurityGroup
-        SubnetIds:
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
       Code:
         S3Bucket:
           !FindInMap [
@@ -1094,36 +1104,6 @@ Resources:
       FilterPattern: ""
       LogGroupName: !Ref CreateAccountCanaryLogGroup
 
-  # Security Group for Canaries
-  CanarySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for Synthetics Canaries
-      VpcId:
-        Fn::ImportValue: !Sub ${VpcStackName}-VpcId
-      SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-          Description: HTTPS outbound for internet
-        - Description: Allow outbound traffic to vpc endpoints
-          IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          DestinationSecurityGroupId:
-            Fn::ImportValue: !Sub ${VpcStackName}-AWSServicesEndpointSecurityGroupId
-        - DestinationPrefixListId: pl-7ca54015 # See https://docs.aws.amazon.com/vpc/latest/userguide/working-with-aws-managed-prefix-lists.html
-          Description: Allow outgoing HTTPS requests to AWS S3 route from security group
-          IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Application
-          Value: smoke-tests
-
   # Common IAM policies
   CanaryBasePolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -1149,21 +1129,6 @@ Resources:
             Action:
               - cloudwatch:PutMetricData
             Resource: "*"
-          - Sid: AllowVPCAccess
-            Effect: Allow
-            Action:
-              - ec2:CreateNetworkInterface
-              - ec2:DescribeNetworkInterfaces
-              - ec2:DeleteNetworkInterface
-              - ec2:AttachNetworkInterface
-              - ec2:DetachNetworkInterface
-            Resource: "*"
-            Condition:
-              ArnLikeIfExists:
-                ec2:Vpc: !Sub
-                  - arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/${VpcId}
-                  - VpcId:
-                      Fn::ImportValue: !Sub ${VpcStackName}-VpcId
           - Sid: AllowKMSDecrypt
             Effect: Allow
             Action:
@@ -1353,12 +1318,30 @@ Resources:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
       OKActions:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
   SignInCanaryAlarmP2:
     Type: AWS::CloudWatch::Alarm
@@ -1381,12 +1364,30 @@ Resources:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
       OKActions:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
   # CloudWatch Alarms create canary
   CreateAccountCanaryAlarmP1:
@@ -1410,12 +1411,30 @@ Resources:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
       OKActions:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
   CreateAccountCanaryAlarmP2:
     Type: AWS::CloudWatch::Alarm
@@ -1438,13 +1457,30 @@ Resources:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
       OKActions:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
   # CloudWatch Alarms signInWithIPVCanary
   SignInWithIPVCanaryAlarmP1:
@@ -1468,12 +1504,30 @@ Resources:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
       OKActions:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
   SignInWithIPVCanaryAlarmP2:
     Type: AWS::CloudWatch::Alarm
@@ -1496,12 +1550,30 @@ Resources:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
       OKActions:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+          - !Sub
+            - arn:aws:sns:${AWS::Region}:${AccountID}:${Environment}-slack-alerts
+            - {
+                AccountID:
+                  !FindInMap [
+                    EnvironmentConfiguration,
+                    !Ref Environment,
+                    BackendAccountID,
+                  ],
+              }
 
   # CloudWatch Events for Heartbeat
   SignInCanaryHeartbeatRule:
