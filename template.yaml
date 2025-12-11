@@ -902,13 +902,6 @@ Resources:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: false
-      VPCConfig:
-        SecurityGroupIds:
-          - !Ref CanarySecurityGroup
-        SubnetIds:
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
       Code:
         #S3Bucket: !Ref SmokeTestSourceBucket
         S3Bucket:
@@ -974,13 +967,6 @@ Resources:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: false
-      VPCConfig:
-        SecurityGroupIds:
-          - !Ref CanarySecurityGroup
-        SubnetIds:
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
       Code:
         S3Bucket:
           !FindInMap [
@@ -1045,13 +1031,6 @@ Resources:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: false
-      VPCConfig:
-        SecurityGroupIds:
-          - !Ref CanarySecurityGroup
-        SubnetIds:
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
       Code:
         S3Bucket:
           !FindInMap [
@@ -1094,36 +1073,6 @@ Resources:
       FilterPattern: ""
       LogGroupName: !Ref CreateAccountCanaryLogGroup
 
-  # Security Group for Canaries
-  CanarySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for Synthetics Canaries
-      VpcId:
-        Fn::ImportValue: !Sub ${VpcStackName}-VpcId
-      SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-          Description: HTTPS outbound for internet
-        - Description: Allow outbound traffic to vpc endpoints
-          IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          DestinationSecurityGroupId:
-            Fn::ImportValue: !Sub ${VpcStackName}-AWSServicesEndpointSecurityGroupId
-        - DestinationPrefixListId: pl-7ca54015 # See https://docs.aws.amazon.com/vpc/latest/userguide/working-with-aws-managed-prefix-lists.html
-          Description: Allow outgoing HTTPS requests to AWS S3 route from security group
-          IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-      Tags:
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Application
-          Value: smoke-tests
-
   # Common IAM policies
   CanaryBasePolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -1149,21 +1098,6 @@ Resources:
             Action:
               - cloudwatch:PutMetricData
             Resource: "*"
-          - Sid: AllowVPCAccess
-            Effect: Allow
-            Action:
-              - ec2:CreateNetworkInterface
-              - ec2:DescribeNetworkInterfaces
-              - ec2:DeleteNetworkInterface
-              - ec2:AttachNetworkInterface
-              - ec2:DetachNetworkInterface
-            Resource: "*"
-            Condition:
-              ArnLikeIfExists:
-                ec2:Vpc: !Sub
-                  - arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/${VpcId}
-                  - VpcId:
-                      Fn::ImportValue: !Sub ${VpcStackName}-VpcId
           - Sid: AllowKMSDecrypt
             Effect: Allow
             Action:
@@ -1439,7 +1373,6 @@ Resources:
           - IsPagerDutyEnabled
           - !Ref PagerDutyP2Alerts
           - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-
       OKActions:
         - !If
           - IsPagerDutyEnabled
