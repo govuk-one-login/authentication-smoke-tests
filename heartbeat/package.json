@@ -9,7 +9,7 @@
     "yarn": "Please use npm"
   },
   "dependencies": {
-    "cronitor": "^2.5.1"
+    "cronitor": "^2.6.0"
   },
   "overrides": {
     "js-yaml": "4.1.1"
