@@ -12,7 +12,8 @@
     "cronitor": "^2.6.0"
   },
   "overrides": {
-    "js-yaml": "4.1.1"
+    "js-yaml": "4.1.1",
+    "axios": "1.13.5"
   },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/heartbeat.zip ."
