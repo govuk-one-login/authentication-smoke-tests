@@ -11,6 +11,7 @@
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.989.0",
     "@aws-sdk/client-sts": "^3.989.0",
+    "@aws-sdk/xml-builder": "^3.972.5",
     "fast-xml-parser": ">=5.3.6"
   },
   "scripts": {
