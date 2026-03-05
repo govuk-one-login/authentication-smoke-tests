@@ -47,6 +47,18 @@ jobs:
           sam validate --lint -t template.yaml
           sam build --parallel -t template.yaml
 
+      - name: Extract PR number and commit message
+        id: version_info
+        run: |
+          HEAD_MESSAGE=$(git log -1 --format=%s)
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          if [[ "$HEAD_MESSAGE" =~ \(#([0-9]+)\) ]]; then
+            VERSION="#${BASH_REMATCH[1]} - ${HEAD_MESSAGE}"
+          else
+            VERSION="${SHORT_SHA}${HEAD_MESSAGE:+: $HEAD_MESSAGE}"
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
       - name: Deploy SAM app # synthetics-directory is used for synthetics canary Artifacts upload to S3
         uses: govuk-one-login/devplatform-upload-action@ac4a243a86c2017f5360b83d737dea4268dcf38a #v3.11.1
         with:
@@ -54,3 +66,4 @@ jobs:
           signing-profile-name: ${{ secrets.DEV_SIGNING_PROFILE_NAME }}
           template-file: .aws-sam/build/template.yaml
           synthetics-directory: ./dist
+          version: ${{ steps.version_info.outputs.version }}
