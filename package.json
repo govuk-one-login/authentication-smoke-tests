@@ -35,7 +35,8 @@
     "express-openid-connect": "^2.18.1"
   },
   "overrides": {
-    "body-parser": "2.2.1"
+    "body-parser": "2.2.1",
+    "fast-xml-parser": ">=5.5.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
