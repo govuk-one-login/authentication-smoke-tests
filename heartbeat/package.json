@@ -13,7 +13,7 @@
   },
   "overrides": {
     "js-yaml": "4.1.1",
-    "axios": "1.13.5"
+    "axios": "1.15.0"
   },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/heartbeat.zip ."
