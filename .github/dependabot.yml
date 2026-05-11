@@ -3,8 +3,8 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: daily
-      time: "03:00"
+      interval: "cron"
+      cronjob: "0 3 1,15 * *"
     cooldown:
       default-days: 7
     groups:
@@ -21,8 +21,8 @@ updates:
   - package-ecosystem: "npm"
     directory: /alerts
     schedule:
-      interval: daily
-      time: "03:00"
+      interval: "cron"
+      cronjob: "0 3 1,15 * *"
     groups:
       npm-aws-dependencies:
         patterns:
@@ -34,8 +34,8 @@ updates:
   - package-ecosystem: "npm"
     directory: /heartbeat
     schedule:
-      interval: daily
-      time: "03:00"
+      interval: "cron"
+      cronjob: "0 3 1,15 * *"
     open-pull-requests-limit: 100
     target-branch: main
     commit-message:
@@ -43,8 +43,8 @@ updates:
   - package-ecosystem: "npm"
     directory: /slack
     schedule:
-      interval: daily
-      time: "03:00"
+      interval: "cron"
+      cronjob: "0 3 1,15 * *"
     groups:
       npm-aws-dependencies:
         patterns:
@@ -56,8 +56,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      # Check for updates to GitHub Actions every week
-      interval: "weekly"
+      interval: "cron"
+      cronjob: "0 3 1,15 * *"
     open-pull-requests-limit: 10
     groups:
       gha-all-dependencies:
