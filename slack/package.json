@@ -4,7 +4,7 @@
   "main": "slack.js",
   "license": "MIT",
   "engines": {
-    "node": "20.17.x",
+    "node": "22.22.x",
     "npm": ">=10.0.0",
     "yarn": "Please use npm"
   },
