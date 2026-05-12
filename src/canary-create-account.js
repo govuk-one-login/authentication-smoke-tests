@@ -144,7 +144,12 @@ const basicCustomEntryPoint = async () => {
 
   await steps.submitPhoneNumber(page);
 
-  await steps.enterOtpCode(page, phoneNumber, bucketName);
+  await steps.enterOtpCode(
+    page,
+    phoneNumber,
+    bucketName,
+    "Enter phone OTP code"
+  );
 
   await steps.submitPhoneOTP(page);
 
