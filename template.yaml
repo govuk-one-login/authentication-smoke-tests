@@ -504,7 +504,7 @@ Resources:
     Properties:
       Name: !Sub "${Environment}-smoke-cra-username"
       Type: String
-      Value: "simulate-delivered@notifications.service.gov.uk"
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/synthetics_user}}"
 
   SmokeCraTestServicesApiHostnameParameter:
     Type: AWS::SSM::Parameter
