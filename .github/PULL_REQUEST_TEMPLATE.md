@@ -8,7 +8,7 @@
 For example:
 
 1. Code Review
-1. Deploy to sandpit with `./deploy-sandpit.sh -a`
+1. Deploy to authdev3 with `./sam-deploy-authdevs.sh`
 1. Ensure that resources `x`, `y` and `z` were not changed
 1. Visit [some url](https://some.sandpit.url/to/visit)
 1. Log in
