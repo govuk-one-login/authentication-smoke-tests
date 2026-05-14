@@ -33,11 +33,6 @@ Parameters:
     Type: String
     Default: none
 
-  RuntimeVersion:
-    Type: String
-    Description: "The runtime version for the canary"
-    Default: "syn-nodejs-puppeteer-10.0"
-
   Environment:
     Description: "The name of the environment to deploy to"
     Type: "String"
@@ -184,7 +179,7 @@ Globals:
     KmsKeyArn: !GetAtt KmsKey.Arn
     PermissionsBoundary:
       !If [UsePermissionsBoundary, !Ref PermissionsBoundary, !Ref AWS::NoValue]
-    Runtime: nodejs20.x
+    Runtime: nodejs22.x
     Timeout: 30
     MemorySize: 512
     Architectures:
@@ -884,7 +879,7 @@ Resources:
         - - "s3://"
           - !Ref SmokeTestArtefactBucket
       ExecutionRoleArn: !GetAtt SyntheticsCanaryRoleSmokeIn.Arn
-      RuntimeVersion: !Ref RuntimeVersion
+      RuntimeVersion: syn-nodejs-puppeteer-15.0
       Schedule:
         Expression:
           !FindInMap [
@@ -949,7 +944,7 @@ Resources:
         - - "s3://"
           - !Ref SmokeTestArtefactBucket
       ExecutionRoleArn: !GetAtt SyntheticsCanaryRoleSmokeIpv.Arn
-      RuntimeVersion: !Ref RuntimeVersion
+      RuntimeVersion: syn-nodejs-puppeteer-15.0
       Schedule:
         Expression:
           !FindInMap [
@@ -1013,7 +1008,7 @@ Resources:
         - - "s3://"
           - !Ref SmokeTestArtefactBucket
       ExecutionRoleArn: !GetAtt SyntheticsCanaryRoleSmokeCra.Arn
-      RuntimeVersion: !Ref RuntimeVersion
+      RuntimeVersion: syn-nodejs-puppeteer-15.0
       Schedule:
         Expression:
           !FindInMap [

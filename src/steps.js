@@ -66,16 +66,21 @@ const submitPassword = async (page) => {
   });
 };
 
-const enterOtpCode = async (page, phoneNumber, bucketName) => {
-  await synthetics.executeStep("Enter OTP code", async () => {
+const enterOtpCode = async (
+  page,
+  phoneNumber,
+  bucketName,
+  stepName = "Enter OTP code"
+) => {
+  await synthetics.executeStep(stepName, async () => {
     await page.waitForSelector(selectors.otpCodeInput);
     const otpCode = await getOTPCode(phoneNumber, bucketName);
     await page.type(selectors.otpCodeInput, otpCode);
   });
 };
 
-const submitOtpCode = async (page) => {
-  await synthetics.executeStep("Submit OTP code", async () => {
+const submitOtpCode = async (page, stepName = "Submit OTP code") => {
+  await synthetics.executeStep(stepName, async () => {
     await page.waitForSelector(selectors.submitFormButton);
     await Promise.all([
       page.click(selectors.submitFormButton),
@@ -129,10 +134,13 @@ const clickCreateAccount = async (page) => {
 };
 
 const submitEmailCreate = async (page) => {
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    await waitForNavigationAndClick(page, selectors.submitFormButton);
-  });
+  await synthetics.executeStep(
+    "Submit email for account creation",
+    async () => {
+      await page.waitForSelector(selectors.submitFormButton);
+      await waitForNavigationAndClick(page, selectors.submitFormButton);
+    }
+  );
   await validateUrlContains("check-your-email", page);
 };
 
@@ -145,11 +153,14 @@ const createPassword = async (page, password) => {
 };
 
 const submitCreatePassword = async (page) => {
-  await synthetics.executeStep("Click continue", async () => {
-    await page.waitForSelector(selectors.submitFormButton);
-    await waitForNavigationAndClick(page, selectors.submitFormButton);
-    await validateUrlContains("get-security-codes", page);
-  });
+  await synthetics.executeStep(
+    "Submit password for account creation",
+    async () => {
+      await page.waitForSelector(selectors.submitFormButton);
+      await waitForNavigationAndClick(page, selectors.submitFormButton);
+      await validateUrlContains("get-security-codes", page);
+    }
+  );
 };
 
 const chooseSMSForSecurityCodes = async (page) => {
@@ -160,7 +171,7 @@ const chooseSMSForSecurityCodes = async (page) => {
 };
 
 const submitSecurityCodesChoice = async (page) => {
-  await synthetics.executeStep("Click continue", async () => {
+  await synthetics.executeStep("Submit security codes choice", async () => {
     await page.waitForSelector(selectors.submitFormButton);
     await waitForNavigationAndClick(page, selectors.submitFormButton);
     await validateUrlContains("enter-phone-number", page);
@@ -175,14 +186,14 @@ const enterPhoneNumber = async (page, phoneNumber) => {
 };
 
 const submitPhoneNumber = async (page) => {
-  await synthetics.executeStep("Click continue", async () => {
+  await synthetics.executeStep("Submit phone number", async () => {
     await waitForNavigationAndClick(page, selectors.submitFormButton);
     await validateUrlContains("check-your-phone", page);
   });
 };
 
 const submitPhoneOTP = async (page) => {
-  await synthetics.executeStep("Click continue", async () => {
+  await synthetics.executeStep("Submit phone OTP", async () => {
     await page.waitForSelector(selectors.submitFormButton);
     await waitForNavigationAndClick(page, selectors.submitFormButton);
     await validateUrlContains("account-created", page);
@@ -192,7 +203,7 @@ const submitPhoneOTP = async (page) => {
 // Helper steps
 
 const standardClickContinue = async (page) => {
-  await synthetics.executeStep("Click continue", async () => {
+  await synthetics.executeStep("Click continue to proceed", async () => {
     await page.waitForSelector(selectors.submitFormButton);
     await waitForNavigationAndClick(page, selectors.submitFormButton);
   });
