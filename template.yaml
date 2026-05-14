@@ -58,7 +58,6 @@ Conditions:
         EnvironmentConfiguration,
         !Ref Environment,
         MetricAlarmsEnabled,
-        DefaultValue: "No",
       ]
     - "Yes"
   HeartbeatPingEnabled: !Equals
@@ -66,7 +65,6 @@ Conditions:
         EnvironmentConfiguration,
         !Ref Environment,
         HeartbeatPingEnabled,
-        DefaultValue: "No",
       ]
     - "Yes"
   IsSplunkEnabled: !Equals
