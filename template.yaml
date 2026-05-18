@@ -1010,6 +1010,8 @@ Resources:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: false
+        EnvironmentVariables:
+          DEPLOY_ENVIRONMENT: !Ref Environment
       Code:
         S3Bucket:
           !FindInMap [
