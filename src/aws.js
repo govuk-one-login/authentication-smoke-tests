@@ -6,9 +6,11 @@ const {
 } = require("@aws-sdk/client-s3");
 
 const { SSM } = require("@aws-sdk/client-ssm");
+const { SecretsManager } = require("@aws-sdk/client-secrets-manager");
 
 const synthetics = require("Synthetics");
 const ssm = new SSM();
+const secretsManager = new SecretsManager();
 const s3 = new S3();
 const s3Client = new S3Client();
 
@@ -21,6 +23,18 @@ const getParameter = async (parameterName) => {
   });
 
   return result.Parameter.Value;
+};
+
+const getSecretValue = async (secretPath) => {
+  const result = await secretsManager.getSecretValue({
+    SecretId: secretPath,
+  });
+
+  if (result.SecretString) {
+    return result.SecretString;
+  }
+
+  return result.SecretBinary;
 };
 
 const emptyOtpBucket = async (bucketName, phoneNumber) => {
@@ -53,4 +67,4 @@ const getOTPCode = async (phoneNumber, bucketName) => {
   return otpCode;
 };
 
-module.exports = { getOTPCode, emptyOtpBucket, getParameter };
+module.exports = { getOTPCode, emptyOtpBucket, getParameter, getSecretValue };
