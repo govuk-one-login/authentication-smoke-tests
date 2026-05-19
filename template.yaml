@@ -504,20 +504,6 @@ Resources:
       Type: String
       Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/synthetics_user}}"
 
-  SmokeCraTestServicesApiHostnameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "${Environment}-smoke-cra-test-services-api-hostname"
-      Type: String
-      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/test_services_api_hostname}}"
-
-  SmokeCraTestServicesApiKeyParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "${Environment}-smoke-cra-test-services-api-key"
-      Type: String
-      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/test_services_api_key}}"
-
   SmokeCraTestHeaderParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -1024,6 +1010,8 @@ Resources:
         TimeoutInSeconds: 60
         MemoryInMB: 1024
         ActiveTracing: false
+        EnvironmentVariables:
+          DEPLOY_ENVIRONMENT: !Ref Environment
       Code:
         S3Bucket:
           !FindInMap [
@@ -1196,6 +1184,7 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                 Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/deploy/${Environment}/*"
                   - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/smoketest/${Environment}-smoke-cra-*"
       PermissionsBoundary:
         !If [
