@@ -678,6 +678,24 @@ Resources:
       SourceArn: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
       Id: AllowExecutionFromSlackAlertsSNSTopic
 
+  SlackElasticacheAlertsWithSNSPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AlertsLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Sub
+        - arn:aws:sns:${AWS::Region}:${Awsid}:${Environment}-elasticache-alerts
+        - {
+            Awsid:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                BackendAccountID,
+              ],
+          }
+      Id: AllowExecutionCrossAWSAcctElasticacheAlerts
+
   # OIDC Cloufront Alerts SNS Subscription and lambda permission
   OidcCloudfrontAlertsPermission:
     Type: AWS::Lambda::Permission
