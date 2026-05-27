@@ -23,14 +23,14 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up SAM cli
-        uses: aws-actions/setup-sam@c2a20b1822cc4a6bc594ff7f1dbb658758e383c3 # v2
+        uses: aws-actions/setup-sam@89ddb14d60e682855e3fea4be85b3c56485de310 # v2
         with:
           use-installer: true
           version: 1.159.1
 
-      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: "22.22.2"
           cache: "npm"
@@ -42,7 +42,7 @@ jobs:
         run: npm run build:all
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@acca2b1b2070338fb9fd1ca27ecee81d687e58e5 # v6.1.2
         with:
           role-to-assume: ${{ secrets.GHA_BUILD_ROLE }}
           aws-region: eu-west-2
@@ -65,7 +65,7 @@ jobs:
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Deploy SAM app # synthetics-directory is used for synthetics canary Artifacts upload to S3
-        uses: govuk-one-login/devplatform-upload-action@ac4a243a86c2017f5360b83d737dea4268dcf38a #v3.11.1
+        uses: govuk-one-login/devplatform-upload-action@5879c30205266ad61e8299a4fcea76364530c9c1 #v3.14.0
         with:
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET }}
           signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
