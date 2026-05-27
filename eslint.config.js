@@ -40,4 +40,12 @@ module.exports = [
   {
     ignores: ["eslint.config.js"],
   },
+  {
+    files: ["**/test/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.mocha,
+      },
+    },
+  },
 ];
