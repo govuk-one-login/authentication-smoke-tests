@@ -12,8 +12,18 @@ jobs:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: "22.22.2"
+      - name: Run alerts tests with coverage
+        run: cd alerts && npm ci --ignore-scripts && npm run test:coverage
+      - name: Run slack tests with coverage
+        run: cd slack && npm ci --ignore-scripts && npm run test:coverage
+      - name: Run heartbeat tests with coverage
+        run: cd heartbeat && npm ci --ignore-scripts && npm run test:coverage
       - name: SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # v7.0.0
+        uses: sonarsource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v7.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
