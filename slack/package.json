@@ -22,7 +22,7 @@
     "test:coverage": "npx c8 --reporter=lcov --report-dir=coverage mocha"
   },
   "devDependencies": {
-    "c8": "^10.1.3",
+    "c8": "^11.0.0",
     "chai": "^4.5.0",
     "mocha": "^11.7.5",
     "sinon": "^19.0.2",
