@@ -93,6 +93,7 @@ Mappings:
       StartSignInCanaryAfterCreation: false
       StartCraCanaryAfterCreation: false
       StartIPVCanaryAfterCreation: false
+      StartPasskeyCanaryAfterCreation: false
       IsPagerDutyEnabled: "No"
 
     dev:
@@ -108,6 +109,7 @@ Mappings:
       StartSignInCanaryAfterCreation: false
       StartCraCanaryAfterCreation: false
       StartIPVCanaryAfterCreation: false
+      StartPasskeyCanaryAfterCreation: false
       IsPagerDutyEnabled: "No"
 
     build:
@@ -123,6 +125,7 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: false
+      StartPasskeyCanaryAfterCreation: false
       IsPagerDutyEnabled: "No"
 
     staging:
@@ -138,6 +141,7 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
+      StartPasskeyCanaryAfterCreation: false
       IsPagerDutyEnabled: "No"
 
     integration:
@@ -153,6 +157,7 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
+      StartPasskeyCanaryAfterCreation: false
       IsPagerDutyEnabled: "No"
 
     production:
@@ -168,6 +173,7 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
+      StartPasskeyCanaryAfterCreation: false
       IsPagerDutyEnabled: "Yes"
 
 Globals:
@@ -429,6 +435,63 @@ Resources:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "${Environment}-smoke-ipv-test-header"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_header}}"
+
+  # SmokePasskey Parameters
+  SmokePasskeyStubRpClientPrivateKeyParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-client-private-key"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_private_key}}"
+
+  SmokePasskeyTestClientIDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-client-id"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_client_id}}"
+
+  SmokePasskeyClientBaseUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-client-base-url"
+      Type: String
+      Value: "http://localhost:3033"
+
+  SmokePasskeyIssuerBaseUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-issuer-base-url"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_issuer_base_url}}"
+
+  SmokePasskeyfireDrillParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-fire-drill"
+      Type: String
+      Value: "0"
+
+  SmokePasskeySlackHookUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-slack-hook-url"
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_slack_hook_url}}"
+
+  SmokePasskeyUsernameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-username"
+      Type: String
+      Value: "digital-identity-tech-team+smoke-tests-passkey@digital.cabinet-office.gov.uk"
+
+  SmokePasskeyTestHeaderParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-test-header"
       Type: String
       Value: !Sub "{{resolve:secretsmanager:/deploy/${Environment}/smoke_test_header}}"
 
@@ -1001,6 +1064,70 @@ Resources:
       FilterPattern: ""
       LogGroupName: !Ref SignInWithIPVCanaryLogGroup
 
+  SignInWithPasskeyCanary:
+    Type: AWS::Synthetics::Canary
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey"
+      ArtifactS3Location: !Join
+        - ""
+        - - "s3://"
+          - !Ref SmokeTestArtefactBucket
+      ExecutionRoleArn: !GetAtt SyntheticsCanaryRoleSmokePasskey.Arn
+      RuntimeVersion: syn-nodejs-puppeteer-15.0
+      Schedule:
+        Expression:
+          !FindInMap [
+            EnvironmentConfiguration,
+            !Ref Environment,
+            SmokeTestCronExpression,
+          ]
+      StartCanaryAfterCreation:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          StartPasskeyCanaryAfterCreation,
+        ]
+      RunConfig:
+        TimeoutInSeconds: 60
+        MemoryInMB: 1024
+        ActiveTracing: false
+      Code:
+        S3Bucket:
+          !FindInMap [
+            EnvironmentConfiguration,
+            !Ref Environment,
+            ArtifactSourceBucket,
+          ]
+        S3Key: synthetics.zip
+        Handler: canary-sign-in-with-passkey.handler
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
+  SignInWithPasskeyCanaryLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub
+        - "/aws/lambda/cwsyn-${Environment}-smoke-passkey-${Lambdafunctionid}"
+        - Lambdafunctionid: !GetAtt SignInWithPasskeyCanary.Id
+      RetentionInDays:
+        !FindInMap [
+          EnvironmentConfiguration,
+          !Ref Environment,
+          cloudwatchLogRetentionInDays,
+        ]
+      KmsKeyId: !GetAtt KmsKey.Arn
+
+  SignInWithPasskeyCanarySubscriptionFilter:
+    Condition: IsSplunkEnabled
+    Type: AWS::Logs::SubscriptionFilter
+    Properties:
+      DestinationArn: !Ref LoggingSubscriptionEndpointArn
+      FilterPattern: ""
+      LogGroupName: !Ref SignInWithPasskeyCanaryLogGroup
+
   CreateAccountCanary:
     Type: AWS::Synthetics::Canary
     Properties:
@@ -1265,6 +1392,55 @@ Resources:
         - Key: Application
           Value: smoke-tests
 
+  SyntheticsCanaryRoleSmokePasskey:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref CanaryBasePolicy
+      Policies:
+        - PolicyName: !Sub "${Environment}-smoke-passkey-specific-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AllowS3Publishing
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetBucketLocation
+                Resource:
+                  - !GetAtt SmokeTestArtefactBucket.Arn
+                  - !Sub "${SmokeTestArtefactBucket.Arn}/canary/${AWS::Region}/${Environment}-smoke-passkey/*"
+              - Sid: AllowSSMAccess
+                Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}-smoke-passkey-*"
+              - Sid: AllowSecretsManagerAccess
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/smoketest/${Environment}-smoke-passkey-*"
+      PermissionsBoundary:
+        !If [
+          UsePermissionsBoundary,
+          !Ref PermissionsBoundary,
+          !Ref AWS::NoValue,
+        ]
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: smoke-tests
+
   # CloudWatch Alarms SignInCanary
   SignInCanaryAlarmP1:
     Type: AWS::CloudWatch::Alarm
@@ -1436,6 +1612,63 @@ Resources:
           - !Ref PagerDutyP2Alerts
           - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
 
+  # CloudWatch Alarms SignInWithPasskeyCanary
+  SignInWithPasskeyCanaryAlarmP1:
+    Type: AWS::CloudWatch::Alarm
+    Condition: MetricAlarmsEnabled
+    Properties:
+      AlarmName: !Sub "${Environment}-smoke-passkey-metric-alarm-p1"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: Failed
+      Namespace: CloudWatchSynthetics
+      Period: 600
+      Statistic: Sum
+      Threshold: 2
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: CanaryName
+          Value: !Ref SignInWithPasskeyCanary
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-passkey P1 alarm"
+      AlarmActions:
+        - !If
+          - IsPagerDutyEnabled
+          - !Ref PagerDutyP1Alerts
+          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+      OKActions:
+        - !If
+          - IsPagerDutyEnabled
+          - !Ref PagerDutyP1Alerts
+          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+
+  SignInWithPasskeyCanaryAlarmP2:
+    Type: AWS::CloudWatch::Alarm
+    Condition: MetricAlarmsEnabled
+    Properties:
+      AlarmName: !Sub "${Environment}-smoke-passkey-metric-alarm-p2"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 3
+      MetricName: Failed
+      Namespace: CloudWatchSynthetics
+      Period: 600
+      Statistic: Sum
+      Threshold: 5
+      TreatMissingData: notBreaching
+      Dimensions:
+        - Name: CanaryName
+          Value: !Ref SignInWithPasskeyCanary
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-passkey P2 alarm"
+      AlarmActions:
+        - !If
+          - IsPagerDutyEnabled
+          - !Ref PagerDutyP2Alerts
+          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+      OKActions:
+        - !If
+          - IsPagerDutyEnabled
+          - !Ref PagerDutyP2Alerts
+          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+
   # CloudWatch Events for Heartbeat
   SignInCanaryHeartbeatRule:
     Type: AWS::Events::Rule
@@ -1522,3 +1755,32 @@ Resources:
       FunctionName: !Ref HeartbeatLambdaFunction
       Principal: events.amazonaws.com
       SourceArn: !GetAtt CreateAccountHeartbeatRule.Arn
+
+  # CloudWatch Events for Heartbeat - Passkey
+  SignInWithPasskeyHeartbeatRule:
+    Type: AWS::Events::Rule
+    Condition: HeartbeatPingEnabled
+    Properties:
+      Name: !Sub "${Environment}-smoke-passkey-cronitor-rule"
+      State: ENABLED
+      EventPattern:
+        source:
+          - aws.synthetics
+        detail-type:
+          - Synthetics Canary TestRun Successful
+          - Synthetics Canary TestRun Failure
+        detail:
+          canary-name:
+            - !Sub "${Environment}-smoke-passkey"
+      Targets:
+        - Arn: !GetAtt HeartbeatLambdaFunction.Arn
+          Id: HeartbeatLambdaFunctionTarget
+
+  SignInWithPasskeyHeartbeatPermission:
+    Type: AWS::Lambda::Permission
+    Condition: HeartbeatPingEnabled
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref HeartbeatLambdaFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt SignInWithPasskeyHeartbeatRule.Arn
