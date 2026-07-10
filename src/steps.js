@@ -209,6 +209,48 @@ const standardClickContinue = async (page) => {
   });
 };
 
+// Steps only used by Passkey canary
+
+const enableVirtualAuthenticator = async (page) => {
+  await synthetics.executeStep("Enable virtual authenticator", async () => {
+    const client = await page.target().createCDPSession();
+    await client.send("WebAuthn.enable");
+    await client.send("WebAuthn.addVirtualAuthenticator", {
+      options: {
+        protocol: "ctap2",
+        transport: "internal",
+        hasResidentKey: true,
+        hasUserVerification: true,
+        isUserVerified: true,
+      },
+    });
+    log.info("Virtual authenticator enabled");
+  });
+};
+
+const submitEmailForPasskey = async (page) => {
+  await synthetics.executeStep("Submit email for passkey sign-in", async () => {
+    await page.waitForSelector(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("sign-in-with-passkey", page);
+  });
+};
+
+const authenticateWithPasskey = async (page) => {
+  await synthetics.executeStep("Authenticate with passkey", async () => {
+    await page.waitForSelector(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateNoText("There is a problem", page);
+    await validateNoText("We could not sign you in", page);
+  });
+};
+
 // In step helper functions
 
 function waitForNavigationAndClick(page, selector) {
@@ -241,4 +283,7 @@ module.exports = {
   submitPhoneNumber,
   submitPhoneOTP,
   standardClickContinue,
+  enableVirtualAuthenticator,
+  submitEmailForPasskey,
+  authenticateWithPasskey,
 };
