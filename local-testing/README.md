@@ -37,6 +37,7 @@ Scripts are namespaced by environment:
 npm run canary:sign-in:authdev3
 npm run canary:create-account:authdev3
 npm run canary:sign-in-ipv:authdev3
+npm run canary:sign-in-passkey:authdev3
 ```
 
 ### staging
@@ -45,6 +46,7 @@ npm run canary:sign-in-ipv:authdev3
 npm run canary:sign-in:staging
 npm run canary:create-account:staging
 npm run canary:sign-in-ipv:staging
+npm run canary:sign-in-passkey:staging
 ```
 
 SSO login is handled automatically — if your session has expired, it will prompt you.
