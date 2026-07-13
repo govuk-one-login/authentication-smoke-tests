@@ -69,6 +69,8 @@ const basicCustomEntryPoint = async () => {
 
   await steps.submitOtpCode(page);
 
+  await steps.skipPasskeyPromptIfPresent(page);
+
   await steps.microclientUserInfo(page, email);
 
   return "success";

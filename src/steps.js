@@ -90,6 +90,21 @@ const submitOtpCode = async (page, stepName = "Submit OTP code") => {
   });
 };
 
+const skipPasskeyPromptIfPresent = async (page) => {
+  await synthetics.executeStep("Skip passkey prompt if present", async () => {
+    const url = await page.url();
+    if (url.includes("create-passkey")) {
+      log.info("Passkey prompt detected — clicking skip");
+      await Promise.all([
+        page.click('button[name="createPasskeyOption"][value="skip"]'),
+        page.waitForNavigation(),
+      ]);
+    } else {
+      log.info("No passkey prompt — continuing");
+    }
+  });
+};
+
 const microclientUserInfo = async (page, email) => {
   await synthetics.executeStep("Microclient user info", async () => {
     await page.content();
@@ -229,6 +244,7 @@ module.exports = {
   submitPassword,
   enterOtpCode,
   submitOtpCode,
+  skipPasskeyPromptIfPresent,
   ipvHandOff,
   microclientUserInfo,
   clickCreateAccount,
