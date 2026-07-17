@@ -1,5 +1,18 @@
 const { getParameter } = require("./aws");
 
+const isSuppressedAlert = (snsMessage) => {
+  if (
+    JSON.stringify(snsMessage).includes("ElastiCache") &&
+    snsMessage["ElastiCache:ServiceUpdateAvailable"]
+  ) {
+    console.log(
+      `Suppressing ElastiCache ServiceUpdateAvailable notification for cluster: ${snsMessage["ElastiCache:ServiceUpdateAvailable"]}`
+    );
+    return true;
+  }
+  return false;
+};
+
 const formatMessage = (snsMessage, colorCode, snsMessageFooter) => {
   if (JSON.stringify(snsMessage).includes("ElastiCache")) {
     return {
@@ -106,6 +119,11 @@ const handler = async function (event, context) {
 
   let snsMessage = JSON.parse(event.Records[0].Sns.Message);
   console.log(snsMessage);
+
+  if (isSuppressedAlert(snsMessage)) {
+    return { statusCode: 200, body: "Alert suppressed" };
+  }
+
   if (snsMessage.NewStateValue === "OK") {
     colorCode = process.env.OK_COLOR || "#36a64f";
   }
@@ -125,4 +143,4 @@ const handler = async function (event, context) {
   }
 };
 
-module.exports = { handler };
+module.exports = { handler, isSuppressedAlert };
