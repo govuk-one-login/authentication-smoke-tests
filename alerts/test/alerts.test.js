@@ -5,7 +5,7 @@ const chai = require("chai");
 
 chai.use(sinonChai);
 
-const { handler } = require("../alerts");
+const { handler, isSuppressedAlert } = require("../alerts");
 
 describe("alerts handler", () => {
   let fetchStub;
@@ -210,6 +210,105 @@ describe("alerts handler", () => {
 
       const body = JSON.parse(fetchStub.firstCall.args[1].body);
       expect(body.attachments[0].fields[1].value).to.equal("my-account");
+    });
+  });
+
+  describe("alert suppression", () => {
+    it("should suppress ElastiCache ServiceUpdateAvailable notifications", async () => {
+      fetchStub.resolves({ text: () => Promise.resolve("ok") });
+
+      const snsMessage = {
+        "Service Update Name": "elasticache-20260608-intel",
+        "Replication Group ID": "production-sessions-store",
+        "ElastiCache:ServiceUpdateAvailable": "production-sessions-store",
+      };
+
+      const event = {
+        Records: [
+          {
+            Sns: { Type: "Notification", Message: JSON.stringify(snsMessage) },
+          },
+        ],
+      };
+
+      const result = await handler(event, {});
+
+      expect(fetchStub).to.not.have.been.called;
+      expect(result.statusCode).to.equal(200);
+      expect(result.body).to.equal("Alert suppressed");
+    });
+
+    it("should not suppress other ElastiCache notifications", async () => {
+      fetchStub.resolves({ text: () => Promise.resolve("ok") });
+
+      const snsMessage = { "ElastiCache:event": "my-cluster" };
+
+      const event = {
+        Records: [
+          {
+            Sns: { Type: "Notification", Message: JSON.stringify(snsMessage) },
+          },
+        ],
+      };
+
+      await handler(event, {});
+
+      expect(fetchStub).to.have.been.calledWith(
+        "https://hooks.slack.com/test",
+        sinon.match.has("method", "post")
+      );
+    });
+
+    it("should not suppress regular alarm notifications", async () => {
+      fetchStub.resolves({ text: () => Promise.resolve("ok") });
+
+      const snsMessage = {
+        AlarmName: "TestAlarm",
+        AlarmDescription: "Something broke",
+        NewStateValue: "ALARM",
+        AWSAccountId: "123456789",
+      };
+
+      const event = {
+        Records: [
+          {
+            Sns: { Type: "Notification", Message: JSON.stringify(snsMessage) },
+          },
+        ],
+      };
+
+      await handler(event, {});
+
+      expect(fetchStub).to.have.been.calledWith(
+        "https://hooks.slack.com/test",
+        sinon.match.has("method", "post")
+      );
+    });
+  });
+
+  describe("isSuppressedAlert", () => {
+    it("should return true for ServiceUpdateAvailable messages", () => {
+      const message = {
+        "Service Update Name": "elasticache-20260608-intel",
+        "Replication Group ID": "production-sessions-store",
+        "ElastiCache:ServiceUpdateAvailable": "production-sessions-store",
+      };
+      expect(isSuppressedAlert(message)).to.be.true;
+    });
+
+    it("should return false for other ElastiCache messages", () => {
+      const message = { "ElastiCache:event": "my-cluster" };
+      expect(isSuppressedAlert(message)).to.be.false;
+    });
+
+    it("should return false for non-ElastiCache messages", () => {
+      const message = {
+        AlarmName: "TestAlarm",
+        AlarmDescription: "Test",
+        NewStateValue: "ALARM",
+        AWSAccountId: "123456789",
+      };
+      expect(isSuppressedAlert(message)).to.be.false;
     });
   });
 });
