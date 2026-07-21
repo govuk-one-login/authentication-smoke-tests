@@ -39,9 +39,9 @@
     "joi": ">=17.13.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "eslint": "^9.39.2",
-    "eslint-plugin-n": "^17.23.2",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0",
+    "eslint-plugin-n": "^18.2.1",
     "globals": "^17.7.0",
     "prettier": "^3.8.4"
   }
