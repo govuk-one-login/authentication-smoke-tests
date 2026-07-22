@@ -27,8 +27,8 @@
     "semi": true
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1027.0",
-    "@aws-sdk/client-ssm": "^3.1027.0",
+    "@aws-sdk/client-s3": "^3.1081.0",
+    "@aws-sdk/client-ssm": "^3.1081.0",
     "express": "^5.1.0",
     "express-openid-connect": "^2.18.1"
   },
