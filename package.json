@@ -19,7 +19,10 @@
     "build:all": "npm run build:synthetics && npm run build:alerts && npm run build:heartbeat && npm run build:slack",
     "pretty": "prettier --write \"**/*.{js,json}\"",
     "check-pretty": "prettier --check \"**/*.{js,json}\"",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "canary:sign-in": "AWS_PROFILE=di-authentication-development-AdministratorAccessPermission AWS_REGION=eu-west-2 node local-testing/run.js canary-sign-in",
+    "canary:create-account": "AWS_PROFILE=di-authentication-development-AdministratorAccessPermission AWS_REGION=eu-west-2 node local-testing/run.js canary-create-account",
+    "canary:sign-in-ipv": "AWS_PROFILE=di-authentication-development-AdministratorAccessPermission AWS_REGION=eu-west-2 node local-testing/run.js canary-sign-in-with-ipv"
   },
   "prettier": {
     "trailingComma": "es5",
@@ -39,10 +42,12 @@
     "joi": ">=17.13.4"
   },
   "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.1088.0",
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
     "eslint-plugin-n": "^17.23.2",
     "globals": "^17.7.0",
-    "prettier": "^3.8.4"
+    "prettier": "^3.8.4",
+    "puppeteer": "^25.3.0"
   }
 }
