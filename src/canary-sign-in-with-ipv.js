@@ -77,6 +77,8 @@ const basicCustomEntryPoint = async () => {
 
   await steps.submitOtpCode(page);
 
+  await steps.skipPasskeyPromptIfPresent(page);
+
   await steps.ipvHandOff(page);
 
   return "success";
