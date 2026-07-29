@@ -13,7 +13,7 @@
   },
   "overrides": {
     "js-yaml": "4.2.0",
-    "axios": "1.16.0",
+    "axios": ">=1.18.0",
     "serialize-javascript": ">=7.0.5"
   },
   "scripts": {
