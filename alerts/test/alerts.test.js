@@ -238,6 +238,31 @@ describe("alerts handler", () => {
       expect(result.body).to.equal("Alert suppressed");
     });
 
+    it("should suppress ElastiCache ServiceUpdateAvailableForNode notifications", async () => {
+      fetchStub.resolves({ text: () => Promise.resolve("ok") });
+
+      const snsMessage = {
+        "Service Update Name": "elasticache-20260608-intel",
+        "Replication Group ID": "production-sessions-store",
+        "ElastiCache:ServiceUpdateAvailableForNode":
+          "production-sessions-store",
+      };
+
+      const event = {
+        Records: [
+          {
+            Sns: { Type: "Notification", Message: JSON.stringify(snsMessage) },
+          },
+        ],
+      };
+
+      const result = await handler(event, {});
+
+      expect(fetchStub).to.not.have.been.called;
+      expect(result.statusCode).to.equal(200);
+      expect(result.body).to.equal("Alert suppressed");
+    });
+
     it("should not suppress other ElastiCache notifications", async () => {
       fetchStub.resolves({ text: () => Promise.resolve("ok") });
 
@@ -292,6 +317,16 @@ describe("alerts handler", () => {
         "Service Update Name": "elasticache-20260608-intel",
         "Replication Group ID": "production-sessions-store",
         "ElastiCache:ServiceUpdateAvailable": "production-sessions-store",
+      };
+      expect(isSuppressedAlert(message)).to.be.true;
+    });
+
+    it("should return true for ServiceUpdateAvailableForNode messages", () => {
+      const message = {
+        "Service Update Name": "elasticache-20260608-intel",
+        "Replication Group ID": "production-sessions-store",
+        "ElastiCache:ServiceUpdateAvailableForNode":
+          "production-sessions-store",
       };
       expect(isSuppressedAlert(message)).to.be.true;
     });

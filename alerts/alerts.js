@@ -1,12 +1,12 @@
 const { getParameter } = require("./aws");
 
 const isSuppressedAlert = (snsMessage) => {
-  if (
-    JSON.stringify(snsMessage).includes("ElastiCache") &&
-    snsMessage["ElastiCache:ServiceUpdateAvailable"]
-  ) {
+  const elasticacheServiceUpdateKey = Object.keys(snsMessage).find((key) =>
+    key.startsWith("ElastiCache:ServiceUpdate")
+  );
+  if (elasticacheServiceUpdateKey) {
     console.log(
-      `Suppressing ElastiCache ServiceUpdateAvailable notification for cluster: ${snsMessage["ElastiCache:ServiceUpdateAvailable"]}`
+      `Suppressing ${elasticacheServiceUpdateKey} notification for cluster: ${snsMessage[elasticacheServiceUpdateKey]}`
     );
     return true;
   }
