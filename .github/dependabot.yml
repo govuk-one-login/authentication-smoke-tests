@@ -27,6 +27,10 @@ updates:
       npm-aws-dependencies:
         patterns:
           - "@aws-sdk/*"
+      npm-chai-dependencies:
+        patterns:
+          - "chai"
+          - "*-chai"
     open-pull-requests-limit: 100
     target-branch: main
     commit-message:
@@ -36,6 +40,11 @@ updates:
     schedule:
       interval: "cron"
       cronjob: "0 3 1,15 * *"
+    groups:
+      npm-chai-dependencies:
+        patterns:
+          - "chai"
+          - "*-chai"
     open-pull-requests-limit: 100
     target-branch: main
     commit-message:
@@ -49,6 +58,10 @@ updates:
       npm-aws-dependencies:
         patterns:
           - "@aws-sdk/*"
+      npm-chai-dependencies:
+        patterns:
+          - "chai"
+          - "*-chai"
     open-pull-requests-limit: 100
     target-branch: main
     commit-message:
