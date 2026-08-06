@@ -1,9 +1,9 @@
-const { expect } = require("chai");
+const chai = require("chai");
+const { expect } = chai;
 const sinon = require("sinon");
 const sinonChai = require("sinon-chai");
-const chai = require("chai");
 
-chai.use(sinonChai);
+chai.use(sinonChai.default);
 
 describe("heartbeat handler", () => {
   let pingStub;
