@@ -19,7 +19,13 @@
     "build:all": "npm run build:synthetics && npm run build:alerts && npm run build:heartbeat && npm run build:slack",
     "pretty": "prettier --write \"**/*.{js,json}\"",
     "check-pretty": "prettier --check \"**/*.{js,json}\"",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "canary:sign-in:authdev3": "DEPLOY_ENVIRONMENT=authdev3 CANARY_NAME=authdev3-smoke-in AWS_PROFILE=di-authentication-development-AdministratorAccessPermission AWS_REGION=eu-west-2 node local-testing/run.js canary-sign-in",
+    "canary:create-account:authdev3": "DEPLOY_ENVIRONMENT=authdev3 CANARY_NAME=authdev3-smoke-cra AWS_PROFILE=di-authentication-development-AdministratorAccessPermission AWS_REGION=eu-west-2 node local-testing/run.js canary-create-account",
+    "canary:sign-in-ipv:authdev3": "DEPLOY_ENVIRONMENT=authdev3 CANARY_NAME=authdev3-smoke-ipv AWS_PROFILE=di-authentication-development-AdministratorAccessPermission AWS_REGION=eu-west-2 node local-testing/run.js canary-sign-in-with-ipv",
+    "canary:sign-in:staging": "DEPLOY_ENVIRONMENT=staging CANARY_NAME=staging-smoke-in AWS_PROFILE=di-authentication-staging-ApprovedAdmin AWS_REGION=eu-west-2 node local-testing/run.js canary-sign-in",
+    "canary:create-account:staging": "DEPLOY_ENVIRONMENT=staging CANARY_NAME=staging-smoke-cra AWS_PROFILE=di-authentication-staging-ApprovedAdmin AWS_REGION=eu-west-2 node local-testing/run.js canary-create-account",
+    "canary:sign-in-ipv:staging": "DEPLOY_ENVIRONMENT=staging CANARY_NAME=staging-smoke-ipv AWS_PROFILE=di-authentication-staging-ApprovedAdmin AWS_REGION=eu-west-2 node local-testing/run.js canary-sign-in-with-ipv"
   },
   "prettier": {
     "trailingComma": "es5",
@@ -39,10 +45,12 @@
     "joi": ">=17.13.4"
   },
   "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.1105.0",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.8.0",
     "eslint-plugin-n": "^18.2.2",
     "globals": "^17.8.0",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "puppeteer": "^25.5.0"
   }
 }

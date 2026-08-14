@@ -41,6 +41,12 @@ module.exports = [
     ignores: ["eslint.config.js"],
   },
   {
+    files: ["local-testing/**/*.js"],
+    rules: {
+      "no-unused-vars": ["error", { args: "none" }],
+    },
+  },
+  {
     files: ["**/test/**/*.js"],
     languageOptions: {
       globals: {

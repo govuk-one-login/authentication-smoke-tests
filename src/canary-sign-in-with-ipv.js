@@ -24,6 +24,12 @@ const basicCustomEntryPoint = async () => {
     throw "Sign in with IPV smoke test failed due to Fire Drill";
   }
 
+  const environment = process.env.DEPLOY_ENVIRONMENT;
+  const ipvAvailable = ["staging", "integration", "production"].includes(
+    environment
+  );
+  log.info(`Environment: ${environment}, IPV available: ${ipvAvailable}`);
+
   const bucketName = await getParameter("bucket");
   const email = await getParameter("username");
   const password = await getParameter("password");
@@ -79,7 +85,13 @@ const basicCustomEntryPoint = async () => {
 
   await steps.skipPasskeyPromptIfPresent(page);
 
-  await steps.ipvHandOff(page);
+  if (ipvAvailable) {
+    await steps.ipvHandOff(page);
+  } else {
+    log.info(
+      "IPV not available in this environment — sign-in completed successfully"
+    );
+  }
 
   return "success";
 };
