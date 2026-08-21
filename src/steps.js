@@ -1,6 +1,6 @@
 const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
-const { getOTPCode } = require("./aws");
+const { getOTPCode, getParameter } = require("./aws");
 const { selectors } = require("./vars");
 const {
   validateNoText,
@@ -224,6 +224,76 @@ const standardClickContinue = async (page) => {
   });
 };
 
+// Steps only used by Passkey canary
+
+const enableVirtualAuthenticator = async (page) => {
+  await synthetics.executeStep("Enable virtual authenticator", async () => {
+    const client = await page.target().createCDPSession();
+    await client.send("WebAuthn.enable");
+
+    const { authenticatorId } = await client.send(
+      "WebAuthn.addVirtualAuthenticator",
+      {
+        options: {
+          protocol: "ctap2",
+          transport: "internal",
+          hasResidentKey: true,
+          hasUserVerification: true,
+          isUserVerified: true,
+        },
+      }
+    );
+
+    // Load credential material from SSM and pre-load into the virtual authenticator
+    const credentialId = await getParameter("credential-id");
+    const privateKey = await getParameter("credential-private-key");
+    const rpId = await getParameter("rp-id");
+    const userHandle = await getParameter("user-handle");
+
+    // CDP expects standard base64, SSM stores base64url
+    const toBase64 = (b64url) =>
+      b64url.replace(/-/g, "+").replace(/_/g, "/") +
+      "=".repeat((4 - (b64url.length % 4)) % 4);
+
+    await client.send("WebAuthn.addCredential", {
+      authenticatorId,
+      credential: {
+        credentialId: toBase64(credentialId),
+        isResidentCredential: true,
+        rpId: rpId,
+        privateKey: privateKey,
+        userHandle: toBase64(userHandle),
+        signCount: 0,
+      },
+    });
+
+    log.info("Virtual authenticator enabled with pre-loaded credential");
+  });
+};
+
+const submitEmailForPasskey = async (page) => {
+  await synthetics.executeStep("Submit email for passkey sign-in", async () => {
+    await page.waitForSelector(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateUrlContains("sign-in-passkey", page);
+  });
+};
+
+const authenticateWithPasskey = async (page) => {
+  await synthetics.executeStep("Authenticate with passkey", async () => {
+    await page.waitForSelector(selectors.submitFormButton);
+    await Promise.all([
+      page.click(selectors.submitFormButton),
+      page.waitForNavigation(),
+    ]);
+    await validateNoText("There is a problem", page);
+    await validateNoText("We could not sign you in", page);
+  });
+};
+
 // In step helper functions
 
 function waitForNavigationAndClick(page, selector) {
@@ -257,4 +327,7 @@ module.exports = {
   submitPhoneNumber,
   submitPhoneOTP,
   standardClickContinue,
+  enableVirtualAuthenticator,
+  submitEmailForPasskey,
+  authenticateWithPasskey,
 };

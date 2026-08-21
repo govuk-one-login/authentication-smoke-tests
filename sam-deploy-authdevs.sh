@@ -66,6 +66,8 @@ yq -i ".Resources.SignInWithIPVCanary.Properties.Code.S3ObjectVersion = \"${S3ob
 
 yq -i ".Resources.CreateAccountCanary.Properties.Code.S3ObjectVersion = \"${S3objectVersion}\"" ".aws-sam/build/template.yaml"
 
+yq -i ".Resources.SignInWithPasskeyCanary.Properties.Code.S3ObjectVersion = \"${S3objectVersion}\"" ".aws-sam/build/template.yaml"
+
 sam deploy \
   --no-fail-on-empty-changeset \
   --config-env "authdev3" \

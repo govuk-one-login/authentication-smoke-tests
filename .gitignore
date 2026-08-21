@@ -120,3 +120,7 @@ ci/terraform/.terraform/
 ci/terraform/*.plan
 .terraform
 .aws-sam
+
+# Generated passkey credential files
+dynamo-item.json
+secrets-values.json
