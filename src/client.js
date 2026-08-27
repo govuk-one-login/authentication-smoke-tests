@@ -4,6 +4,12 @@ const app = express();
 const { auth } = require("express-openid-connect");
 const crypto = require("node:crypto");
 
+// Normalise any RSA private key (PKCS#1 or PKCS#8) to PKCS#8 PEM
+function toPkcs8Pem(pem) {
+  const key = crypto.createPrivateKey(pem);
+  return key.export({ type: "pkcs8", format: "pem" });
+}
+
 const startClient = async (
   port,
   scope,
@@ -21,7 +27,8 @@ const startClient = async (
       clientID: clientId,
       secret: crypto.randomBytes(20).toString("base64url"),
       clientAuthMethod: "private_key_jwt",
-      clientAssertionSigningKey: clientPrivateKey,
+      clientAssertionSigningKey: toPkcs8Pem(clientPrivateKey),
+      clientAssertionSigningAlg: "RS256",
       idTokenSigningAlg: "ES256",
       authRequired: true,
       authorizationParams: {

@@ -38,7 +38,7 @@
     "@aws-sdk/client-s3": "^3.1106.0",
     "@aws-sdk/client-ssm": "^3.1106.0",
     "express": "^5.1.0",
-    "express-openid-connect": "^2.18.1"
+    "express-openid-connect": "^3.4.0"
   },
   "overrides": {
     "fast-xml-parser": ">=5.5.9",
@@ -47,12 +47,12 @@
     "joi": ">=17.13.4"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.1109.0",
+    "@aws-sdk/client-secrets-manager": "^3.1119.0",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.8.1",
     "eslint-plugin-n": "^18.2.2",
     "globals": "^17.11.0",
     "prettier": "^3.9.6",
-    "puppeteer": "^25.6.0"
+    "puppeteer": "^25.9.0"
   }
 }
