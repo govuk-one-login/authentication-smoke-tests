@@ -1630,7 +1630,7 @@ Resources:
       Dimensions:
         - Name: CanaryName
           Value: !Ref SignInWithIPVCanary
-      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P2 alarm"
+      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-ipv P2 alarm"
       AlarmActions:
         - !If
           - IsPagerDutyEnabled
