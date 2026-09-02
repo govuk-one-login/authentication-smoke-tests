@@ -45,7 +45,7 @@ repos:
           - shell
         exclude_types:
           - zsh
-        exclude: ^(dev-platform|docker|terraform|service-down-page-config)/.*$
+        exclude: ^(dev-platform|docker|service-down-page-config)/.*$
         args:
           - -w # write
           - -s # simplify
