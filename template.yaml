@@ -275,6 +275,12 @@ Resources:
         IgnorePublicAcls: true
         BlockPublicPolicy: true
         RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldCanaryArtefacts
+            Status: Enabled
+            Prefix: "canary/"
+            ExpirationInDays: 90
       Tags:
         - Key: Environment
           Value: !Ref Environment
