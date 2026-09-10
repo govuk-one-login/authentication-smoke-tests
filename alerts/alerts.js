@@ -13,8 +13,16 @@ const isSuppressedAlert = (snsMessage) => {
   return false;
 };
 
+const ELASTICACHE_RUNBOOK_URL =
+  "https://govukverify.atlassian.net/wiki/x/WwDbiQE";
+
 const formatMessage = (snsMessage, colorCode, snsMessageFooter) => {
   if (JSON.stringify(snsMessage).includes("ElastiCache")) {
+    const summary =
+      Object.keys(snsMessage)[0] +
+      " for cluster: " +
+      Object.values(snsMessage)[0];
+
     return {
       attachments: [
         {
@@ -23,11 +31,16 @@ const formatMessage = (snsMessage, colorCode, snsMessageFooter) => {
             "for cluster: " +
             Object.values(snsMessage)[0],
           color: "#ff9966",
-          title: Object.values(snsMessage)[0] + "-notification",
+          title:
+            "ElastiCache: " + Object.values(snsMessage)[0] + "-notification",
           text:
-            Object.keys(snsMessage)[0] +
-            " for cluster: " +
-            Object.values(snsMessage)[0],
+            summary +
+            "\n\n" +
+            "Runbook: " +
+            ELASTICACHE_RUNBOOK_URL +
+            "\n\n" +
+            "Raw event:\n" +
+            JSON.stringify(snsMessage, null, 2),
           fields: [
             {
               title: "Status",
@@ -143,4 +156,10 @@ const handler = async function (event, context) {
   }
 };
 
-module.exports = { handler, isSuppressedAlert };
+module.exports = {
+  handler,
+  isSuppressedAlert,
+  formatMessage,
+  buildMessageRequest,
+  ELASTICACHE_RUNBOOK_URL,
+};

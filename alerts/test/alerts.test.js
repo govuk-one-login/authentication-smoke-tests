@@ -5,7 +5,13 @@ const chai = require("chai");
 
 chai.use(sinonChai);
 
-const { handler, isSuppressedAlert } = require("../alerts");
+const {
+  handler,
+  isSuppressedAlert,
+  formatMessage,
+  buildMessageRequest,
+  ELASTICACHE_RUNBOOK_URL,
+} = require("../alerts");
 
 describe("alerts handler", () => {
   let fetchStub;
@@ -185,7 +191,9 @@ describe("alerts handler", () => {
 
       const body = JSON.parse(fetchStub.firstCall.args[1].body);
       expect(body.attachments[0].color).to.equal("#ff9966");
-      expect(body.attachments[0].title).to.equal("my-cluster-notification");
+      expect(body.attachments[0].title).to.equal(
+        "ElastiCache: my-cluster-notification"
+      );
     });
 
     it("should extract account from AlarmDescription ACCOUNT: prefix", async () => {
@@ -344,6 +352,128 @@ describe("alerts handler", () => {
         AWSAccountId: "123456789",
       };
       expect(isSuppressedAlert(message)).to.be.false;
+    });
+  });
+
+  describe("formatMessage - ElastiCache text content", () => {
+    const snsMessage = {
+      "ElastiCache:FailoverComplete": "production-sessions-store",
+      "Cache Cluster ID": "production-sessions-store-001",
+    };
+
+    it("should include the summary line as the first line", () => {
+      const result = formatMessage(snsMessage, "#ff9966", "test footer");
+      const text = result.attachments[0].text;
+      const firstLine = text.split("\n")[0];
+
+      expect(firstLine).to.equal(
+        "ElastiCache:FailoverComplete for cluster: production-sessions-store"
+      );
+    });
+
+    it("should include the full stringified SNS message", () => {
+      const result = formatMessage(snsMessage, "#ff9966", "test footer");
+      const text = result.attachments[0].text;
+
+      expect(text).to.include(JSON.stringify(snsMessage, null, 2));
+    });
+
+    it("should include the runbook link", () => {
+      const result = formatMessage(snsMessage, "#ff9966", "test footer");
+      const text = result.attachments[0].text;
+
+      expect(text).to.include("Runbook: " + ELASTICACHE_RUNBOOK_URL);
+    });
+
+    it("should include a Raw event label before the stringified message", () => {
+      const result = formatMessage(snsMessage, "#ff9966", "test footer");
+      const text = result.attachments[0].text;
+
+      expect(text).to.include(
+        "Raw event:\n" + JSON.stringify(snsMessage, null, 2)
+      );
+    });
+
+    it("should end with the stringified SNS message", () => {
+      const result = formatMessage(snsMessage, "#ff9966", "test footer");
+      const text = result.attachments[0].text;
+
+      expect(text.trim().endsWith(JSON.stringify(snsMessage, null, 2))).to.be
+        .true;
+    });
+
+    it("should order content as summary, then runbook, then raw event", () => {
+      const result = formatMessage(snsMessage, "#ff9966", "test footer");
+      const text = result.attachments[0].text;
+
+      const summaryIndex = text.indexOf(
+        "ElastiCache:FailoverComplete for cluster:"
+      );
+      const runbookIndex = text.indexOf(ELASTICACHE_RUNBOOK_URL);
+      const rawEventIndex = text.indexOf("Raw event:");
+      const dumpIndex = text.indexOf(JSON.stringify(snsMessage, null, 2));
+
+      expect(summaryIndex).to.be.lessThan(runbookIndex);
+      expect(runbookIndex).to.be.lessThan(rawEventIndex);
+      expect(rawEventIndex).to.be.lessThan(dumpIndex);
+    });
+
+    it("should still set color, title, status, and footer correctly", () => {
+      const result = formatMessage(snsMessage, "#ff9966", "test footer");
+      const attachment = result.attachments[0];
+
+      expect(attachment.color).to.equal("#ff9966");
+      expect(attachment.title).to.equal(
+        "ElastiCache: production-sessions-store-notification"
+      );
+      expect(attachment.fields[0].value).to.equal("INFO");
+      expect(attachment.footer).to.equal("test footer");
+    });
+  });
+
+  describe("buildMessageRequest - ElastiCache JSON.stringify round-trip", () => {
+    const snsMessage = {
+      "ElastiCache:FailoverComplete": "production-sessions-store",
+      "Cache Cluster ID": "production-sessions-store-001",
+      "Replication Group ID": "production-sessions-store",
+    };
+
+    it("should produce valid JSON in the request body", () => {
+      const request = buildMessageRequest(snsMessage, "#ff9966", "test footer");
+
+      expect(() => JSON.parse(request.body)).to.not.throw();
+    });
+
+    it("should preserve the full SNS message dump after JSON.stringify round-trip", () => {
+      const request = buildMessageRequest(snsMessage, "#ff9966", "test footer");
+      const parsed = JSON.parse(request.body);
+      const text = parsed.attachments[0].text;
+
+      // Extract the JSON dump that follows "Raw event:\n"
+      const rawEventPrefix = "Raw event:\n";
+      const dumpStart = text.indexOf(rawEventPrefix) + rawEventPrefix.length;
+      const extractedDump = text.substring(dumpStart).trim();
+
+      expect(() => JSON.parse(extractedDump)).to.not.throw();
+      expect(JSON.parse(extractedDump)).to.deep.equal(snsMessage);
+    });
+
+    it("should preserve the runbook URL after JSON.stringify round-trip", () => {
+      const request = buildMessageRequest(snsMessage, "#ff9966", "test footer");
+      const parsed = JSON.parse(request.body);
+      const text = parsed.attachments[0].text;
+
+      expect(text).to.include(ELASTICACHE_RUNBOOK_URL);
+    });
+
+    it("should include channel when not production", () => {
+      process.env.DEPLOY_ENVIRONMENT = "test";
+      process.env.SLACK_CHANNEL_ID = "C12345";
+
+      const request = buildMessageRequest(snsMessage, "#ff9966", "test footer");
+      const parsed = JSON.parse(request.body);
+
+      expect(parsed.channel).to.equal("C12345");
     });
   });
 });
