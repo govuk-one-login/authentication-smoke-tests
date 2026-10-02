@@ -793,44 +793,6 @@ Resources:
           }
       Id: AllowExecutionCrossAWSAcctElasticacheAlerts
 
-  # OIDC Cloufront Alerts SNS Subscription and lambda permission
-  OidcCloudfrontAlertsPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref AlertsLambdaFunction
-      Action: lambda:InvokeFunction
-      Principal: sns.amazonaws.com
-      SourceArn: !Sub
-        - arn:aws:sns:us-east-1:${Awsid}:${Environment}-oidc-cloudfront-alerts
-        - {
-            Awsid:
-              !FindInMap [
-                EnvironmentConfiguration,
-                !Ref Environment,
-                BackendAccountID,
-              ],
-          }
-      Id: AllowExecutionFromCloudfrontAlertsSNSTopic
-
-  # OIDC Cloudfront Alerts SNS Subscription commented because this needs to be created in us-east-1 region
-  # and the template is deployed in eu-west-2 region.
-
-  # OidcCloudfrontAlertsSubscription:
-  #   Type: AWS::SNS::Subscription
-  #   Properties:
-  #     TopicArn: !Sub
-  #       - arn:aws:sns:us-east-1:${AccountID}:${Environment}-oidc-cloudfront-alerts
-  #       - {
-  #           AccountID:
-  #             !FindInMap [
-  #               EnvironmentConfiguration,
-  #               !Ref Environment,
-  #               BackendAccountID,
-  #             ],
-  #         }
-  #     Protocol: lambda
-  #     Endpoint: !GetAtt AlertsLambdaFunction.Arn
-
   AlertsLambdaLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
