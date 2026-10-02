@@ -53,6 +53,6 @@
     "eslint-plugin-n": "^18.3.0",
     "globals": "^17.12.0",
     "prettier": "^3.9.9",
-    "puppeteer": "^25.6.0"
+    "puppeteer": "^25.12.0"
   }
 }
