@@ -263,7 +263,7 @@ const enableVirtualAuthenticator = async (page) => {
         rpId: rpId,
         privateKey: privateKey,
         userHandle: toBase64(userHandle),
-        signCount: 0,
+        signCount: -1,
       },
     });
 
