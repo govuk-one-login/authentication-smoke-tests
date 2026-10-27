@@ -2,7 +2,7 @@ const log = require("SyntheticsLogger");
 const synthetics = require("Synthetics");
 const { getParameter } = require("./aws");
 const { startClient } = require("./client");
-const { setStandardViewportSize } = require("./helpers");
+const { setStandardViewportSize, logSessionCookies } = require("./helpers");
 const steps = require("./steps");
 
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
@@ -55,6 +55,8 @@ const basicCustomEntryPoint = async () => {
     clientBaseUrl,
     "Create your GOV.UK One Login or sign in"
   );
+
+  await logSessionCookies(page);
 
   setStandardViewportSize(page);
 
