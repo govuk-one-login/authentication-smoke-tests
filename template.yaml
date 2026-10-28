@@ -10,6 +10,7 @@ Metadata:
         - W1028
         - W8003
         - E1011
+        - E3724
 
 Description: "GOV.UK Sign In Authentication Smoke Tests Infrastructure"
 
@@ -89,6 +90,7 @@ Mappings:
       ArtifactSourceBucket: authdev3-smoke-test-githubartifactsourcebucket
       IsSplunkEnabled: "No"
       BackendAccountID: "653994557586"
+      experianAccountID: "590183679200"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartSignInCanaryAfterCreation: false
       StartCraCanaryAfterCreation: false
@@ -105,6 +107,7 @@ Mappings:
       ArtifactSourceBucket: dev-smoke-test-pipeline-githubartifactsourcebucket-jhweooji1sgc
       IsSplunkEnabled: "No"
       BackendAccountID: "653994557586"
+      experianAccountID: "590183679200"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartSignInCanaryAfterCreation: false
       StartCraCanaryAfterCreation: false
@@ -121,6 +124,7 @@ Mappings:
       ArtifactSourceBucket: smoke-test-pipeline-githubartifactsourcebucket-fvdnfg2bqo3n
       IsSplunkEnabled: "No"
       BackendAccountID: "761723964695"
+      experianAccountID: "851725166715"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
@@ -137,6 +141,7 @@ Mappings:
       ArtifactSourceBucket: smoke-test-pipeline-artifactpromotionbucket-em4xyoxb51ns
       IsSplunkEnabled: "Yes"
       BackendAccountID: "758531536632"
+      experianAccountID: "891377189576"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
@@ -153,6 +158,7 @@ Mappings:
       ArtifactSourceBucket: smoke-test-pipeline-artifactpromotionbucket-ddqtd5mulfgn
       IsSplunkEnabled: "Yes"
       BackendAccountID: "761723964695"
+      experianAccountID: "211125427676"
       SmokeTestCronExpression: "cron(0/3 8-17 ? * MON-FRI *)"
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
@@ -169,6 +175,7 @@ Mappings:
       ArtifactSourceBucket: smoke-test-pipeline-artifactpromotionbucket-ddqtd5mulfgn
       IsSplunkEnabled: "Yes"
       BackendAccountID: "172348255554"
+      experianAccountID: "637423504848"
       SmokeTestCronExpression: "cron(0/01 * * * ? *)"
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
@@ -774,6 +781,25 @@ Resources:
       Principal: sns.amazonaws.com
       SourceArn: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
       Id: AllowExecutionFromSlackAlertsSNSTopic
+
+  # Cross-account permissions for SNS topics in the backend account to invoke the alerts lambda function from experian Account SNS topics
+  SlackPrunerWithSNSPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AlertsLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Sub
+        - arn:aws:sns:${AWS::Region}:${Awsid}:${Environment}-lambda-pruner-notifications
+        - {
+            Awsid:
+              !FindInMap [
+                EnvironmentConfiguration,
+                !Ref Environment,
+                experianAccountID,
+              ],
+          }
+      Id: AllowExecutionCrossAWSAcctSlackPruner
 
   SlackElasticacheAlertsWithSNSPermission:
     Type: AWS::Lambda::Permission
