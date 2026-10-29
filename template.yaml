@@ -146,7 +146,7 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
-      StartPasskeyCanaryAfterCreation: false
+      StartPasskeyCanaryAfterCreation: true
       IsPagerDutyEnabled: "No"
 
     integration:
@@ -163,7 +163,7 @@ Mappings:
       StartSignInCanaryAfterCreation: true
       StartCraCanaryAfterCreation: true
       StartIPVCanaryAfterCreation: true
-      StartPasskeyCanaryAfterCreation: false
+      StartPasskeyCanaryAfterCreation: true
       IsPagerDutyEnabled: "No"
 
     production:
