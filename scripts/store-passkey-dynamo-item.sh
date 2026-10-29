@@ -98,6 +98,7 @@ echo
 echo "Inserting passkey credential record..."
 
 aws dynamodb put-item \
+  --region eu-west-2 \
   --table-name "${TABLE_NAME}" \
   --item file://"${DYNAMO_FILE}"
 

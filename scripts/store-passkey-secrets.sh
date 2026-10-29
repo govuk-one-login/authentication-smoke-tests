@@ -97,12 +97,14 @@ put_secret() {
   echo "  Storing: ${secret_name}"
 
   # Try to create the secret; if it already exists, update it
-  if aws secretsmanager describe-secret --secret-id "${secret_name}" &> /dev/null; then
+  if aws secretsmanager describe-secret --region eu-west-2 --secret-id "${secret_name}" &> /dev/null; then
     aws secretsmanager put-secret-value \
+      --region eu-west-2 \
       --secret-id "${secret_name}" \
       --secret-string "${secret_value}"
   else
     aws secretsmanager create-secret \
+      --region eu-west-2 \
       --name "${secret_name}" \
       --secret-string "${secret_value}"
   fi

@@ -124,6 +124,7 @@ create_sms_user() {
 
   # shellcheck disable=SC2086
   aws dynamodb put-item \
+    --region eu-west-2 \
     --table-name "${ENVIRONMENT}-user-profile" \
     --item '{
       "Email": {"S": "'${email}'"},
@@ -146,6 +147,7 @@ create_sms_user() {
 
   # shellcheck disable=SC2086
   aws dynamodb put-item \
+    --region eu-west-2 \
     --table-name "${ENVIRONMENT}-user-credentials" \
     --item '{
       "Email": {"S": "'${email}'"},
@@ -175,6 +177,7 @@ create_auth_app_user() {
 
   # shellcheck disable=SC2086
   aws dynamodb put-item \
+    --region eu-west-2 \
     --table-name "${ENVIRONMENT}-user-profile" \
     --item '{
       "Email": {"S": "'${email}'"},
@@ -196,6 +199,7 @@ create_auth_app_user() {
 
   # shellcheck disable=SC2086
   aws dynamodb put-item \
+    --region eu-west-2 \
     --table-name "${ENVIRONMENT}-user-credentials" \
     --item '{
       "Email": {"S": "'${email}'"},
