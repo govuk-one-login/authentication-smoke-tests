@@ -1494,34 +1494,6 @@ Resources:
           - !Ref PagerDutyP1Alerts
           - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
 
-  SignInCanaryAlarmP2:
-    Type: AWS::CloudWatch::Alarm
-    Condition: MetricAlarmsEnabled
-    Properties:
-      AlarmName: !Sub "${Environment}-smoke-in-metric-alarm-p2"
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      EvaluationPeriods: 3
-      MetricName: Failed
-      Namespace: CloudWatchSynthetics
-      Period: 600
-      Statistic: Sum
-      Threshold: 5
-      TreatMissingData: notBreaching
-      Dimensions:
-        - Name: CanaryName
-          Value: !Ref SignInCanary
-      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-in P2 alarm"
-      AlarmActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-      OKActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-
   # CloudWatch Alarms create canary
   CreateAccountCanaryAlarmP1:
     Type: AWS::CloudWatch::Alarm
@@ -1549,34 +1521,6 @@ Resources:
         - !If
           - IsPagerDutyEnabled
           - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-
-  CreateAccountCanaryAlarmP2:
-    Type: AWS::CloudWatch::Alarm
-    Condition: MetricAlarmsEnabled
-    Properties:
-      AlarmName: !Sub "${Environment}-smoke-cra-metric-alarm-p2"
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      EvaluationPeriods: 3
-      MetricName: Failed
-      Namespace: CloudWatchSynthetics
-      Period: 600
-      Statistic: Sum
-      Threshold: 5
-      TreatMissingData: notBreaching
-      Dimensions:
-        - Name: CanaryName
-          Value: !Ref CreateAccountCanary
-      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-cra P2 alarm"
-      AlarmActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-      OKActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP2Alerts
           - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
 
   # CloudWatch Alarms signInWithIPVCanary
@@ -1608,40 +1552,12 @@ Resources:
           - !Ref PagerDutyP1Alerts
           - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
 
-  SignInWithIPVCanaryAlarmP2:
-    Type: AWS::CloudWatch::Alarm
-    Condition: MetricAlarmsEnabled
-    Properties:
-      AlarmName: !Sub "${Environment}-smoke-ipv-metric-alarm-p2"
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      EvaluationPeriods: 3
-      MetricName: Failed
-      Namespace: CloudWatchSynthetics
-      Period: 600
-      Statistic: Sum
-      Threshold: 5
-      TreatMissingData: notBreaching
-      Dimensions:
-        - Name: CanaryName
-          Value: !Ref SignInWithIPVCanary
-      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-ipv P2 alarm"
-      AlarmActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-      OKActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-
   # CloudWatch Alarms SignInWithPasskeyCanary
-  SignInWithPasskeyCanaryAlarmP1:
+  SignInWithPasskeyCanaryAlarmP2:
     Type: AWS::CloudWatch::Alarm
     Condition: MetricAlarmsEnabled
     Properties:
-      AlarmName: !Sub "${Environment}-smoke-passkey-metric-alarm-p1"
+      AlarmName: !Sub "${Environment}-smoke-passkey-metric-alarm-p2"
       ComparisonOperator: GreaterThanOrEqualToThreshold
       EvaluationPeriods: 1
       MetricName: Failed
@@ -1653,45 +1569,11 @@ Resources:
       Dimensions:
         - Name: CanaryName
           Value: !Ref SignInWithPasskeyCanary
-      AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-passkey P1 alarm"
-      AlarmActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-      OKActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP1Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
-
-  SignInWithPasskeyCanaryAlarmP2:
-    Type: AWS::CloudWatch::Alarm
-    Condition: MetricAlarmsEnabled
-    Properties:
-      AlarmName: !Sub "${Environment}-smoke-passkey-metric-alarm-p2"
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      EvaluationPeriods: 3
-      MetricName: Failed
-      Namespace: CloudWatchSynthetics
-      Period: 600
-      Statistic: Sum
-      Threshold: 5
-      TreatMissingData: notBreaching
-      Dimensions:
-        - Name: CanaryName
-          Value: !Ref SignInWithPasskeyCanary
       AlarmDescription: !Sub "GOV.UK Sign in - ${Environment}-smoke-passkey P2 alarm"
       AlarmActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+        - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
       OKActions:
-        - !If
-          - IsPagerDutyEnabled
-          - !Ref PagerDutyP2Alerts
-          - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
+        - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${Environment}-slack-alerts
 
   # CloudWatch Events for Heartbeat
   SignInCanaryHeartbeatRule:
