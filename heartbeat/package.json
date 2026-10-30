@@ -14,8 +14,10 @@
   "overrides": {
     "js-yaml": ">=4.3.1",
     "axios": ">=1.18.0",
-    "serialize-javascript": ">=7.0.5",
-    "brace-expansion": ">=5.0.12"
+    "serialize-javascript": ">=7.1.4",
+    "brace-expansion": ">=5.0.12",
+    "follow-redirects": ">=1.16.2",
+    "qs": ">=6.17.1"
   },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/heartbeat.zip .",
