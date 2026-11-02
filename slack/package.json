@@ -15,7 +15,7 @@
   "overrides": {
     "fast-xml-parser": ">=5.7.3",
     "js-yaml": ">=4.3.1",
-    "serialize-javascript": ">=7.0.5"
+    "serialize-javascript": ">=7.1.4"
   },
   "scripts": {
     "build": "mkdir -p ../dist && zip -r ../dist/slack.zip .",
