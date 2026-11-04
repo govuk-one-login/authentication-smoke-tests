@@ -4,7 +4,7 @@ const { getParameter, emptyOtpBucket, getSecretValue } = require("./aws");
 const { startClient } = require("./client");
 const crypto = require("node:crypto");
 const steps = require("./steps");
-const { setStandardViewportSize } = require("./helpers");
+const { setStandardViewportSize, logSessionCookies } = require("./helpers");
 
 const SYNTHETICS_CONFIG = synthetics.getConfiguration();
 
@@ -121,6 +121,8 @@ const basicCustomEntryPoint = async () => {
     clientBaseUrl,
     "Create your GOV.UK One Login or sign in"
   );
+
+  await logSessionCookies(page);
 
   await setStandardViewportSize(page);
 
