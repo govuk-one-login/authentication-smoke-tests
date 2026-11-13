@@ -271,6 +271,29 @@ describe("alerts handler", () => {
       expect(result.body).to.equal("Alert suppressed");
     });
 
+    it("should suppress ElastiCache CertificateRenewalComplete notifications", async () => {
+      fetchStub.resolves({ text: () => Promise.resolve("ok") });
+
+      const snsMessage = {
+        "Replication Group ID": "production-sessions-store",
+        "ElastiCache:CertificateRenewalComplete": "production-sessions-store",
+      };
+
+      const event = {
+        Records: [
+          {
+            Sns: { Type: "Notification", Message: JSON.stringify(snsMessage) },
+          },
+        ],
+      };
+
+      const result = await handler(event, {});
+
+      expect(fetchStub).to.not.have.been.called;
+      expect(result.statusCode).to.equal(200);
+      expect(result.body).to.equal("Alert suppressed");
+    });
+
     it("should not suppress other ElastiCache notifications", async () => {
       fetchStub.resolves({ text: () => Promise.resolve("ok") });
 
@@ -335,6 +358,14 @@ describe("alerts handler", () => {
         "Replication Group ID": "production-sessions-store",
         "ElastiCache:ServiceUpdateAvailableForNode":
           "production-sessions-store",
+      };
+      expect(isSuppressedAlert(message)).to.be.true;
+    });
+
+    it("should return true for CertificateRenewalComplete messages", () => {
+      const message = {
+        "Replication Group ID": "production-sessions-store",
+        "ElastiCache:CertificateRenewalComplete": "production-sessions-store",
       };
       expect(isSuppressedAlert(message)).to.be.true;
     });

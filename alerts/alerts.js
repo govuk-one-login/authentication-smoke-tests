@@ -1,12 +1,17 @@
 const { getParameter } = require("./aws");
 
+const SUPPRESSED_ELASTICACHE_PREFIXES = [
+  "ElastiCache:ServiceUpdate",
+  "ElastiCache:CertificateRenewalComplete",
+];
+
 const isSuppressedAlert = (snsMessage) => {
-  const elasticacheServiceUpdateKey = Object.keys(snsMessage).find((key) =>
-    key.startsWith("ElastiCache:ServiceUpdate")
+  const suppressedKey = Object.keys(snsMessage).find((key) =>
+    SUPPRESSED_ELASTICACHE_PREFIXES.some((prefix) => key.startsWith(prefix))
   );
-  if (elasticacheServiceUpdateKey) {
+  if (suppressedKey) {
     console.log(
-      `Suppressing ${elasticacheServiceUpdateKey} notification for cluster: ${snsMessage[elasticacheServiceUpdateKey]}`
+      `Suppressing ${suppressedKey} notification for cluster: ${snsMessage[suppressedKey]}`
     );
     return true;
   }
