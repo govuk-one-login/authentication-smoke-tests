@@ -37,7 +37,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1127.0",
     "@aws-sdk/client-ssm": "^3.1127.0",
-    "express": "^5.1.0",
+    "express": "^5.3.0",
     "express-openid-connect": "^2.18.1"
   },
   "overrides": {
